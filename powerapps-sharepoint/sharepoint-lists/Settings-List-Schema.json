@@ -1,0 +1,132 @@
+{
+  "listName": "LDC_Settings",
+  "description": "Application settings and configuration for LDC Tools",
+  "template": "GenericList",
+  "enableVersioning": true,
+  "enableContentTypes": false,
+  "fields": [
+    {
+      "internalName": "Title",
+      "displayName": "Setting Key",
+      "type": "Text",
+      "required": true,
+      "indexed": true,
+      "maxLength": 100,
+      "description": "Unique setting identifier"
+    },
+    {
+      "internalName": "SettingValue",
+      "displayName": "Value",
+      "type": "Note",
+      "required": false,
+      "richText": false,
+      "appendChanges": false,
+      "description": "Setting value (can be text, number, JSON, etc.)"
+    },
+    {
+      "internalName": "SettingType",
+      "displayName": "Type",
+      "type": "Choice",
+      "required": true,
+      "choices": [
+        "Text",
+        "Number",
+        "Boolean",
+        "JSON",
+        "URL"
+      ],
+      "defaultValue": "Text",
+      "description": "Data type of the setting value"
+    },
+    {
+      "internalName": "Category",
+      "displayName": "Category",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "General",
+        "Display",
+        "Notifications",
+        "Integration",
+        "Advanced"
+      ],
+      "defaultValue": "General",
+      "description": "Setting category for organization"
+    },
+    {
+      "internalName": "Description",
+      "displayName": "Description",
+      "type": "Note",
+      "required": false,
+      "richText": false,
+      "description": "Description of what this setting controls"
+    },
+    {
+      "internalName": "IsActive",
+      "displayName": "Active",
+      "type": "Boolean",
+      "required": true,
+      "defaultValue": true,
+      "description": "Whether this setting is currently active"
+    }
+  ],
+  "views": [
+    {
+      "name": "All Settings",
+      "default": true,
+      "fields": ["Title", "SettingValue", "SettingType", "Category", "IsActive"],
+      "query": "<OrderBy><FieldRef Name='Category'/><FieldRef Name='Title'/></OrderBy>"
+    },
+    {
+      "name": "Active Settings",
+      "fields": ["Title", "SettingValue", "Category"],
+      "query": "<Where><Eq><FieldRef Name='IsActive'/><Value Type='Boolean'>1</Value></Eq></Where><OrderBy><FieldRef Name='Category'/></OrderBy>"
+    }
+  ],
+  "defaultData": [
+    {
+      "Title": "AppVersion",
+      "SettingValue": "2.0.0",
+      "SettingType": "Text",
+      "Category": "General",
+      "Description": "Current application version",
+      "IsActive": true
+    },
+    {
+      "Title": "DefaultProjectStatus",
+      "SettingValue": "Active",
+      "SettingType": "Text",
+      "Category": "General",
+      "Description": "Default status for new projects",
+      "IsActive": true
+    },
+    {
+      "Title": "DefaultTaskStatus",
+      "SettingValue": "Not Started",
+      "SettingType": "Text",
+      "Category": "General",
+      "Description": "Default status for new tasks",
+      "IsActive": true
+    },
+    {
+      "Title": "FeedbackNumberPrefix",
+      "SettingValue": "FB",
+      "SettingType": "Text",
+      "Category": "General",
+      "Description": "Prefix for feedback numbers (e.g., FB-001)",
+      "IsActive": true
+    },
+    {
+      "Title": "EnableNotifications",
+      "SettingValue": "true",
+      "SettingType": "Boolean",
+      "Category": "Notifications",
+      "Description": "Enable email notifications for task assignments",
+      "IsActive": true
+    }
+  ],
+  "permissions": {
+    "breakInheritance": false,
+    "notes": "Inherits permissions from parent SharePoint site. Restrict edit access to admins only."
+  }
+}

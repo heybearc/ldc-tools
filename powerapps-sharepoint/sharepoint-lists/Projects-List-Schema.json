@@ -1,0 +1,165 @@
+{
+  "listName": "LDC_Projects",
+  "description": "Construction projects managed in LDC Tools",
+  "template": "GenericList",
+  "enableVersioning": true,
+  "enableContentTypes": false,
+  "fields": [
+    {
+      "internalName": "Title",
+      "displayName": "Project Name",
+      "type": "Text",
+      "required": true,
+      "indexed": true,
+      "maxLength": 255,
+      "description": "Name of the construction project"
+    },
+    {
+      "internalName": "ProjectNumber",
+      "displayName": "Project Number",
+      "type": "Text",
+      "required": false,
+      "indexed": true,
+      "maxLength": 50,
+      "description": "Unique project identifier/number"
+    },
+    {
+      "internalName": "Status",
+      "displayName": "Status",
+      "type": "Choice",
+      "required": true,
+      "choices": [
+        "Active",
+        "On Hold",
+        "Completed",
+        "Cancelled"
+      ],
+      "defaultValue": "Active",
+      "indexed": true,
+      "description": "Current project status"
+    },
+    {
+      "internalName": "ProjectOwner",
+      "displayName": "Project Owner",
+      "type": "User",
+      "required": true,
+      "allowMultiple": false,
+      "description": "Person responsible for the project"
+    },
+    {
+      "internalName": "StartDate",
+      "displayName": "Start Date",
+      "type": "DateTime",
+      "required": true,
+      "format": "DateOnly",
+      "description": "Project start date"
+    },
+    {
+      "internalName": "DueDate",
+      "displayName": "Due Date",
+      "type": "DateTime",
+      "required": true,
+      "format": "DateOnly",
+      "indexed": true,
+      "description": "Project due/completion date"
+    },
+    {
+      "internalName": "RiskLevel",
+      "displayName": "Risk Level",
+      "type": "Choice",
+      "required": true,
+      "choices": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ],
+      "defaultValue": "Low",
+      "description": "Project risk assessment"
+    },
+    {
+      "internalName": "PercentComplete",
+      "displayName": "% Complete",
+      "type": "Number",
+      "required": true,
+      "min": 0,
+      "max": 100,
+      "decimals": 0,
+      "defaultValue": 0,
+      "description": "Project completion percentage (0-100)"
+    },
+    {
+      "internalName": "Budget",
+      "displayName": "Budget",
+      "type": "Currency",
+      "required": false,
+      "min": 0,
+      "decimals": 2,
+      "description": "Project budget amount"
+    },
+    {
+      "internalName": "ActualCost",
+      "displayName": "Actual Cost",
+      "type": "Currency",
+      "required": false,
+      "min": 0,
+      "decimals": 2,
+      "description": "Actual cost to date"
+    },
+    {
+      "internalName": "Location",
+      "displayName": "Location",
+      "type": "Text",
+      "required": false,
+      "maxLength": 255,
+      "description": "Project site location/address"
+    },
+    {
+      "internalName": "ClientName",
+      "displayName": "Client Name",
+      "type": "Text",
+      "required": false,
+      "maxLength": 255,
+      "description": "Client or customer name"
+    },
+    {
+      "internalName": "Description",
+      "displayName": "Description",
+      "type": "Note",
+      "required": false,
+      "richText": false,
+      "appendChanges": false,
+      "description": "Detailed project description and notes"
+    },
+    {
+      "internalName": "Tags",
+      "displayName": "Tags",
+      "type": "Text",
+      "required": false,
+      "maxLength": 255,
+      "description": "Comma-separated tags for categorization"
+    }
+  ],
+  "views": [
+    {
+      "name": "All Projects",
+      "default": true,
+      "fields": ["Title", "Status", "ProjectOwner", "StartDate", "DueDate", "RiskLevel", "PercentComplete"],
+      "query": "<OrderBy><FieldRef Name='Modified' Ascending='FALSE'/></OrderBy>"
+    },
+    {
+      "name": "Active Projects",
+      "fields": ["Title", "ProjectOwner", "StartDate", "DueDate", "PercentComplete"],
+      "query": "<Where><Eq><FieldRef Name='Status'/><Value Type='Choice'>Active</Value></Eq></Where><OrderBy><FieldRef Name='DueDate' Ascending='TRUE'/></OrderBy>"
+    },
+    {
+      "name": "At Risk",
+      "fields": ["Title", "ProjectOwner", "RiskLevel", "DueDate", "Status"],
+      "query": "<Where><Or><Eq><FieldRef Name='RiskLevel'/><Value Type='Choice'>High</Value></Eq><Eq><FieldRef Name='RiskLevel'/><Value Type='Choice'>Critical</Value></Eq></Or></Where><OrderBy><FieldRef Name='DueDate' Ascending='TRUE'/></OrderBy>"
+    }
+  ],
+  "permissions": {
+    "breakInheritance": false,
+    "notes": "Inherits permissions from parent SharePoint site"
+  }
+}

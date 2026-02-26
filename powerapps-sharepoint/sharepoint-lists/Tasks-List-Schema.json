@@ -1,0 +1,170 @@
+{
+  "listName": "LDC_Tasks",
+  "description": "Tasks and action items for LDC construction projects",
+  "template": "GenericList",
+  "enableVersioning": true,
+  "enableContentTypes": false,
+  "fields": [
+    {
+      "internalName": "Title",
+      "displayName": "Task Title",
+      "type": "Text",
+      "required": true,
+      "indexed": true,
+      "maxLength": 255,
+      "description": "Brief description of the task"
+    },
+    {
+      "internalName": "ProjectLookup",
+      "displayName": "Project",
+      "type": "Lookup",
+      "required": true,
+      "lookupList": "LDC_Projects",
+      "lookupField": "Title",
+      "indexed": true,
+      "description": "Associated project"
+    },
+    {
+      "internalName": "Status",
+      "displayName": "Status",
+      "type": "Choice",
+      "required": true,
+      "choices": [
+        "Not Started",
+        "In Progress",
+        "Completed",
+        "Blocked",
+        "Cancelled"
+      ],
+      "defaultValue": "Not Started",
+      "indexed": true,
+      "description": "Current task status"
+    },
+    {
+      "internalName": "AssignedTo",
+      "displayName": "Assigned To",
+      "type": "User",
+      "required": true,
+      "allowMultiple": false,
+      "description": "Person responsible for completing the task"
+    },
+    {
+      "internalName": "Priority",
+      "displayName": "Priority",
+      "type": "Choice",
+      "required": true,
+      "choices": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ],
+      "defaultValue": "Medium",
+      "indexed": true,
+      "description": "Task priority level"
+    },
+    {
+      "internalName": "StartDate",
+      "displayName": "Start Date",
+      "type": "DateTime",
+      "required": false,
+      "format": "DateOnly",
+      "description": "Task start date"
+    },
+    {
+      "internalName": "DueDate",
+      "displayName": "Due Date",
+      "type": "DateTime",
+      "required": false,
+      "format": "DateOnly",
+      "indexed": true,
+      "description": "Task due date"
+    },
+    {
+      "internalName": "CompletedDate",
+      "displayName": "Completed Date",
+      "type": "DateTime",
+      "required": false,
+      "format": "DateTime",
+      "description": "Date and time task was completed"
+    },
+    {
+      "internalName": "EstimatedHours",
+      "displayName": "Estimated Hours",
+      "type": "Number",
+      "required": false,
+      "min": 0,
+      "decimals": 1,
+      "description": "Estimated hours to complete"
+    },
+    {
+      "internalName": "ActualHours",
+      "displayName": "Actual Hours",
+      "type": "Number",
+      "required": false,
+      "min": 0,
+      "decimals": 1,
+      "description": "Actual hours spent"
+    },
+    {
+      "internalName": "Description",
+      "displayName": "Description",
+      "type": "Note",
+      "required": false,
+      "richText": false,
+      "appendChanges": false,
+      "description": "Detailed task description and notes"
+    },
+    {
+      "internalName": "BlockerReason",
+      "displayName": "Blocker Reason",
+      "type": "Note",
+      "required": false,
+      "richText": false,
+      "description": "Reason if task is blocked"
+    },
+    {
+      "internalName": "Category",
+      "displayName": "Category",
+      "type": "Choice",
+      "required": false,
+      "choices": [
+        "Planning",
+        "Design",
+        "Procurement",
+        "Construction",
+        "Inspection",
+        "Documentation",
+        "Other"
+      ],
+      "description": "Task category"
+    }
+  ],
+  "views": [
+    {
+      "name": "All Tasks",
+      "default": true,
+      "fields": ["Title", "ProjectLookup", "Status", "AssignedTo", "Priority", "DueDate"],
+      "query": "<OrderBy><FieldRef Name='Modified' Ascending='FALSE'/></OrderBy>"
+    },
+    {
+      "name": "My Tasks",
+      "fields": ["Title", "ProjectLookup", "Status", "Priority", "DueDate"],
+      "query": "<Where><Eq><FieldRef Name='AssignedTo'/><Value Type='Integer'><UserID/></Value></Eq></Where><OrderBy><FieldRef Name='DueDate' Ascending='TRUE'/></OrderBy>"
+    },
+    {
+      "name": "Open Tasks",
+      "fields": ["Title", "ProjectLookup", "AssignedTo", "Priority", "DueDate"],
+      "query": "<Where><And><Neq><FieldRef Name='Status'/><Value Type='Choice'>Completed</Value></Neq><Neq><FieldRef Name='Status'/><Value Type='Choice'>Cancelled</Value></Neq></And></Where><OrderBy><FieldRef Name='Priority' Ascending='FALSE'/><FieldRef Name='DueDate' Ascending='TRUE'/></OrderBy>"
+    },
+    {
+      "name": "Overdue Tasks",
+      "fields": ["Title", "ProjectLookup", "AssignedTo", "DueDate", "Status"],
+      "query": "<Where><And><Lt><FieldRef Name='DueDate'/><Value Type='DateTime'><Today/></Value></Lt><Neq><FieldRef Name='Status'/><Value Type='Choice'>Completed</Value></Neq></And></Where><OrderBy><FieldRef Name='DueDate' Ascending='TRUE'/></OrderBy>"
+    }
+  ],
+  "permissions": {
+    "breakInheritance": false,
+    "notes": "Inherits permissions from parent SharePoint site"
+  }
+}

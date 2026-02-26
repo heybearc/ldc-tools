@@ -1,0 +1,741 @@
+# ============================================================================
+# LDC Tools Power Apps - Application Structure
+# ============================================================================
+# This file defines the complete structure of the Power Apps canvas app
+# Use this as a guide to build the app in Power Apps Studio
+# ============================================================================
+
+appName: "LDC Tools"
+appType: "Canvas"
+appDescription: "Construction project and task management application"
+version: "2.0.0"
+
+# ============================================================================
+# DATA SOURCES
+# ============================================================================
+dataSources:
+  - name: "Projects"
+    type: "SharePoint"
+    listName: "LDC_Projects"
+    connection: "SharePoint"
+    
+  - name: "Tasks"
+    type: "SharePoint"
+    listName: "LDC_Tasks"
+    connection: "SharePoint"
+    
+  - name: "Feedback"
+    type: "SharePoint"
+    listName: "LDC_Feedback"
+    connection: "SharePoint"
+    
+  - name: "Settings"
+    type: "SharePoint"
+    listName: "LDC_Settings"
+    connection: "SharePoint"
+
+# ============================================================================
+# GLOBAL VARIABLES
+# ============================================================================
+globalVariables:
+  - name: "varCurrentScreen"
+    type: "Text"
+    initialValue: "Dashboard"
+    description: "Currently active screen name"
+    
+  - name: "varSelectedProject"
+    type: "Record"
+    initialValue: "Blank()"
+    description: "Currently selected project record"
+    
+  - name: "varSelectedTask"
+    type: "Record"
+    initialValue: "Blank()"
+    description: "Currently selected task record"
+    
+  - name: "varCurrentUser"
+    type: "Record"
+    initialValue: "User()"
+    description: "Current logged-in user"
+    
+  - name: "varFilterStatus"
+    type: "Text"
+    initialValue: '""'
+    description: "Current filter for status"
+    
+  - name: "varSearchText"
+    type: "Text"
+    initialValue: '""'
+    description: "Current search text"
+    
+  - name: "varShowForm"
+    type: "Boolean"
+    initialValue: "false"
+    description: "Whether to show form dialog"
+    
+  - name: "varFormMode"
+    type: "Text"
+    initialValue: '""'
+    description: "Form mode: New, Edit, View"
+
+# ============================================================================
+# COLLECTIONS
+# ============================================================================
+collections:
+  - name: "colFilteredProjects"
+    description: "Filtered and searched projects"
+    source: "Projects"
+    
+  - name: "colFilteredTasks"
+    description: "Filtered and searched tasks"
+    source: "Tasks"
+    
+  - name: "colRecentProjects"
+    description: "Recently modified projects"
+    source: "Projects"
+    
+  - name: "colMyTasks"
+    description: "Tasks assigned to current user"
+    source: "Tasks"
+
+# ============================================================================
+# COLOR THEME
+# ============================================================================
+theme:
+  primary: "RGBA(41, 98, 255, 1)"          # Blue
+  primaryHover: "RGBA(31, 78, 235, 1)"     # Darker blue
+  success: "RGBA(40, 167, 69, 1)"          # Green
+  warning: "RGBA(255, 193, 7, 1)"          # Yellow
+  danger: "RGBA(220, 53, 69, 1)"           # Red
+  info: "RGBA(23, 162, 184, 1)"            # Cyan
+  light: "RGBA(248, 249, 250, 1)"          # Light gray
+  dark: "RGBA(52, 58, 64, 1)"              # Dark gray
+  white: "RGBA(255, 255, 255, 1)"          # White
+  border: "RGBA(222, 226, 230, 1)"         # Border gray
+  text: "RGBA(33, 37, 41, 1)"              # Text dark
+  textLight: "RGBA(108, 117, 125, 1)"      # Text light
+
+# ============================================================================
+# SCREENS
+# ============================================================================
+screens:
+  # --------------------------------------------------------------------------
+  # SPLASH SCREEN (Loading)
+  # --------------------------------------------------------------------------
+  - name: "scrSplash"
+    description: "Initial loading screen"
+    onVisible: |
+      // Initialize app
+      Set(varCurrentUser, User());
+      Set(varCurrentScreen, "Dashboard");
+      
+      // Load initial data
+      ClearCollect(colRecentProjects, 
+        SortByColumns(
+          Filter(Projects, Status = "Active"),
+          "Modified",
+          Descending
+        )
+      );
+      
+      // Navigate to dashboard
+      Navigate(scrDashboard, ScreenTransition.Fade);
+    
+    controls:
+      - type: "Label"
+        name: "lblAppName"
+        properties:
+          Text: "LDC Tools"
+          X: "(Parent.Width - Self.Width) / 2"
+          Y: "(Parent.Height - Self.Height) / 2"
+          Size: 32
+          FontWeight: "Bold"
+          Color: "RGBA(41, 98, 255, 1)"
+      
+      - type: "Label"
+        name: "lblLoading"
+        properties:
+          Text: "Loading..."
+          X: "(Parent.Width - Self.Width) / 2"
+          Y: "lblAppName.Y + lblAppName.Height + 20"
+          Size: 14
+          Color: "RGBA(108, 117, 125, 1)"
+
+  # --------------------------------------------------------------------------
+  # DASHBOARD SCREEN
+  # --------------------------------------------------------------------------
+  - name: "scrDashboard"
+    description: "Main dashboard with KPIs and recent items"
+    onVisible: |
+      Set(varCurrentScreen, "Dashboard");
+      
+      // Refresh data
+      Refresh(Projects);
+      Refresh(Tasks);
+      
+      // Update collections
+      ClearCollect(colRecentProjects,
+        FirstN(
+          SortByColumns(
+            Filter(Projects, Status = "Active"),
+            "Modified",
+            Descending
+          ),
+          5
+        )
+      );
+      
+      ClearCollect(colMyTasks,
+        Filter(Tasks, 
+          AssignedTo.Email = varCurrentUser.Email &&
+          Status <> "Completed" &&
+          Status <> "Cancelled"
+        )
+      );
+    
+    components:
+      - component: "cmpNavigation"
+        description: "Left navigation panel"
+        
+      - component: "cmpHeader"
+        description: "Top header bar"
+        properties:
+          Title: "Dashboard"
+      
+      - type: "Container"
+        name: "conKPICards"
+        description: "KPI cards container"
+        properties:
+          X: 200
+          Y: 80
+          Width: "Parent.Width - 220"
+          Height: 120
+        
+        children:
+          - type: "Rectangle"
+            name: "cardTotalProjects"
+            properties:
+              X: 0
+              Y: 0
+              Width: 240
+              Height: 100
+              Fill: "RGBA(255, 255, 255, 1)"
+              BorderColor: "RGBA(222, 226, 230, 1)"
+              BorderThickness: 1
+              RadiusTopLeft: 8
+              RadiusTopRight: 8
+              RadiusBottomLeft: 8
+              RadiusBottomRight: 8
+            
+            children:
+              - type: "Label"
+                name: "lblTotalProjectsTitle"
+                properties:
+                  Text: "Total Projects"
+                  X: 15
+                  Y: 15
+                  Size: 11
+                  Color: "RGBA(108, 117, 125, 1)"
+              
+              - type: "Label"
+                name: "lblTotalProjectsValue"
+                properties:
+                  Text: "CountRows(Projects)"
+                  X: 15
+                  Y: 40
+                  Size: 32
+                  FontWeight: "Bold"
+                  Color: "RGBA(41, 98, 255, 1)"
+          
+          - type: "Rectangle"
+            name: "cardOpenTasks"
+            properties:
+              X: 255
+              Y: 0
+              Width: 240
+              Height: 100
+              Fill: "RGBA(255, 255, 255, 1)"
+              BorderColor: "RGBA(222, 226, 230, 1)"
+              BorderThickness: 1
+              RadiusTopLeft: 8
+              RadiusTopRight: 8
+              RadiusBottomLeft: 8
+              RadiusBottomRight: 8
+            
+            children:
+              - type: "Label"
+                name: "lblOpenTasksTitle"
+                properties:
+                  Text: "Open Tasks"
+                  X: 15
+                  Y: 15
+                  Size: 11
+                  Color: "RGBA(108, 117, 125, 1)"
+              
+              - type: "Label"
+                name: "lblOpenTasksValue"
+                properties:
+                  Text: |
+                    CountRows(
+                      Filter(Tasks, 
+                        Status <> "Completed" && 
+                        Status <> "Cancelled"
+                      )
+                    )
+                  X: 15
+                  Y: 40
+                  Size: 32
+                  FontWeight: "Bold"
+                  Color: "RGBA(40, 167, 69, 1)"
+          
+          - type: "Rectangle"
+            name: "cardAtRisk"
+            properties:
+              X: 510
+              Y: 0
+              Width: 240
+              Height: 100
+              Fill: "RGBA(255, 255, 255, 1)"
+              BorderColor: "RGBA(222, 226, 230, 1)"
+              BorderThickness: 1
+              RadiusTopLeft: 8
+              RadiusTopRight: 8
+              RadiusBottomLeft: 8
+              RadiusBottomRight: 8
+            
+            children:
+              - type: "Label"
+                name: "lblAtRiskTitle"
+                properties:
+                  Text: "At Risk"
+                  X: 15
+                  Y: 15
+                  Size: 11
+                  Color: "RGBA(108, 117, 125, 1)"
+              
+              - type: "Label"
+                name: "lblAtRiskValue"
+                properties:
+                  Text: |
+                    CountRows(
+                      Filter(Projects,
+                        RiskLevel = "High" || RiskLevel = "Critical"
+                      )
+                    )
+                  X: 15
+                  Y: 40
+                  Size: 32
+                  FontWeight: "Bold"
+                  Color: "RGBA(220, 53, 69, 1)"
+          
+          - type: "Rectangle"
+            name: "cardDueThisWeek"
+            properties:
+              X: 765
+              Y: 0
+              Width: 240
+              Height: 100
+              Fill: "RGBA(255, 255, 255, 1)"
+              BorderColor: "RGBA(222, 226, 230, 1)"
+              BorderThickness: 1
+              RadiusTopLeft: 8
+              RadiusTopRight: 8
+              RadiusBottomLeft: 8
+              RadiusBottomRight: 8
+            
+            children:
+              - type: "Label"
+                name: "lblDueThisWeekTitle"
+                properties:
+                  Text: "Due This Week"
+                  X: 15
+                  Y: 15
+                  Size: 11
+                  Color: "RGBA(108, 117, 125, 1)"
+              
+              - type: "Label"
+                name: "lblDueThisWeekValue"
+                properties:
+                  Text: |
+                    CountRows(
+                      Filter(Tasks,
+                        DueDate >= Today() &&
+                        DueDate <= Today() + 7 &&
+                        Status <> "Completed"
+                      )
+                    )
+                  X: 15
+                  Y: 40
+                  Size: 32
+                  FontWeight: "Bold"
+                  Color: "RGBA(255, 193, 7, 1)"
+      
+      - type: "Label"
+        name: "lblRecentProjectsTitle"
+        properties:
+          Text: "Recent Projects"
+          X: 200
+          Y: 220
+          Size: 18
+          FontWeight: "Bold"
+          Color: "RGBA(33, 37, 41, 1)"
+      
+      - type: "Gallery"
+        name: "galRecentProjects"
+        properties:
+          Items: "colRecentProjects"
+          X: 200
+          Y: 255
+          Width: 700
+          Height: 250
+          TemplateSize: 45
+          BorderColor: "RGBA(222, 226, 230, 1)"
+          BorderThickness: 1
+        
+        template:
+          - type: "Label"
+            name: "lblProjectName"
+            properties:
+              Text: "ThisItem.Title"
+              X: 15
+              Y: 10
+              Width: 400
+              Size: 12
+              FontWeight: "Semibold"
+              Color: "RGBA(33, 37, 41, 1)"
+              OnSelect: |
+                Set(varSelectedProject, ThisItem);
+                Navigate(scrProjectDetail, ScreenTransition.None);
+          
+          - type: "Label"
+            name: "lblProjectStatus"
+            properties:
+              Text: "ThisItem.Status"
+              X: 420
+              Y: 10
+              Width: 100
+              Size: 10
+              Color: |
+                Switch(ThisItem.Status,
+                  "Active", RGBA(40, 167, 69, 1),
+                  "On Hold", RGBA(255, 193, 7, 1),
+                  "Completed", RGBA(41, 98, 255, 1),
+                  RGBA(108, 117, 125, 1)
+                )
+          
+          - type: "Label"
+            name: "lblProjectDueDate"
+            properties:
+              Text: "\"Due: \" & Text(ThisItem.DueDate, \"mm/dd/yyyy\")"
+              X: 530
+              Y: 10
+              Width: 150
+              Size: 10
+              Color: "RGBA(108, 117, 125, 1)"
+      
+      - type: "Button"
+        name: "btnNewProject"
+        properties:
+          Text: "New Project"
+          X: 200
+          Y: 530
+          Width: 150
+          Height: 40
+          Fill: "RGBA(41, 98, 255, 1)"
+          HoverFill: "RGBA(31, 78, 235, 1)"
+          Color: "RGBA(255, 255, 255, 1)"
+          FontWeight: "Semibold"
+          BorderRadius: 4
+          OnSelect: |
+            Set(varFormMode, "New");
+            Set(varShowForm, true);
+            Navigate(scrProjectForm, ScreenTransition.None);
+      
+      - type: "Button"
+        name: "btnNewTask"
+        properties:
+          Text: "New Task"
+          X: 365
+          Y: 530
+          Width: 150
+          Height: 40
+          Fill: "RGBA(40, 167, 69, 1)"
+          HoverFill: "RGBA(30, 147, 59, 1)"
+          Color: "RGBA(255, 255, 255, 1)"
+          FontWeight: "Semibold"
+          BorderRadius: 4
+          OnSelect: |
+            Set(varFormMode, "New");
+            Navigate(scrTaskForm, ScreenTransition.None);
+
+  # --------------------------------------------------------------------------
+  # PROJECTS LIST SCREEN
+  # --------------------------------------------------------------------------
+  - name: "scrProjectsList"
+    description: "List of all projects with filtering"
+    onVisible: |
+      Set(varCurrentScreen, "Projects");
+      Refresh(Projects);
+      
+      // Apply filters
+      ClearCollect(colFilteredProjects,
+        If(IsBlank(varFilterStatus),
+          Projects,
+          Filter(Projects, Status = varFilterStatus)
+        )
+      );
+      
+      // Apply search
+      If(!IsBlank(varSearchText),
+        ClearCollect(colFilteredProjects,
+          Filter(colFilteredProjects,
+            varSearchText in Title ||
+            varSearchText in ProjectNumber ||
+            varSearchText in ClientName
+          )
+        )
+      );
+    
+    components:
+      - component: "cmpNavigation"
+      - component: "cmpHeader"
+        properties:
+          Title: "Projects"
+      
+      - type: "TextInput"
+        name: "txtSearch"
+        properties:
+          HintText: "Search projects..."
+          X: 200
+          Y: 90
+          Width: 300
+          Height: 40
+          OnChange: |
+            Set(varSearchText, Self.Text);
+            // Trigger filter refresh
+            Set(varCurrentScreen, "Projects");
+      
+      - type: "Dropdown"
+        name: "ddFilterStatus"
+        properties:
+          Items: '["All", "Active", "On Hold", "Completed", "Cancelled"]'
+          DefaultSelectedItems: '["All"]'
+          X: 520
+          Y: 90
+          Width: 150
+          Height: 40
+          OnChange: |
+            Set(varFilterStatus, 
+              If(Self.Selected.Value = "All", "", Self.Selected.Value)
+            );
+            // Trigger filter refresh
+            Set(varCurrentScreen, "Projects");
+      
+      - type: "Button"
+        name: "btnNewProject"
+        properties:
+          Text: "+ New Project"
+          X: "Parent.Width - 170"
+          Y: 90
+          Width: 150
+          Height: 40
+          Fill: "RGBA(41, 98, 255, 1)"
+          OnSelect: |
+            Set(varFormMode, "New");
+            Navigate(scrProjectForm, ScreenTransition.None);
+      
+      - type: "Gallery"
+        name: "galProjects"
+        properties:
+          Items: "colFilteredProjects"
+          X: 200
+          Y: 150
+          Width: "Parent.Width - 220"
+          Height: "Parent.Height - 170"
+          TemplateSize: 60
+          Layout: "Vertical"
+        
+        template:
+          - type: "Rectangle"
+            name: "recProjectRow"
+            properties:
+              Fill: "RGBA(255, 255, 255, 1)"
+              BorderColor: "RGBA(222, 226, 230, 1)"
+              BorderThickness: 1
+              OnSelect: |
+                Set(varSelectedProject, ThisItem);
+                Navigate(scrProjectDetail, ScreenTransition.None);
+          
+          - type: "Label"
+            name: "lblProjectName"
+            properties:
+              Text: "ThisItem.Title"
+              X: 15
+              Y: 10
+              Width: 350
+              Size: 13
+              FontWeight: "Semibold"
+          
+          - type: "Label"
+            name: "lblStatus"
+            properties:
+              Text: "ThisItem.Status"
+              X: 380
+              Y: 10
+              Width: 100
+              Size: 11
+              Color: |
+                Switch(ThisItem.Status,
+                  "Active", RGBA(40, 167, 69, 1),
+                  "On Hold", RGBA(255, 193, 7, 1),
+                  "Completed", RGBA(41, 98, 255, 1),
+                  RGBA(108, 117, 125, 1)
+                )
+          
+          - type: "Label"
+            name: "lblOwner"
+            properties:
+              Text: "ThisItem.ProjectOwner.DisplayName"
+              X: 495
+              Y: 10
+              Width: 150
+              Size: 11
+          
+          - type: "Label"
+            name: "lblDueDate"
+            properties:
+              Text: "Text(ThisItem.DueDate, \"mm/dd/yyyy\")"
+              X: 660
+              Y: 10
+              Width: 100
+              Size: 11
+          
+          - type: "Label"
+            name: "lblRisk"
+            properties:
+              Text: "ThisItem.RiskLevel"
+              X: 775
+              Y: 10
+              Width: 80
+              Size: 11
+              Color: |
+                Switch(ThisItem.RiskLevel,
+                  "Low", RGBA(40, 167, 69, 1),
+                  "Medium", RGBA(255, 193, 7, 1),
+                  "High", RGBA(253, 126, 20, 1),
+                  "Critical", RGBA(220, 53, 69, 1),
+                  RGBA(108, 117, 125, 1)
+                )
+          
+          - type: "Label"
+            name: "lblProgress"
+            properties:
+              Text: "ThisItem.PercentComplete & \"%\""
+              X: 870
+              Y: 10
+              Width: 60
+              Size: 11
+              Align: "Right"
+
+# ============================================================================
+# COMPONENTS (Reusable)
+# ============================================================================
+components:
+  - name: "cmpNavigation"
+    description: "Left navigation panel"
+    width: 180
+    height: "Parent.Height"
+    
+    controls:
+      - type: "Rectangle"
+        name: "recNavBackground"
+        properties:
+          Fill: "RGBA(248, 249, 250, 1)"
+          Width: 180
+          Height: "Parent.Height"
+      
+      - type: "Button"
+        name: "btnNavDashboard"
+        properties:
+          Text: "Dashboard"
+          X: 10
+          Y: 80
+          Width: 160
+          Height: 40
+          Fill: "If(varCurrentScreen = \"Dashboard\", RGBA(41, 98, 255, 1), RGBA(255, 255, 255, 1))"
+          Color: "If(varCurrentScreen = \"Dashboard\", RGBA(255, 255, 255, 1), RGBA(33, 37, 41, 1))"
+          BorderRadius: 4
+          OnSelect: "Navigate(scrDashboard, ScreenTransition.None)"
+      
+      - type: "Button"
+        name: "btnNavProjects"
+        properties:
+          Text: "Projects"
+          X: 10
+          Y: 130
+          Width: 160
+          Height: 40
+          Fill: "If(varCurrentScreen = \"Projects\", RGBA(41, 98, 255, 1), RGBA(255, 255, 255, 1))"
+          Color: "If(varCurrentScreen = \"Projects\", RGBA(255, 255, 255, 1), RGBA(33, 37, 41, 1))"
+          BorderRadius: 4
+          OnSelect: "Navigate(scrProjectsList, ScreenTransition.None)"
+      
+      - type: "Button"
+        name: "btnNavTasks"
+        properties:
+          Text: "Tasks"
+          X: 10
+          Y: 180
+          Width: 160
+          Height: 40
+          Fill: "If(varCurrentScreen = \"Tasks\", RGBA(41, 98, 255, 1), RGBA(255, 255, 255, 1))"
+          Color: "If(varCurrentScreen = \"Tasks\", RGBA(255, 255, 255, 1), RGBA(33, 37, 41, 1))"
+          BorderRadius: 4
+          OnSelect: "Navigate(scrTasksList, ScreenTransition.None)"
+      
+      - type: "Button"
+        name: "btnNavFeedback"
+        properties:
+          Text: "Feedback"
+          X: 10
+          Y: 230
+          Width: 160
+          Height: 40
+          Fill: "If(varCurrentScreen = \"Feedback\", RGBA(41, 98, 255, 1), RGBA(255, 255, 255, 1))"
+          Color: "If(varCurrentScreen = \"Feedback\", RGBA(255, 255, 255, 1), RGBA(33, 37, 41, 1))"
+          BorderRadius: 4
+          OnSelect: "Navigate(scrFeedbackList, ScreenTransition.None)"
+  
+  - name: "cmpHeader"
+    description: "Top header bar"
+    width: "Parent.Width"
+    height: 60
+    
+    controls:
+      - type: "Rectangle"
+        name: "recHeaderBackground"
+        properties:
+          Fill: "RGBA(41, 98, 255, 1)"
+          Width: "Parent.Width"
+          Height: 60
+      
+      - type: "Label"
+        name: "lblHeaderTitle"
+        properties:
+          Text: "Parent.Title"
+          X: 200
+          Y: 15
+          Size: 20
+          FontWeight: "Bold"
+          Color: "RGBA(255, 255, 255, 1)"
+      
+      - type: "Label"
+        name: "lblUserName"
+        properties:
+          Text: "varCurrentUser.FullName"
+          X: "Parent.Width - 200"
+          Y: 20
+          Width: 180
+          Size: 12
+          Color: "RGBA(255, 255, 255, 1)"
+          Align: "Right"
