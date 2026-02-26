@@ -20,7 +20,25 @@ This matches your web app's `CrewChangeRequest` model exactly.
 
 ## SharePoint List Schema
 
-### LDC_CrewChangeRequests
+### Prerequisites: Supporting Lists
+
+For the best user experience with dropdowns and filtering, create these helper lists first:
+
+#### LDC_TradeTeams (Simple)
+- **Title** (Text) - Trade team name (e.g., "Drywall", "Electrical")
+
+#### LDC_TradeCrews (With Lookup)
+- **Title** (Text) - Crew name (e.g., "Drywall Crew 1")
+- **TradeTeam** (Lookup) - Lookup to LDC_TradeTeams → Title
+
+#### LDC_Projects (Simple)
+- **Title** (Text) - Project name
+
+**Note:** You can skip these and use text fields instead if you want to start even simpler. The form will still work!
+
+---
+
+### LDC_CrewChangeRequests (Main List)
 
 | Column Name | Type | Settings | Description |
 |-------------|------|----------|-------------|
@@ -30,9 +48,10 @@ This matches your web app's `CrewChangeRequest` model exactly.
 | RequestorEmail | Text | Required, Max: 255 | Email of requestor |
 | VolunteerName | Text | Required, Max: 255 | Name of volunteer being added/removed |
 | VolunteerBaId | Text | Max: 50 | Builder Assistant ID |
-| TradeTeamName | Text | Max: 255 | Trade team name (e.g., "Drywall") |
-| CrewName | Text | Max: 255 | Crew name |
-| ProjectName | Text | Max: 255 | Project name if adding to roster |
+| **TradeTeam** | **Lookup** | **Lookup to LDC_TradeTeams → Title** | **Trade team (dropdown)** |
+| **Crew** | **Lookup** | **Lookup to LDC_TradeCrews → Title** | **Crew (filtered by trade team)** |
+| **Project** | **Lookup** | **Lookup to LDC_Projects → Title** | **Project (dropdown)** |
+| ProjectNameCustom | Text | Max: 255 | Custom project name if not in dropdown |
 | Comments | Multiple lines | Plain text | Additional notes/context |
 | Status | Choice | Required, Default: NEW | NEW, IN_PROGRESS, COMPLETED, REJECTED |
 | AssignedTo | Person | Single | Person assigned to process request |
@@ -40,7 +59,15 @@ This matches your web app's `CrewChangeRequest` model exactly.
 | CompletedDate | Date/Time | Include time | When request was completed |
 | ConstructionGroup | Text | Default: "CG 01.12" | Your construction group |
 
-**Total:** 15 columns (including built-in Title, Created, Modified)
+**Total:** 16 columns (including built-in Title, Created, Modified)
+
+**Alternative (Text-Only Version):**
+If you don't want to create the helper lists, replace the Lookup columns with Text:
+- TradeTeam → Text (Max: 255)
+- Crew → Text (Max: 255)  
+- Project → Text (Max: 255)
+
+You'll lose the dropdown filtering but the form will still work!
 
 ---
 
@@ -61,7 +88,45 @@ This matches your web app's `CrewChangeRequest` model exactly.
 2. **Column settings** > **Rename**
 3. Change to: `Request Summary`
 
-### Step 3: Add Columns (15 min)
+### Step 3: Create Helper Lists First (10 min)
+
+**Option A: With Lookups (Recommended)**
+
+Create these 3 simple lists:
+
+**1. LDC_TradeTeams**
+- Create blank list
+- Rename Title to "Trade Team Name"
+- Add sample data:
+  - Drywall
+  - Electrical
+  - Plumbing
+  - HVAC
+  - Framing
+
+**2. LDC_TradeCrews**
+- Create blank list
+- Rename Title to "Crew Name"
+- Add column: **TradeTeam** (Lookup to LDC_TradeTeams → Title)
+- Add sample data:
+  - Drywall Crew 1 (TradeTeam: Drywall)
+  - Drywall Crew 2 (TradeTeam: Drywall)
+  - Electrical Crew 1 (TradeTeam: Electrical)
+
+**3. LDC_Projects**
+- Create blank list
+- Rename Title to "Project Name"
+- Add sample data:
+  - Kingdom Hall - City Name
+  - Assembly Hall Renovation
+
+**Option B: Skip Lookups (Simpler)**
+
+Skip this step and use text fields instead. Less fancy but faster to set up.
+
+---
+
+### Step 4: Add Columns to Main List (15 min)
 
 Click **+ Add column** for each:
 
@@ -89,37 +154,48 @@ Click **+ Add column** for each:
 **5. VolunteerBaId** (Text)
 - Max length: 50
 
-**6. TradeTeamName** (Text)
+**6. TradeTeam** (Lookup) - *If using Option A*
+- Get information from: LDC_TradeTeams
+- In this column: Title
+
+**7. Crew** (Lookup) - *If using Option A*
+- Get information from: LDC_TradeCrews
+- In this column: Title
+
+**8. Project** (Lookup) - *If using Option A*
+- Get information from: LDC_Projects
+- In this column: Title
+
+**9. ProjectNameCustom** (Text)
 - Max length: 255
 
-**7. CrewName** (Text)
-- Max length: 255
+**Alternative for Option B (Text-Only):**
+- **6. TradeTeam** (Text, Max: 255)
+- **7. Crew** (Text, Max: 255)
+- **8. Project** (Text, Max: 255)
 
-**8. ProjectName** (Text)
-- Max length: 255
-
-**9. Comments** (Multiple lines of text)
+**10. Comments** (Multiple lines of text)
 - Plain text
 
-**10. Status** (Choice)
+**11. Status** (Choice)
 - Choices: NEW, IN_PROGRESS, COMPLETED, REJECTED
 - Required: Yes
 - Default: NEW
 
-**11. AssignedTo** (Person)
+**12. AssignedTo** (Person)
 - Single selection
 
-**12. ResolutionNotes** (Multiple lines of text)
+**13. ResolutionNotes** (Multiple lines of text)
 - Plain text
 
-**13. CompletedDate** (Date and time)
+**14. CompletedDate** (Date and time)
 - Include time: Yes
 
-**14. ConstructionGroup** (Text)
+**15. ConstructionGroup** (Text)
 - Max length: 50
 - Default value: "CG 01.12"
 
-### Step 4: Create Views (5 min)
+### Step 5: Create Views (5 min)
 
 **New Requests View:**
 1. Click **All Items** > **Create new view**
@@ -160,7 +236,22 @@ Click **+ Add column** for each:
 5. Select: `LDC_CrewChangeRequests`
 6. Click **Connect**
 
-### Step 3: Add Form (5 min)
+### Step 3: Add Form Controls (15 min)
+
+Instead of using a standard form, we'll build a custom form with conditional logic.
+
+**Add these controls to your screen:**
+
+1. **Label** - Header: "Crew Change Request"
+2. **Dropdown** - Request Type
+3. **Text Input** - Volunteer Name
+4. **Text Input** - Volunteer BA ID
+5. **Dropdown** - Trade Team (if using lookups)
+6. **Dropdown** - Crew (filtered by trade team)
+7. **Dropdown** - Project (if using lookups)
+8. **Text Input** - Custom Project Name
+9. **Text Input (Multiline)** - Comments
+10. **Button** - Submit
 
 1. Click **Insert** > **Forms** > **Edit**
 2. Set **DataSource**: `LDC_CrewChangeRequests`
@@ -182,43 +273,141 @@ Click **+ Add column** for each:
    - RequestorName (auto-fill with user name)
    - RequestorEmail (auto-fill with user email)
 
-### Step 4: Auto-Fill User Info (10 min)
+### Step 4: Configure Dropdowns with Filtering (20 min)
 
-1. Click the form
-2. Set **OnVisible** property:
+**1. Request Type Dropdown**
 ```powerfx
-Set(varCurrentUser, User());
+// Items property
+["ADD_TO_CREW", "REMOVE_FROM_CREW", "ADD_TO_PROJECT_ROSTER", "ADD_TO_CREW_AND_PROJECT"]
 ```
 
-3. Click **RequestorName** data card
-4. Set **Default** property:
+**2. Trade Team Dropdown** (if using lookups)
 ```powerfx
-varCurrentUser.FullName
+// Items property
+LDC_TradeTeams
+
+// DisplayFields property
+["Title"]
+
+// Visible property (show only for crew-related requests)
+Or(
+    drpRequestType.Selected.Value = "ADD_TO_CREW",
+    drpRequestType.Selected.Value = "REMOVE_FROM_CREW",
+    drpRequestType.Selected.Value = "ADD_TO_CREW_AND_PROJECT"
+)
 ```
 
-5. Click **RequestorEmail** data card
-6. Set **Default** property:
+**3. Crew Dropdown** (FILTERED by selected trade team)
 ```powerfx
-varCurrentUser.Email
+// Items property - THIS IS THE KEY FILTERING LOGIC!
+Filter(
+    LDC_TradeCrews,
+    TradeTeam.Title = drpTradeTeam.Selected.Title
+)
+
+// DisplayFields property
+["Title"]
+
+// Visible property (show only when trade team is selected)
+And(
+    !IsBlank(drpTradeTeam.Selected),
+    Or(
+        drpRequestType.Selected.Value = "ADD_TO_CREW",
+        drpRequestType.Selected.Value = "REMOVE_FROM_CREW",
+        drpRequestType.Selected.Value = "ADD_TO_CREW_AND_PROJECT"
+    )
+)
 ```
 
-7. Click **ConstructionGroup** data card
-8. Set **Default** property:
+**4. Project Dropdown** (if using lookups)
 ```powerfx
-"CG 01.12"
+// Items property
+LDC_Projects
+
+// DisplayFields property
+["Title"]
+
+// Visible property (show only for project-related requests)
+Or(
+    drpRequestType.Selected.Value = "ADD_TO_PROJECT_ROSTER",
+    drpRequestType.Selected.Value = "ADD_TO_CREW_AND_PROJECT"
+)
 ```
 
-### Step 5: Add Submit Button (5 min)
-
-1. **Insert** > **Button**
-2. Text: "Submit Request"
-3. OnSelect:
+**5. Custom Project Name Input**
 ```powerfx
-SubmitForm(Form1);
-If(Form1.LastSubmit.Error = Blank(),
+// Visible property
+Or(
+    drpRequestType.Selected.Value = "ADD_TO_PROJECT_ROSTER",
+    drpRequestType.Selected.Value = "ADD_TO_CREW_AND_PROJECT"
+)
+
+// HintText property
+"Or enter project name if not in dropdown"
+```
+
+### Step 5: Add Submit Button with Validation (10 min)
+
+**Button OnSelect property:**
+```powerfx
+// Validate required fields
+If(
+    IsBlank(txtVolunteerName.Text),
+    Notify("Please enter volunteer name", NotificationType.Error),
+    IsBlank(drpRequestType.Selected),
+    Notify("Please select request type", NotificationType.Error),
+    
+    // Validate crew fields for crew-related requests
+    And(
+        Or(
+            drpRequestType.Selected.Value = "ADD_TO_CREW",
+            drpRequestType.Selected.Value = "REMOVE_FROM_CREW",
+            drpRequestType.Selected.Value = "ADD_TO_CREW_AND_PROJECT"
+        ),
+        Or(IsBlank(drpTradeTeam.Selected), IsBlank(drpCrew.Selected))
+    ),
+    Notify("Please select trade team and crew", NotificationType.Error),
+    
+    // All validations passed - submit the request
+    Patch(
+        LDC_CrewChangeRequests,
+        Defaults(LDC_CrewChangeRequests),
+        {
+            Title: "Request by " & User().FullName,
+            RequestType: drpRequestType.Selected.Value,
+            RequestorName: User().FullName,
+            RequestorEmail: User().Email,
+            VolunteerName: txtVolunteerName.Text,
+            VolunteerBaId: txtBaId.Text,
+            TradeTeam: drpTradeTeam.Selected,  // Lookup value
+            Crew: drpCrew.Selected,  // Lookup value
+            Project: drpProject.Selected,  // Lookup value
+            ProjectNameCustom: txtCustomProject.Text,
+            Comments: txtComments.Text,
+            Status: "NEW",
+            ConstructionGroup: "CG 01.12"
+        }
+    );
     Notify("Request submitted successfully!", NotificationType.Success);
-    ResetForm(Form1),
-    Notify("Error: " & Form1.LastSubmit.Error, NotificationType.Error)
+    
+    // Reset form
+    Reset(drpRequestType);
+    Reset(drpTradeTeam);
+    Reset(drpCrew);
+    Reset(drpProject);
+    Reset(txtVolunteerName);
+    Reset(txtBaId);
+    Reset(txtCustomProject);
+    Reset(txtComments);
+)
+```
+
+**Button DisplayMode property:**
+```powerfx
+If(
+    IsBlank(txtVolunteerName.Text) || IsBlank(drpRequestType.Selected),
+    DisplayMode.Disabled,
+    DisplayMode.Edit
 )
 ```
 
