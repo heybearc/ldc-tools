@@ -1,0 +1,78 @@
+
+Screen scrCrewChange:
+  Fill: RGBA(250,250,250,1)
+  Controls:
+  - Dropdown drpRequestType:
+      Items: colRequestTypes
+      DisplayFields: ["Value"]
+      Value: ThisItem.Value
+      Default: First(colRequestTypes).Value
+  - TextInput txtVolunteerName:
+      HintText: "Enter volunteer name"
+  - TextInput txtBAID:
+      HintText: "Enter BA ID"
+  - ComboBox cmbTradeTeam:
+      Items: SortByColumns(LDC_TradeTeams, "Title")
+      DisplayFields: ["Title"]
+      SearchFields: ["Title"]
+      SelectMultiple: false
+  - ComboBox cmbCrew:
+      Items: With(
+                { _teamId: If(IsBlank(cmbTradeTeam.Selected), Blank(), cmbTradeTeam.Selected.Id) },
+                SortByColumns(
+                  Filter(LDC_TradeCrews, TradeTeam.Id = _teamId),
+                  "Title"
+                )
+             )
+      DisplayFields: ["Title"]
+      SearchFields: ["Title"]
+      SelectMultiple: false
+  - ComboBox cmbProject:
+      Items: SortByColumns(LDC_Projects, "Title")
+      DisplayFields: ["Title"]
+      SearchFields: ["Title"]
+      SelectMultiple: false
+  - TextInput txtCustomProjectName:
+      HintText: "Enter custom project name"
+  - TextInput txtComments:
+      Mode: TextMode.MultiLine
+      HintText: "Comments"
+  - Group cntCrewSection:
+      Visible: With({ t: drpRequestType.Selected.Value }, t in ["ADD_TO_CREW","REMOVE_FROM_CREW","ADD_TO_CREW_AND_PROJECT"]) 
+      Controls: [cmbTradeTeam, cmbCrew]
+  - Group cntProjectSection:
+      Visible: With({ t: drpRequestType.Selected.Value }, t in ["ADD_TO_PROJECT_ROSTER","ADD_TO_CREW_AND_PROJECT"]) 
+      Controls: [cmbProject, txtCustomProjectName]
+  - Button btnSubmit:
+      Text: "Submit"
+      OnSelect: |
+        Set(_newRecord,
+            Patch(
+              LDC_CrewChangeRequests,
+              Defaults(LDC_CrewChangeRequests),
+              {
+                'Requestor Name': User().FullName,
+                'Requestor Email': User().Email,
+                'Request Type': drpRequestType.Selected.Value,
+                'Volunteer Name': txtVolunteerName.Text,
+                'BA ID': txtBAID.Text,
+                'Trade Team': cmbTradeTeam.Selected,
+                'Crew': cmbCrew.Selected,
+                'Project': cmbProject.Selected,
+                'Custom Project Name': txtCustomProjectName.Text,
+                'Comments': txtComments.Text,
+                'Status': "NEW",
+                'Construction Group': "CG 01.12"
+              }
+            )
+        );
+        If(!IsBlank(_newRecord),
+            Notify("Crew change request submitted successfully.", NotificationType.Success);
+            Reset(txtVolunteerName);
+            Reset(txtBAID);
+            Reset(cmbTradeTeam);
+            Reset(cmbCrew);
+            Reset(cmbProject);
+            Reset(txtCustomProjectName);
+            Reset(txtComments)
+        )

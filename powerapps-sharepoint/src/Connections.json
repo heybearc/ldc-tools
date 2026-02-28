@@ -1,0 +1,20 @@
+{
+  "DataSources": [
+    {
+      "Name": "LDC_CrewChangeRequests",
+      "Type": "SharePoint"
+    },
+    {
+      "Name": "LDC_TradeTeams",
+      "Type": "SharePoint"
+    },
+    {
+      "Name": "LDC_TradeCrews",
+      "Type": "SharePoint"
+    },
+    {
+      "Name": "LDC_Projects",
+      "Type": "SharePoint"
+    }
+  ]
+}

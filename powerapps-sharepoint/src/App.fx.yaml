@@ -1,0 +1,10 @@
+
+App:
+  OnStart: |
+    ClearCollect(colRequestTypes,
+        {Value:"ADD_TO_CREW"},
+        {Value:"REMOVE_FROM_CREW"},
+        {Value:"ADD_TO_PROJECT_ROSTER"},
+        {Value:"ADD_TO_CREW_AND_PROJECT"}
+    )
+  Theme: Office
