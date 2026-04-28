@@ -3,7 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.8.2**
+Current: **1.27.4**
+
+## Version History
+- **v1.27.4** (2026-04-28) - Fixed feedback submission reliability and qa-01 test runner setup
 
 ## Infrastructure
 

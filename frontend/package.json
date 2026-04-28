@@ -1,6 +1,6 @@
 {
   "name": "ldc-tools-frontend",
-  "version": "1.27.3",
+  "version": "1.27.4",
   "private": true,
   "description": "Frontend for LDC Tools - Personnel Contact assistance system",
   "scripts": {
