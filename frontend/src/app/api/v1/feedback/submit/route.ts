@@ -40,23 +40,56 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid priority level' }, { status: 400 });
     }
 
-    const feedback = await prisma.feedback.create({
-      data: {
-        type: type.toUpperCase(),
-        title: title.trim(),
-        description: description.trim(),
-        priority: (priority || 'MEDIUM').toUpperCase(),
-        submittedBy: user.id,
-        attachments: {
-          create: screenshots.map((screenshot: string, index: number) => ({
-            filename: `screenshot-${index + 1}.png`,
-            fileData: screenshot,
-            fileSize: screenshot.length,
-            mimeType: 'image/png'
-          }))
+    let feedback = null;
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        const lastFeedback = await prisma.feedback.findFirst({
+          orderBy: { feedbackNumber: 'desc' },
+          select: { feedbackNumber: true }
+        });
+
+        let nextNumber = 1;
+        if (lastFeedback?.feedbackNumber) {
+          const match = lastFeedback.feedbackNumber.match(/^FB-(\d+)$/);
+          if (match) {
+            nextNumber = parseInt(match[1], 10) + 1;
+          }
         }
+
+        const feedbackNumber = `FB-${String(nextNumber).padStart(3, '0')}`;
+
+        feedback = await prisma.feedback.create({
+          data: {
+            feedbackNumber,
+            type: type.toUpperCase(),
+            title: title.trim(),
+            description: description.trim(),
+            priority: (priority || 'MEDIUM').toUpperCase(),
+            submittedBy: user.id,
+            attachments: {
+              create: screenshots.map((screenshot: string, index: number) => ({
+                filename: `screenshot-${index + 1}.png`,
+                fileData: screenshot,
+                fileSize: screenshot.length,
+                mimeType: 'image/png'
+              }))
+            }
+          }
+        });
+
+        break;
+      } catch (error: any) {
+        if (error?.code === 'P2002' && attempt < 4) {
+          // Retry when feedbackNumber collides from concurrent submissions.
+          continue;
+        }
+        throw error;
       }
-    });
+    }
+
+    if (!feedback) {
+      throw new Error('Failed to create feedback after retries');
+    }
 
     return NextResponse.json({
       success: true,
