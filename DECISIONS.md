@@ -62,3 +62,10 @@ For shared architectural decisions that apply to all apps, see `.cloudy-work/_cl
 - **Pattern:** Sidebar groups (v1.20-1.27, v1.10-1.19, v1.0-1.9), single-version focus, removed technical details
 - **Consequences:** All 36 release notes accessible, matches industry standards (Stripe, GitHub, Notion)
 - **Reference:** Research documented in `docs/RELEASE-NOTES-RECOMMENDATIONS.md`
+
+## D-LDC-008: LDC Tools release verification must use HAProxy routing as runtime truth
+- **Date:** 2026-04-28
+- **Context:** During v1.27.4 release, MCP deploy/sync operations succeeded but status reporting for ldc-tools intermittently returned `backend: unknown` and stale LIVE/STANDBY labels.
+- **Decision:** Treat HAProxy config inspection (`use_backend ... if is_ldc`) as the authoritative runtime source before release/sync decisions whenever MCP status output is ambiguous.
+- **Operational rule:** If MCP status and observed version differ, verify HAProxy first, then perform role-based action (LIVE/STANDBY), then re-verify versions on both nodes.
+- **Naming standard:** Prefer `ldctools-blue` / `ldctools-green` aliases and avoid `prod/staging` language in deployment workflows.

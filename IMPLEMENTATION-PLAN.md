@@ -1,16 +1,17 @@
 # Implementation Plan - LDC Tools
 
-**Last Updated:** 2026-02-18  
-**Current Phase:** Phase 3 Complete - Planning Phase 4
+**Last Updated:** 2026-04-28  
+**Current Phase:** Release reliability hardening (post-v1.27.4)
 
 ---
 
 ## 🎯 Active Work (This Week)
 
-**Current Focus:** Ready for normal development - Phase 3 complete, awaiting Phase 4 prioritization
+**Current Focus:** Stabilize deployment/test-release workflow and MCP LIVE/STANDBY status fidelity after v1.27.4 release
 
+- [ ] Fix MCP `get_deployment_status` parsing for ldc-tools (`backend: unknown` misreport) (effort: S)
+- [ ] Validate end-to-end MCP release workflow against HAProxy truth source (effort: S)
 - [ ] Plan Phase 4 features and timeline (effort: S)
-- [ ] Review and prioritize backlog items (effort: S)
 
 ---
 
@@ -25,6 +26,7 @@
 - [ ] SSH alias configuration improvement (effort: S) - Consider renaming ldc-staging/ldc-prod to match color-based naming (documented in control plane)
 - [ ] Enhanced error messages across application (effort: M) - Improve user-facing error clarity
 - [ ] Additional validation rules (effort: M) - Add comprehensive input validation
+- [ ] Resolve Playwright reporter output folder overlap warning on qa-01 (effort: S)
 
 ### Low Priority
 - [ ] Performance optimizations for large datasets (effort: L) - Improve query performance for projects with many crew requests
@@ -40,16 +42,15 @@ None currently identified.
 
 ### Non-Critical (Backlog)
 - [ ] TypeScript error in ImportExportButtons.tsx (lines 52, 184) (effort: S) - Pre-existing, non-blocking
-- [ ] Smoke tests failing on STANDBY (effort: M) - Authentication/environment issues, manual testing works fine
-- [ ] SSH alias confusion: ldc-staging → Container 135 (GREEN), ldc-prod → Container 133 (BLUE) (effort: S) - Documented but could be renamed for clarity
+- [ ] MCP ldc-tools status endpoint can report stale LIVE/STANDBY (`backend: unknown`) (effort: S)
 
 ---
 
 ## 💡 User Feedback & Feature Requests
 
 ### Active Feedback Items (From Production System)
-- [ ] "Ability to respond in feedback request" (IN_PROGRESS) - Submitted 2025-12-28, priority: MEDIUM - User wants ability to comment/respond in feedback system
-- [ ] "Using my name as requestor" (NEW) - Submitted 2026-01-08, priority: MEDIUM - Bug report about requestor name handling
+- [x] "Ability to respond in feedback request" (RESOLVED) - Fixed and verified in production records
+- [x] "Using my name as requestor" (RESOLVED) - Fixed and verified in production records
 
 ### From Users
 - [ ] Role code mismatch handling improvement (effort: S) - v1.27.2 fixed PC_SUPPORT vs PC-Support, but could add better validation
@@ -93,6 +94,10 @@ None currently.
 
 ## ✅ Recently Completed (Last 30 Days)
 
+- [x] Release v1.27.4 completed (bump, release tag, traffic switch, standby sync) - Date: 2026-04-28 - Both blue/green verified on commit `1321bf6`
+- [x] Fixed feedback submission outage - Date: 2026-04-28 - `feedbackNumber` now generated during submit; resolves 500 error in `/api/v1/feedback/submit`
+- [x] Restored `/test-release` on qa-01 - Date: 2026-04-28 - Added `dotenv` for Playwright config and passed smoke tests 4/4
+- [x] Updated ssh aliases for role-based naming - Date: 2026-04-28 - Added `ldctools-blue` and `ldctools-green` aliases
 - [x] Governance sync - promoted 2 patterns to control plane - Date: 2026-02-16 - Release Notes UI/UX Best Practices and Feedback Status Transition Validation Pattern now available to all apps
 - [x] Fixed CLOSED → RESOLVED status transition bug - Date: 2026-02-15 - Allows existing resolution comment to satisfy requirement, improves UX for admin users
 - [x] D-024 Feedback Management Compliance - Date: 2026-02-15 - Added resolutionComment field to Feedback model, deployed migration to both containers, API already validates required field when marking feedback as RESOLVED
