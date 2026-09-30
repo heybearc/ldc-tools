@@ -49,6 +49,7 @@ ssh ldc-prod     # LIVE (typically)
 - `.cloudy-work/_cloudy-ops/context/RUNBOOK-SHORT.md`
 
 **Repo-local context** (LDC Tools specific):
+- `PLAN.md` - Backlog, roadmap, known issues (D-035)
 - `TASK-STATE.md` - Current work, next steps
 - `DECISIONS.md` - LDC Tools specific decisions
 - `.windsurf/BOOT.md` - This file

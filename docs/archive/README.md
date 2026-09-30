@@ -1,6 +1,6 @@
 # Archived Files
 
-These files have been consolidated into IMPLEMENTATION-PLAN.md (D-022).
+These files have been consolidated into PLAN.md (D-022, migrated D-035).
 
 - BACKLOG_*.md - Consolidated into IMPLEMENTATION-PLAN.md
 - ROADMAP.md - Consolidated into IMPLEMENTATION-PLAN.md

@@ -1,8 +1,8 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-04-28 4:45pm  
+**Last updated:** 2026-05-19  
 **Current branch:** main  
-**Working on:** Release v1.27.4 complete; MCP status parsing follow-up pending
+**Working on:** MCP status fix done; validate deploy workflow; Phase 4 planning
 
 ---
 
@@ -22,23 +22,21 @@ Closing end-of-day context after completing a hotfix-to-release cycle for feedba
 ### Key findings
 - **Root cause for feedback outage:** schema required `feedbackNumber`, submit API did not set it.
 - **MCP naming hygiene:** use `ldctools-blue`/`ldctools-green` aliases and LIVE/STANDBY terminology.
-- **MCP status caveat:** `get_deployment_status` for ldc-tools can report stale/unknown backend; HAProxy must be treated as source of truth when in doubt.
+- **MCP status fix (2026-05-19):** HAProxy ACL is `is_ldc` (not `is_ldc_tools`); backends are `ldc-tools-blue`/`ldc-tools-green`.
 
 ---
 
 ## Known Issues
 **Current:**
 - TypeScript error in `ImportExportButtons.tsx` (lines 52, 184)
-- MCP `get_deployment_status` can misreport LIVE/STANDBY for ldc-tools (`backend: unknown`) despite successful switch/deploy actions
 
 ---
 
 ## Next Steps
 
-**Tomorrow (or next session):**
-1. Fix `get_deployment_status` parsing for ldc-tools so HAProxy backend is resolved reliably (remove `unknown` drift)
-2. Re-run MCP status/deploy/release/sync dry-run checks to validate LIVE/STANDBY reporting
-3. Resume product backlog prioritization for Phase 4 (admin portal rework vs mobile/PWA)
+**Next session:**
+1. Re-run MCP `get_deployment_status` / deploy dry-run to confirm LIVE=BLUE via HAProxy
+2. Resume product backlog prioritization for Phase 4 (admin portal rework vs mobile/PWA)
 
 **Potential work items:**
 - Admin portal rework to match TheoShift (XL effort)
@@ -55,4 +53,4 @@ Closing end-of-day context after completing a hotfix-to-release cycle for feedba
 ---
 
 ## Exact Next Command
-Run `/start-day`, then validate ldc-tools MCP status parser against live HAProxy rules before any deploy operations.
+Run `get_deployment_status` for ldc-tools — expect `haproxy.backend: blue` (matches `use_backend ldc-tools-blue if is_ldc`). See `PLAN.md` for backlog.

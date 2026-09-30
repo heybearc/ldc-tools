@@ -127,3 +127,11 @@ frontend/data/
 
 # --- Local debug scripts ---
 frontend/test-env.js
+
+# Control plane Cursor symlinks
+.cursor/commands/*.md
+.cursor/rules/*
+.cursor/skills/*
+
+# MCP is global only (~/.cursor/mcp.json) — do not commit project mcp.json (D-053)
+.cursor/mcp.json
