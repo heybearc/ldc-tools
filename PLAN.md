@@ -14,7 +14,7 @@
 - [x] Product brief + import template for Trade Leadership Directory (effort: S)
 - [x] Import CG 01.12 hub scrape → oversight tables (effort: M)
 - [x] Place Hart + Miller-Sieving as TT Support on placeholder team TBD (effort: S)
-- [ ] Decide headshots in directory (effort: S)
+- [x] Show hub headshots on the directory (first capture: 26 people) (effort: S)
 - [ ] Clean inferred/no-crew rows in UI (effort: M)
 - [ ] Soft-land homepage → directory; hide legacy noise (effort: M)
 - [ ] Smoke / `/test-release` on STANDBY before any `/release` (effort: S)

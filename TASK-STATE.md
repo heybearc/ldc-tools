@@ -20,8 +20,8 @@ Hub scrape is in CG 01.12 oversight. Hart + Miller-Sieving are TT Support on pla
 - ✅ Oversight import: **195/195** (Hart + Miller-Sieving as TT Support on TBD)
 
 ### Exact Next Command
-1. Decide headshots in directory (yes/no + source)
-2. Spot-clean inferred household-trade / no-crew rows in UI
+1. Spot-clean inferred household-trade / no-crew rows in UI
+2. More headshot captures if the rest of CG 01.12 should have photos (this scroll covered 26 people)
 
 ---
 
@@ -34,4 +34,4 @@ Hub scrape is in CG 01.12 oversight. Hart + Miller-Sieving are TT Support on pla
 ---
 
 ## Exact Next Command
-Confirm headshot decision (yes/no + source)
+Spot-clean inferred household-trade / no-crew rows in the directory UI

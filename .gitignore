@@ -136,5 +136,6 @@ frontend/test-env.js
 # MCP is global only (~/.cursor/mcp.json) — do not commit project mcp.json (D-053)
 .cursor/mcp.json
 frontend/scripts/import-*-oversight-data.json
+.tmp-headshots/
 docs/templates/LDC-Trade-Leadership-Import-CG*.xlsx
 **/~\$*.xlsx

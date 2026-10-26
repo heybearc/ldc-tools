@@ -16,6 +16,7 @@ interface OversightAssignment {
     id: string;
     name: string | null;
     email: string;
+    image?: string | null;
   };
 }
 
@@ -89,6 +90,26 @@ export default function TradeTeamsOverviewPage() {
   const formatUserList = (assignments: OversightAssignment[]) => {
     if (assignments.length === 0) return '—';
     return assignments.map(a => formatUserName(a.user)).join(', ');
+  };
+
+  const PersonList = ({ assignments }: { assignments: OversightAssignment[] }) => {
+    if (assignments.length === 0) return <span>—</span>;
+    return (
+      <div className="flex flex-col gap-1">
+        {assignments.map((assignment) => (
+          <div key={assignment.id} className="flex items-center gap-1.5 min-w-0">
+            {assignment.user.image ? (
+              <img
+                src={assignment.user.image}
+                alt=""
+                className="h-7 w-7 rounded-full object-cover flex-shrink-0 bg-gray-200"
+              />
+            ) : null}
+            <span className="truncate">{formatUserName(assignment.user)}</span>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const exportToCSV = () => {
@@ -304,15 +325,15 @@ export default function TradeTeamsOverviewPage() {
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div>
                           <div className="font-medium text-gray-600">Overseer</div>
-                          <div className="text-gray-900">{formatUserList(getOversightByRole(team.oversight, 'TTO'))}</div>
+                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTO')} /></div>
                         </div>
                         <div>
                           <div className="font-medium text-gray-600">Assistant</div>
-                          <div className="text-gray-900">{formatUserList(getOversightByRole(team.oversight, 'TTOA'))}</div>
+                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTOA')} /></div>
                         </div>
                         <div>
                           <div className="font-medium text-gray-600">Support</div>
-                          <div className="text-gray-900">{formatUserList(getOversightByRole(team.oversight, 'TT_SUPPORT'))}</div>
+                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TT_SUPPORT')} /></div>
                         </div>
                       </div>
                     </div>
@@ -344,13 +365,13 @@ export default function TradeTeamsOverviewPage() {
                                 {crew.name}
                               </div>
                               <div className="text-gray-700">
-                                {formatUserList(getOversightByRole(crew.oversight, 'TCO'))}
+                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCO')} />
                               </div>
                               <div className="text-gray-700">
-                                {formatUserList(getOversightByRole(crew.oversight, 'TCOA'))}
+                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCOA')} />
                               </div>
                               <div className="text-gray-700">
-                                {formatUserList(getOversightByRole(crew.oversight, 'TC_SUPPORT'))}
+                                <PersonList assignments={getOversightByRole(crew.oversight, 'TC_SUPPORT')} />
                               </div>
                             </div>
                           </div>
@@ -410,14 +431,14 @@ export default function TradeTeamsOverviewPage() {
                               <span className="ml-2 text-xs text-gray-500">({team.crews.length} crews)</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                            {formatUserList(getOversightByRole(team.oversight, 'TTO'))}
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            <PersonList assignments={getOversightByRole(team.oversight, 'TTO')} />
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                            {formatUserList(getOversightByRole(team.oversight, 'TTOA'))}
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            <PersonList assignments={getOversightByRole(team.oversight, 'TTOA')} />
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                            {formatUserList(getOversightByRole(team.oversight, 'TT_SUPPORT'))}
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            <PersonList assignments={getOversightByRole(team.oversight, 'TT_SUPPORT')} />
                           </td>
                           <td colSpan={4} className="px-4 py-3"></td>
                         </tr>
@@ -438,14 +459,14 @@ export default function TradeTeamsOverviewPage() {
                                 )}
                               </div>
                             </td>
-                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
-                              {formatUserList(getOversightByRole(crew.oversight, 'TCO'))}
+                            <td className="px-4 py-2 text-sm text-gray-700">
+                              <PersonList assignments={getOversightByRole(crew.oversight, 'TCO')} />
                             </td>
-                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
-                              {formatUserList(getOversightByRole(crew.oversight, 'TCOA'))}
+                            <td className="px-4 py-2 text-sm text-gray-700">
+                              <PersonList assignments={getOversightByRole(crew.oversight, 'TCOA')} />
                             </td>
-                            <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
-                              {formatUserList(getOversightByRole(crew.oversight, 'TC_SUPPORT'))}
+                            <td className="px-4 py-2 text-sm text-gray-700">
+                              <PersonList assignments={getOversightByRole(crew.oversight, 'TC_SUPPORT')} />
                             </td>
                           </tr>
                         ))}
