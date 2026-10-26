@@ -21,7 +21,7 @@ Hub scrape is in CG 01.12 oversight. Hart + Miller-Sieving are TT Support on pla
 
 ### Exact Next Command
 1. Spot-clean inferred household-trade / no-crew rows in UI
-2. Another pass for the remaining headshots — 152 directory users have photos; last full face in the 7:00 shot is Barby Quay
+2. Headshots for the 12 named people still missing a photo (list ends at B.J. Zell)
 
 ---
 
