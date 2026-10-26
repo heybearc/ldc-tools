@@ -21,7 +21,7 @@ Hub scrape is in CG 01.12 oversight. Hart + Miller-Sieving are TT Support on pla
 
 ### Exact Next Command
 1. Spot-clean inferred household-trade / no-crew rows in UI
-2. Slower hub scroll (or several overlapping shots) for the remaining headshots — this file has 53 unique cards, 50 linked
+2. Another pass for the remaining headshots — 112 directory users have photos; sliced circles and people who are not users were skipped
 
 ---
 

@@ -11,7 +11,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ### Discoveries / Notes
 - Both were TC Support with no trade. Assigned TT_SUPPORT on new CG 01.12 team **TBD** (shared DB).
 - Importer now maps a missing trade_team to TT_SUPPORT on TBD instead of skipping.
-- Headshots: walked every name line in the 6:22 scroll. 62 lines, 53 unique people (stitch overlaps). 50 linked on the directory. Header says 210 of 210; the pixels jump and do not contain the other cards. 
+- Headshots: 6:45 capture has 167 name rows and 151 full circles (16 sliced by the stitch). 112 directory users now have a photo. 
 
 ### Decisions to Promote
 - 
