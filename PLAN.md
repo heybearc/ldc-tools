@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-26 (mid-day)  
+**Last updated:** 2026-10-26 (evening)  
 **Current phase:** Trade Leadership Directory v1  
-**Status:** CG 01.12 oversight imported (193/195); STANDBY green current; LIVE still blue
+**Status:** CG 01.12 oversight imported (195/195); STANDBY green current; LIVE still blue
 
 ---
 
@@ -13,7 +13,7 @@
 - [x] Deploy latest `main` to STANDBY (green) (effort: S)
 - [x] Product brief + import template for Trade Leadership Directory (effort: S)
 - [x] Import CG 01.12 hub scrape → oversight tables (effort: M)
-- [ ] Place Hart + Miller-Sieving as TT Support placeholders (effort: S)
+- [x] Place Hart + Miller-Sieving as TT Support on placeholder team TBD (effort: S)
 - [ ] Decide headshots in directory (effort: S)
 - [ ] Clean inferred/no-crew rows in UI (effort: M)
 - [ ] Soft-land homepage → directory; hide legacy noise (effort: M)

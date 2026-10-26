@@ -415,18 +415,21 @@ async function main() {
     const row = rows[i];
     const rowLabel = `${row.first_name} ${row.last_name} (${row.role})`;
     try {
-      const role = (row.role || '').toString().trim().toUpperCase();
+      let role = (row.role || '').toString().trim().toUpperCase();
       if (!TEAM_ROLES.has(role) && !CREW_ROLES.has(role)) {
         stats.skippedBadRole++;
         stats.errors.push(`Row ${i + 1} ${rowLabel}: bad role ${row.role}`);
         continue;
       }
 
-      const teamName = resolveTeamName(row.trade_team);
+      let teamName = resolveTeamName(row.trade_team);
       if (!teamName) {
-        stats.skippedNoTeam++;
-        stats.errors.push(`Row ${i + 1} ${rowLabel}: missing trade_team`);
-        continue;
+        // No trade yet: park as team support on the placeholder team.
+        teamName = 'TBD';
+        role = 'TT_SUPPORT';
+        stats.errors.push(
+          `Row ${i + 1} ${rowLabel}: missing trade_team — assigning as TT_SUPPORT on TBD`
+        );
       }
 
       const person = await ensureUserAndVolunteer(cg.id, row, args.dryRun, cache);
