@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-26  
-**Current phase:** Post-resume operations (after D-056 Level B reverse)  
-**Status:** Resumed; STANDBY green deploy succeeded; LIVE still blue
+**Last updated:** 2026-10-26 (mid-day)  
+**Current phase:** Trade Leadership Directory v1  
+**Status:** CG 01.12 oversight imported (193/195); STANDBY green current; LIVE still blue
 
 ---
 
@@ -11,21 +11,27 @@
 ### Active Work
 - [x] Resume fleet app (CTs, HAProxy, MCP/SSH, DB VIP) (effort: M)
 - [x] Deploy latest `main` to STANDBY (green) (effort: S)
-- [ ] Re-enable Uptime Kuma monitors + clear Alertmanager silences (effort: S — operator)
+- [x] Product brief + import template for Trade Leadership Directory (effort: S)
+- [x] Import CG 01.12 hub scrape → oversight tables (effort: M)
+- [ ] Place Hart + Miller-Sieving as TT Support placeholders (effort: S)
+- [ ] Decide headshots in directory (effort: S)
+- [ ] Clean inferred/no-crew rows in UI (effort: M)
+- [ ] Soft-land homepage → directory; hide legacy noise (effort: M)
 - [ ] Smoke / `/test-release` on STANDBY before any `/release` (effort: S)
-- [ ] Plan Phase 4 features and timeline (effort: S)
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
 - ✅ D-068 — blue IP `10.92.3.34` (Postgres VIP keeps `.23`)
 - ✅ HAProxy green ACL fix + blue server IP update
 - ✅ STANDBY deploy to green `10.92.3.25` success
+- ✅ Oversight import script + 193 assignments loaded
 
 ---
 
 ## Prioritized Backlog
 
 ### High Priority
+- [ ] Trade Leadership Directory UX (search, copy email, export polish) (effort: M)
 - [ ] Rework admin portal to match TheoShift approach (effort: XL)
 - [ ] Mobile optimization and PWA support (effort: L)
 - [ ] Fix TypeScript error in ImportExportButtons.tsx (lines 52, 184) (effort: S)

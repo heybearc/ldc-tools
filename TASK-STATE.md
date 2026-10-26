@@ -1,38 +1,38 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-10-26  
+**Last updated:** 2026-10-26 (mid-day)  
 **Current branch:** main  
-**Working on:** Post-resume operationalization (D-056 reverse + D-068)
+**Working on:** Trade Leadership Directory (v1) for CG 01.12
 
 ---
 
 ## Current Task
-**Fleet resume complete — validate STANDBY deploy + smoke** - IN PROGRESS
+**Populate + clean Trade Leadership Directory** - IN PROGRESS
 
 ### What I'm doing right now
-Brought ldc-tools back from Level B archive: CTs running, HAProxy fixed, blue IP moved to 10.92.3.34, DB on Postgres VIP 10.92.3.23.
+Hub scrape imported into CG 01.12 oversight (Users + TradeTeam/TradeCrew oversight). Directory at `/trade-teams/overview`. Pending: assign Hart + Miller-Sieving as TT Support; decide on headshots; in-app cleanup of inferred rows.
 
 ### Recent completions
-- ✅ GitHub unarchived (`heybearc/ldc-tools`)
-- ✅ CT133 (prox2) + CT135 (prox1) started; onboot enabled
-- ✅ Blue IP conflict resolved: CT133 → `10.92.3.34` (D-068); Postgres VIP kept `.23`
-- ✅ HAProxy blue server + green ACL routing fixed; vzdump restored; watchdog archive cleared
-- ✅ Both nodes PM2 online; health `/api/auth/providers` → 200
-- ✅ DATABASE_URL on both nodes → `10.92.3.23`
+- ✅ Fleet resume (D-056 reverse) + D-068 blue IP `10.92.3.34`
+- ✅ STANDBY green deploy healthy (`b0f0264`)
+- ✅ Product brief: Trade Leadership Directory v1
+- ✅ Import template + CG 01.12 scrape workbook
+- ✅ Oversight import: **193/195** assignments (team 35 + crew 158)
 
 ### Exact Next Command
-1. MCP `deploy_to_standby` for `ldc-tools` (`pullGithub: true`)
-2. Smoke on STANDBY (green)
-3. Re-enable Uptime Kuma monitors for ldctools.com
-4. Operator: expire Alertmanager silences for ldc instances if still active
+1. Assign Daryl Hart + Tiffany Miller-Sieving as TT Support (placeholder trade TBD / any team)
+2. Decide headshots in directory (yes/no + source)
+3. Spot-clean inferred household-trade / no-crew rows in UI
 
 ---
 
 ## Known Issues
 - TypeScript error in `ImportExportButtons.tsx` (lines 52, 184) — deferred
-- Cursor MCP process may need reload to pick up `blueIp` 10.92.3.34
+- 2 people still missing trade_team (Hart, Miller-Sieving)
+- ~9 TC Support without crew → parked as TT Support on inferred team
+- SSH `Host ldc` still points at old IP; use `root@10.92.3.34` / IdentityFile explicitly
 
 ---
 
 ## Exact Next Command
-`deploy_to_standby` app=ldc-tools pullGithub=true createBackup=true
+Assign Hart + Miller-Sieving as TT Support; confirm headshot decision
