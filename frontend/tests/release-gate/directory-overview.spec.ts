@@ -64,12 +64,12 @@ test('directory lists oversight people, role columns, and a CSV export', async (
 
   await page.getByTitle('Table View').click();
   const table = page.getByRole('table');
-  await expect(table.getByRole('columnheader', { name: 'TTO' })).toBeVisible();
-  await expect(table.getByRole('columnheader', { name: 'TTOA' })).toBeVisible();
-  await expect(table.getByRole('columnheader', { name: 'TT Support' })).toBeVisible();
-  await expect(table.getByRole('columnheader', { name: 'TCO' })).toBeVisible();
-  await expect(table.getByRole('columnheader', { name: 'TCOA' })).toBeVisible();
-  await expect(table.getByRole('columnheader', { name: 'TC Support' })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: 'TTO', exact: true })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: 'TTOA', exact: true })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: 'TT Support', exact: true })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: 'TCO', exact: true })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: 'TCOA', exact: true })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: 'TC Support', exact: true })).toBeVisible();
   await expect(table.getByRole('cell', { name: firstName, exact: true })).toBeVisible();
 
   const downloadPromise = page.waitForEvent('download');
