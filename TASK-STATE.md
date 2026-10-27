@@ -21,7 +21,7 @@ Hub scrape is in CG 01.12 oversight. Hart + Miller-Sieving are TT Support on pla
 
 ### Exact Next Command
 1. Spot-clean inferred household-trade / no-crew rows in UI
-2. Headshots for the 12 named people still missing a photo (list ends at B.J. Zell)
+2. Spot-clean inferred household-trade / no-crew rows in the directory UI
 
 ---
 
