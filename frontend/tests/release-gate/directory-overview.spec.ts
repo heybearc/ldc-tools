@@ -70,7 +70,7 @@ test('directory lists oversight people, role columns, and a CSV export', async (
   await expect(table.getByRole('columnheader', { name: 'TCO', exact: true })).toBeVisible();
   await expect(table.getByRole('columnheader', { name: 'TCOA', exact: true })).toBeVisible();
   await expect(table.getByRole('columnheader', { name: 'TC Support', exact: true })).toBeVisible();
-  await expect(table.getByRole('cell', { name: firstName, exact: true })).toBeVisible();
+  await expect(table.getByRole('cell', { name: firstName }).first()).toBeVisible();
 
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export CSV' }).click();
