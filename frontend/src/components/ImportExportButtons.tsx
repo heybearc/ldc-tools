@@ -49,9 +49,9 @@ export default function ImportExportButtons({
       });
 
       await onImport(data);
-      alert(\`Successfully imported \${data.length} \${entityName}\`);
+      alert(`Successfully imported ${data.length} ${entityName}`);
     } catch (error: any) {
-      alert(\`Import failed: \${error.message}\`);
+      alert(`Import failed: ${error.message}`);
     } finally {
       setImporting(false);
       if (fileInputRef.current) {

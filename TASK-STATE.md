@@ -1,6 +1,6 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-10-27 (mid-day)  
+**Last updated:** 2026-10-27  
 **Current branch:** main  
 **Working on:** Trade Leadership Directory (v1) for CG 01.12
 
@@ -23,11 +23,9 @@ Spot-clean inferred household-trade / no-crew rows in the directory UI
 ---
 
 ## Known Issues
-- TypeScript error in `ImportExportButtons.tsx` (lines 52, 184) — deferred
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
 - ~9 TC Support without crew → parked as TT Support on an inferred team
 - Site/Civil is still an empty trade with no populated twin
-- qa-01 cannot read HAProxy CT136 from prox1, so standby detection for LDC fails until that host is fixed
 
 ---
 
