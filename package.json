@@ -13,8 +13,5 @@
   },
   "keywords": ["mcp", "ldc", "construction", "credit-savings"],
   "author": "APEX Guardian System",
-  "license": "MIT",
-  "devDependencies": {
-    "@playwright/test": "1.57.0"
-  }
+  "license": "MIT"
 }

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from './frontend/node_modules/@playwright/test';
 
 const envFile = path.join(__dirname, 'frontend/.env.test');
 if (fs.existsSync(envFile)) {
