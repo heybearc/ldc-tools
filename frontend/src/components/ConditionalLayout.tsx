@@ -88,85 +88,33 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-6">
               <nav className="flex space-x-6">
-                <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium">
-                  Dashboard
+                <Link href="/trade-teams/overview" className="text-gray-900 hover:text-blue-600 font-medium">
+                  Directory
                 </Link>
 
-                {/* People Dropdown */}
                 <div className="relative">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setOpenDropdown(openDropdown === 'people' ? null : 'people');
+                      setOpenDropdown(openDropdown === 'more' ? null : 'more');
                     }}
                     className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1"
                   >
-                    <span>People</span>
+                    <span>More</span>
                     <ChevronDown className="h-4 w-4" />
                   </button>
-                  {openDropdown === 'people' && (
+                  {openDropdown === 'more' && (
                     <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                      <Link href="/volunteers" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Volunteers
-                      </Link>
-                      <Link href="/trade-teams" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Trade Teams
-                      </Link>
-                      <Link href="/congregations" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Congregations
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                {/* Projects Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenDropdown(openDropdown === 'projects' ? null : 'projects');
-                    }}
-                    className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1"
-                  >
-                    <span>Projects</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                  {openDropdown === 'projects' && (
-                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                      <Link href="/projects" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Projects List
-                      </Link>
-                      <Link href="/calendar" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Calendar
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                {/* Requests Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenDropdown(openDropdown === 'requests' ? null : 'requests');
-                    }}
-                    className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1"
-                  >
-                    <span>Requests</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                  {openDropdown === 'requests' && (
-                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                      <Link href="/crew-request" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Submit Request
-                      </Link>
-                      <Link href="/my-requests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        My Requests
-                      </Link>
+                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Former dashboard</Link>
+                      <Link href="/volunteers" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Volunteers</Link>
+                      <Link href="/trade-teams" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Trade Teams</Link>
+                      <Link href="/congregations" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Congregations</Link>
+                      <Link href="/projects" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Projects</Link>
+                      <Link href="/calendar" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Calendar</Link>
+                      <Link href="/crew-request" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Submit Request</Link>
+                      <Link href="/my-requests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Requests</Link>
                       {canManageVolunteers && (
-                        <Link href="/crew-requests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Manage Requests
-                        </Link>
+                        <Link href="/crew-requests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage Requests</Link>
                       )}
                     </div>
                   )}
@@ -257,11 +205,18 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
             <nav className="p-4 space-y-1">
               {/* Dashboard */}
               <Link 
-                href="/" 
-                className="block px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+                href="/trade-teams/overview" 
+                className="block px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                🏠 Dashboard
+                Directory
+              </Link>
+              <Link 
+                href="/dashboard" 
+                className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Former dashboard
               </Link>
 
               {/* People Section */}

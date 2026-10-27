@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { getCGScope, withCGFilter } from '@/lib/cg-scope';
+import { visibleAssignments } from '@/lib/directory-assignments';
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
       include: {
         oversight: {
           where: {
-            isActive: true
+            OR: [{ isActive: true }, { endDate: { not: null } }]
           },
           include: {
             user: {
@@ -37,7 +38,10 @@ export async function GET(request: NextRequest) {
                 id: true,
                 name: true,
                 email: true,
-                image: true
+                image: true,
+                firstName: true,
+                lastName: true,
+                volunteer: { select: { phone: true, firstName: true, lastName: true } }
               }
             }
           }
@@ -52,7 +56,7 @@ export async function GET(request: NextRequest) {
           include: {
             oversight: {
               where: {
-                isActive: true
+                OR: [{ isActive: true }, { endDate: { not: null } }]
               },
               include: {
                 user: {
@@ -60,7 +64,10 @@ export async function GET(request: NextRequest) {
                     id: true,
                     name: true,
                     email: true,
-                    image: true
+                    image: true,
+                    firstName: true,
+                    lastName: true,
+                    volunteer: { select: { phone: true, firstName: true, lastName: true } }
                   }
                 }
               }
@@ -71,15 +78,29 @@ export async function GET(request: NextRequest) {
     });
 
     // Transform data to match expected format
+    const presentPerson = (assignment: (typeof tradeTeams)[number]['oversight'][number] & { awaitingReplacement: boolean }) => ({
+      id: assignment.id,
+      role: assignment.role,
+      isActive: assignment.isActive,
+      awaitingReplacement: assignment.awaitingReplacement,
+      startDate: assignment.startDate,
+      endDate: assignment.endDate,
+      user: {
+        id: assignment.user.id,
+        name: assignment.user.name,
+        email: assignment.user.email,
+        image: assignment.user.image,
+        firstName: assignment.user.volunteer?.firstName || assignment.user.firstName,
+        lastName: assignment.user.volunteer?.lastName || assignment.user.lastName,
+        phone: assignment.user.volunteer?.phone || null
+      }
+    });
+
     const formattedTeams = tradeTeams.map(team => ({
       id: team.id,
       name: team.name,
       description: team.description,
-      oversight: team.oversight.map(o => ({
-        id: o.id,
-        role: o.role,
-        user: o.user
-      })),
+      oversight: visibleAssignments(team.oversight).map(presentPerson),
       crews: team.crews.map(crew => ({
         id: crew.id,
         name: crew.name,
@@ -87,11 +108,7 @@ export async function GET(request: NextRequest) {
         scopeOfWork: crew.scopeOfWork,
         isRequired: crew.isRequired,
         status: crew.status,
-        oversight: crew.oversight.map(o => ({
-          id: o.id,
-          role: o.role,
-          user: o.user
-        }))
+        oversight: visibleAssignments(crew.oversight).map(presentPerson)
       }))
     }));
 

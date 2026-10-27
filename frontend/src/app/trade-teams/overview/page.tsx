@@ -6,17 +6,25 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { 
   Download, RefreshCw, Grid3X3, Table, ArrowLeft,
-  Users, ChevronDown, ChevronRight, Printer
+  Users, ChevronDown, ChevronRight, Printer, Copy, UserPlus
 } from 'lucide-react';
+import DirectoryEntryDialog, { DirectoryEditTarget } from '@/components/DirectoryEntryDialog';
 
 interface OversightAssignment {
   id: string;
   role: string;
+  isActive?: boolean;
+  awaitingReplacement?: boolean;
+  startDate?: string | null;
+  endDate?: string | null;
   user: {
     id: string;
     name: string | null;
     email: string;
     image?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    phone?: string | null;
   };
 }
 
@@ -46,6 +54,8 @@ export default function TradeTeamsOverviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState('');
+  const [editor, setEditor] = useState<null | { mode: 'add' } | { mode: 'edit'; entry: DirectoryEditTarget }>(null);
 
   useEffect(() => {
     fetchOverviewData();
@@ -92,20 +102,58 @@ export default function TradeTeamsOverviewPage() {
     return assignments.map(a => formatUserName(a.user)).join(', ');
   };
 
-  const PersonList = ({ assignments }: { assignments: OversightAssignment[] }) => {
+  const PersonList = ({
+    assignments,
+    tradeTeamId,
+    crewId,
+  }: {
+    assignments: OversightAssignment[];
+    tradeTeamId: string;
+    crewId: string | null;
+  }) => {
     if (assignments.length === 0) return <span>—</span>;
     return (
       <div className="flex flex-col gap-1">
         {assignments.map((assignment) => (
           <div key={assignment.id} className="flex items-center gap-1.5 min-w-0">
-            {assignment.user.image ? (
-              <img
-                src={assignment.user.image}
-                alt=""
-                className="h-7 w-7 rounded-full object-cover flex-shrink-0 bg-gray-200"
-              />
-            ) : null}
-            <span className="truncate">{formatUserName(assignment.user)}</span>
+            <button
+              type="button"
+              className="flex items-center gap-1.5 min-w-0 text-left hover:underline"
+              onClick={() => setEditor({
+                mode: 'edit',
+                entry: {
+                  id: assignment.id,
+                  role: assignment.role,
+                  startDate: assignment.startDate,
+                  endDate: assignment.endDate,
+                  tradeTeamId,
+                  crewId,
+                  user: assignment.user,
+                },
+              })}
+            >
+              {assignment.user.image ? (
+                <img
+                  src={assignment.user.image}
+                  alt=""
+                  className="h-7 w-7 rounded-full object-cover flex-shrink-0 bg-gray-200"
+                />
+              ) : null}
+              <span className={`truncate ${assignment.awaitingReplacement ? 'text-amber-800' : ''}`}>
+                {formatUserName(assignment.user)}
+                {assignment.awaitingReplacement ? ' (ended)' : ''}
+              </span>
+            </button>
+            {assignment.user.email && (
+              <button
+                type="button"
+                title="Copy email"
+                className="text-gray-400 hover:text-gray-700"
+                onClick={() => navigator.clipboard.writeText(assignment.user.email)}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -218,6 +266,26 @@ export default function TradeTeamsOverviewPage() {
     );
   }
 
+  const query = search.trim().toLowerCase();
+  const shownTeams = !query
+    ? tradeTeams
+    : tradeTeams
+        .map((team) => {
+          const teamHit = team.name.toLowerCase().includes(query);
+          const peopleText = (rows: OversightAssignment[]) =>
+            rows.some((row) => {
+              const haystack = `${row.user.name || ''} ${row.user.email || ''} ${row.role}`.toLowerCase();
+              return haystack.includes(query);
+            });
+          if (teamHit || peopleText(team.oversight)) return team;
+          const crews = team.crews.filter(
+            (crew) => crew.name.toLowerCase().includes(query) || peopleText(crew.oversight)
+          );
+          if (crews.length === 0) return null;
+          return { ...team, crews };
+        })
+        .filter((team): team is TradeTeam => team !== null);
+
   // Color scheme for trade teams (matching spreadsheet style)
   const teamColors = [
     { bg: 'bg-green-600', header: 'bg-green-700', light: 'bg-green-50', border: 'border-green-200' },
@@ -247,6 +315,13 @@ export default function TradeTeamsOverviewPage() {
                   <span className="sm:hidden">Back</span>
                 </Link>
                 <h1 className="text-lg sm:text-xl font-bold text-gray-900">Trade Teams Overview</h1>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search trade, person, or role"
+                  className="w-full sm:w-64 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                />
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
                 <button
@@ -287,6 +362,13 @@ export default function TradeTeamsOverviewPage() {
                   <span className="hidden sm:inline">Export PDF</span>
                 </button>
                 <button
+                  onClick={() => setEditor({ mode: 'add' })}
+                  className="inline-flex items-center px-3 py-2 min-h-[44px] border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 flex-shrink-0"
+                >
+                  <UserPlus className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Add person</span>
+                </button>
+                <button
                   onClick={exportToCSV}
                   className="inline-flex items-center px-3 py-2 min-h-[44px] border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 flex-shrink-0"
                 >
@@ -310,7 +392,7 @@ export default function TradeTeamsOverviewPage() {
         {viewMode === 'grid' ? (
           /* Grid View - Vertical stack of team cards */
           <div className="space-y-6">
-              {tradeTeams.map((team, teamIdx) => {
+              {shownTeams.map((team, teamIdx) => {
                 const colors = teamColors[teamIdx % teamColors.length];
                 return (
                   <div key={team.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -325,15 +407,15 @@ export default function TradeTeamsOverviewPage() {
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div>
                           <div className="font-medium text-gray-600">Overseer</div>
-                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTO')} /></div>
+                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTO')} tradeTeamId={team.id} crewId={null} /></div>
                         </div>
                         <div>
                           <div className="font-medium text-gray-600">Assistant</div>
-                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTOA')} /></div>
+                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTOA')} tradeTeamId={team.id} crewId={null} /></div>
                         </div>
                         <div>
                           <div className="font-medium text-gray-600">Support</div>
-                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TT_SUPPORT')} /></div>
+                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TT_SUPPORT')} tradeTeamId={team.id} crewId={null} /></div>
                         </div>
                       </div>
                     </div>
@@ -365,13 +447,13 @@ export default function TradeTeamsOverviewPage() {
                                 {crew.name}
                               </div>
                               <div className="text-gray-700">
-                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCO')} />
+                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCO')} tradeTeamId={team.id} crewId={crew.id} />
                               </div>
                               <div className="text-gray-700">
-                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCOA')} />
+                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCOA')} tradeTeamId={team.id} crewId={crew.id} />
                               </div>
                               <div className="text-gray-700">
-                                <PersonList assignments={getOversightByRole(crew.oversight, 'TC_SUPPORT')} />
+                                <PersonList assignments={getOversightByRole(crew.oversight, 'TC_SUPPORT')} tradeTeamId={team.id} crewId={crew.id} />
                               </div>
                             </div>
                           </div>
@@ -416,7 +498,7 @@ export default function TradeTeamsOverviewPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {tradeTeams.map((team, teamIdx) => {
+                  {shownTeams.map((team, teamIdx) => {
                     const colors = teamColors[teamIdx % teamColors.length];
                     const isExpanded = expandedTeams.has(team.id);
                     
@@ -432,13 +514,13 @@ export default function TradeTeamsOverviewPage() {
                             </div>
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-900">
-                            <PersonList assignments={getOversightByRole(team.oversight, 'TTO')} />
+                            <PersonList assignments={getOversightByRole(team.oversight, 'TTO')} tradeTeamId={team.id} crewId={null} />
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-900">
-                            <PersonList assignments={getOversightByRole(team.oversight, 'TTOA')} />
+                            <PersonList assignments={getOversightByRole(team.oversight, 'TTOA')} tradeTeamId={team.id} crewId={null} />
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-900">
-                            <PersonList assignments={getOversightByRole(team.oversight, 'TT_SUPPORT')} />
+                            <PersonList assignments={getOversightByRole(team.oversight, 'TT_SUPPORT')} tradeTeamId={team.id} crewId={null} />
                           </td>
                           <td colSpan={4} className="px-4 py-3"></td>
                         </tr>
@@ -460,13 +542,13 @@ export default function TradeTeamsOverviewPage() {
                               </div>
                             </td>
                             <td className="px-4 py-2 text-sm text-gray-700">
-                              <PersonList assignments={getOversightByRole(crew.oversight, 'TCO')} />
+                              <PersonList assignments={getOversightByRole(crew.oversight, 'TCO')} tradeTeamId={team.id} crewId={crew.id} />
                             </td>
                             <td className="px-4 py-2 text-sm text-gray-700">
-                              <PersonList assignments={getOversightByRole(crew.oversight, 'TCOA')} />
+                              <PersonList assignments={getOversightByRole(crew.oversight, 'TCOA')} tradeTeamId={team.id} crewId={crew.id} />
                             </td>
                             <td className="px-4 py-2 text-sm text-gray-700">
-                              <PersonList assignments={getOversightByRole(crew.oversight, 'TC_SUPPORT')} />
+                              <PersonList assignments={getOversightByRole(crew.oversight, 'TC_SUPPORT')} tradeTeamId={team.id} crewId={crew.id} />
                             </td>
                           </tr>
                         ))}
@@ -516,6 +598,22 @@ export default function TradeTeamsOverviewPage() {
           .print\\:block { display: block !important; }
         }
       `}</style>
+      {editor && (
+        <DirectoryEntryDialog
+          mode={editor.mode}
+          entry={editor.mode === 'edit' ? editor.entry : null}
+          teams={tradeTeams.map((team) => ({
+            id: team.id,
+            name: team.name,
+            crews: team.crews.map((crew) => ({ id: crew.id, name: crew.name })),
+          }))}
+          onClose={() => setEditor(null)}
+          onSaved={() => {
+            setEditor(null);
+            fetchOverviewData();
+          }}
+        />
+      )}
     </div>
   );
 }
