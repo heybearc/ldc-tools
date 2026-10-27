@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-27  
 **Current branch:** main  
-**Working on:** Trade Leadership Directory (v1) for CG 01.12
+**Working on:** Trade Leadership Directory (v1.29.0) for CG 01.12
 
 ---
 
@@ -10,10 +10,10 @@
 **Spot-clean inferred oversight rows** — next
 
 ### What I'm doing right now
-v1.28.0 is LIVE on green (CT135) and synced to blue (CT133), both at `fe08a8c`. Directory is the home page. Search, copy email, add person, and edit are in. An end date deactivates an assignment and keeps the person listed until a replacement in that role has a start date. Empty duplicate trades are inactive. Next is the inferred household-trade and no-crew rows.
+v1.29.0 is LIVE on blue (CT133) and synced to green (CT135), both at `3222e09`. People can be moved across trades, crews, and roles. Sisters can only be Support. Next is the inferred household-trade and no-crew rows.
 
 ### Recent completions
-- ✅ Shipped v1.28.0 (`fe08a8c`); qa-01 short gate plus directory edit test passed
+- ✅ Shipped v1.29.0 (`3222e09`); qa-01 full suite 68/68 plus generated directory tests passed
 - ✅ Retired empty duplicate trades (Electrical, Exteriors, Interiors, Mechanical, Plumbing, Site Support, Structural) and Test Electrical Team
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
