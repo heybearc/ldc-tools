@@ -32,6 +32,13 @@ export default async function TradeTeamsHelpPage() {
             </p>
           </div>
 
+          <h2>Directory</h2>
+          <p>
+            The home page is the Trade Leadership Directory. Search by trade, person, or role.
+            Click a person to edit their name, email, phone, role, or dates. Add person creates a new oversight entry.
+            An end date deactivates that assignment. The person stays listed until someone else in the same role is added with a start date.
+          </p>
+
           <h2>📋 Understanding the Structure</h2>
           <div className="bg-gray-50 rounded-lg p-4 my-4">
             <p className="mb-2"><strong>Trade Team</strong> → The main category (e.g., "Electrical Team")</p>
