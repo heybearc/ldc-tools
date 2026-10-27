@@ -1,5 +1,14 @@
 # LDC Tools Release Notes
 
+## v1.29.0 - Move people and keep sisters in Support
+
+**Release Date:** October 27, 2026
+
+### ✨ New Features
+
+- Move a person to another trade, crew, or role from the directory
+- Sisters can only be Support
+
 ## v1.22.2 - UI Modernization & Admin Dashboard Fix
 
 **Release Date:** December 29, 2025  
