@@ -25,6 +25,7 @@ interface OversightAssignment {
     firstName?: string | null;
     lastName?: string | null;
     phone?: string | null;
+    isSister?: boolean;
   };
 }
 
@@ -304,8 +305,8 @@ export default function TradeTeamsOverviewPage() {
       <div className="bg-white shadow-sm border-b border-gray-200 print:hidden">
         <div className="max-w-full mx-auto px-3 sm:px-6 lg:px-8">
           <div className="py-3 sm:py-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
-              <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex flex-col gap-3">
+              <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-4">
                 <Link
                   href="/trade-teams"
                   className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 min-h-[44px]"
@@ -323,7 +324,7 @@ export default function TradeTeamsOverviewPage() {
                   className="w-full sm:w-64 rounded-md border border-gray-300 px-3 py-2 text-sm"
                 />
               </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+              <div className="flex w-full min-w-0 flex-wrap items-center gap-2">
                 <button
                   onClick={fetchOverviewData}
                   className="p-2 min-h-[44px] min-w-[44px] text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 flex-shrink-0"

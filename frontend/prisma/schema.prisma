@@ -41,6 +41,7 @@ model User {
   image               String?
   firstName           String?
   lastName            String?
+  isSister            Boolean             @default(false)
   role                UserRole            @default(READ_ONLY)  // System permission role only
   ldcRole             String?             // DEPRECATED: Use volunteer.roles instead. Kept for backwards compatibility during migration.
   adminLevel          AdminLevel?         // Optional admin access level

@@ -35,7 +35,8 @@ export default async function TradeTeamsHelpPage() {
           <h2>Directory</h2>
           <p>
             The home page is the Trade Leadership Directory. Search by trade, person, or role.
-            Click a person to edit their name, email, phone, role, or dates. Add person creates a new oversight entry.
+            Click a person to edit their name, email, phone, trade, crew, role, or dates. Add person creates a new oversight entry.
+            Sisters can only be Support.
             An end date deactivates that assignment. The person stays listed until someone else in the same role is added with a start date.
           </p>
 

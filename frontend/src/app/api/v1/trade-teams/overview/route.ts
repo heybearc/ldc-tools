@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
                 image: true,
                 firstName: true,
                 lastName: true,
+                isSister: true,
                 volunteer: { select: { phone: true, firstName: true, lastName: true } }
               }
             }
@@ -67,6 +68,7 @@ export async function GET(request: NextRequest) {
                     image: true,
                     firstName: true,
                     lastName: true,
+                    isSister: true,
                     volunteer: { select: { phone: true, firstName: true, lastName: true } }
                   }
                 }
@@ -78,7 +80,24 @@ export async function GET(request: NextRequest) {
     });
 
     // Transform data to match expected format
-    const presentPerson = (assignment: (typeof tradeTeams)[number]['oversight'][number] & { awaitingReplacement: boolean }) => ({
+    const presentPerson = (assignment: {
+      id: string;
+      role: string;
+      isActive: boolean;
+      awaitingReplacement: boolean;
+      startDate: Date;
+      endDate: Date | null;
+      user: {
+        id: string;
+        name: string | null;
+        email: string;
+        image: string | null;
+        firstName: string | null;
+        lastName: string | null;
+        isSister: boolean;
+        volunteer: { phone: string | null; firstName: string; lastName: string } | null;
+      };
+    }) => ({
       id: assignment.id,
       role: assignment.role,
       isActive: assignment.isActive,
@@ -92,7 +111,8 @@ export async function GET(request: NextRequest) {
         image: assignment.user.image,
         firstName: assignment.user.volunteer?.firstName || assignment.user.firstName,
         lastName: assignment.user.volunteer?.lastName || assignment.user.lastName,
-        phone: assignment.user.volunteer?.phone || null
+        phone: assignment.user.volunteer?.phone || null,
+        isSister: assignment.user.isSister
       }
     });
 

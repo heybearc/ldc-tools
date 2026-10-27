@@ -18,6 +18,7 @@ test('directory edit keeps an ended person until a replacement starts', async ({
   await page.goto('/trade-teams/overview');
   await expect(page.getByRole('heading', { name: 'Trade Teams Overview' })).toBeVisible();
   await expect(page.getByPlaceholder('Search trade, person, or role')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Export CSV' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Add person' }).click();
   await expect(page.getByRole('heading', { name: 'Add person' })).toBeVisible();
@@ -27,6 +28,9 @@ test('directory edit keeps an ended person until a replacement starts', async ({
 
   await page.locator('img.h-7.rounded-full').first().click();
   await expect(page.getByRole('heading', { name: 'Edit entry' })).toBeVisible();
+  await expect(page.getByLabel('Trade')).toBeVisible();
+  await expect(page.getByLabel('Crew')).toBeVisible();
+  await expect(page.getByLabel('Sister')).toBeVisible();
   await expect(page.getByLabel('End date')).toBeVisible();
   await expect(page.getByText('until someone else in the same role is added with a start date')).toBeVisible();
   await page.getByRole('button', { name: 'Cancel' }).click();

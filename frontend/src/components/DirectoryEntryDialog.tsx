@@ -16,6 +16,7 @@ type EntryUser = {
   firstName?: string | null;
   lastName?: string | null;
   phone?: string | null;
+  isSister?: boolean;
 };
 
 export type DirectoryEditTarget = {
@@ -38,6 +39,17 @@ const CREW_ROLES = [
   { value: 'TCOA', label: 'TCOA' },
   { value: 'TC_SUPPORT', label: 'TC Support' },
 ];
+
+function supportRole(hasCrew: boolean) {
+  return hasCrew ? 'TC_SUPPORT' : 'TT_SUPPORT';
+}
+
+function roleForScope(hasCrew: boolean, sister: boolean, current: string) {
+  const allowed = sister
+    ? [supportRole(hasCrew)]
+    : (hasCrew ? CREW_ROLES : TEAM_ROLES).map((item) => item.value);
+  return allowed.includes(current) ? current : allowed[0];
+}
 
 function nameParts(user: EntryUser) {
   if (user.firstName || user.lastName) {
@@ -65,9 +77,12 @@ export default function DirectoryEntryDialog({
   const [lastName, setLastName] = useState(initialName.lastName);
   const [email, setEmail] = useState(entry?.user.email || '');
   const [phone, setPhone] = useState(entry?.user.phone || '');
+  const [isSister, setIsSister] = useState(entry?.user.isSister === true);
   const [tradeTeamId, setTradeTeamId] = useState(entry?.tradeTeamId || teams[0]?.id || '');
   const [crewId, setCrewId] = useState(entry?.crewId || '');
-  const [role, setRole] = useState(entry?.role || (entry?.crewId ? 'TCO' : 'TTO'));
+  const [role, setRole] = useState(
+    roleForScope(Boolean(entry?.crewId), entry?.user.isSister === true, entry?.role || (entry?.crewId ? 'TCO' : 'TTO'))
+  );
   const [startDate, setStartDate] = useState(dateInputValue(entry?.startDate) || dateInputValue(new Date()));
   const [endDate, setEndDate] = useState(dateInputValue(entry?.endDate));
   const [saving, setSaving] = useState(false);
@@ -77,7 +92,7 @@ export default function DirectoryEntryDialog({
     () => teams.find((team) => team.id === tradeTeamId)?.crews || [],
     [teams, tradeTeamId]
   );
-  const roles = crewId ? CREW_ROLES : TEAM_ROLES;
+  const roles = (crewId ? CREW_ROLES : TEAM_ROLES).filter((item) => !isSister || item.value === supportRole(Boolean(crewId)));
 
   async function save() {
     setSaving(true);
@@ -89,9 +104,11 @@ export default function DirectoryEntryDialog({
       lastName,
       email,
       phone,
+      isSister,
       role,
       tradeTeamId,
       crewId: crewId || null,
+      originScope: entry?.crewId ? 'crew' : 'team',
       startDate,
       endDate,
     };
@@ -111,7 +128,7 @@ export default function DirectoryEntryDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 print:hidden">
-      <div className="w-full max-w-lg rounded-lg bg-white shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-xl">
         <div className="border-b px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
             {mode === 'add' ? 'Add person' : 'Edit entry'}
@@ -136,43 +153,52 @@ export default function DirectoryEntryDialog({
             Phone
             <input className="mt-1 w-full rounded border px-2 py-2" value={phone || ''} onChange={(event) => setPhone(event.target.value)} />
           </label>
-          {mode === 'add' && (
-            <>
-              <label className="block text-sm text-gray-700">
-                Trade
-                <select
-                  className="mt-1 w-full rounded border px-2 py-2"
-                  value={tradeTeamId}
-                  onChange={(event) => {
-                    setTradeTeamId(event.target.value);
-                    setCrewId('');
-                    setRole('TTO');
-                  }}
-                >
-                  {teams.map((team) => (
-                    <option key={team.id} value={team.id}>{team.name}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="block text-sm text-gray-700">
-                Crew
-                <select
-                  className="mt-1 w-full rounded border px-2 py-2"
-                  value={crewId}
-                  onChange={(event) => {
-                    const next = event.target.value;
-                    setCrewId(next);
-                    setRole(next ? 'TCO' : 'TTO');
-                  }}
-                >
-                  <option value="">Team level</option>
-                  {crews.map((crew) => (
-                    <option key={crew.id} value={crew.id}>{crew.name}</option>
-                  ))}
-                </select>
-              </label>
-            </>
-          )}
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={isSister}
+              onChange={(event) => {
+                const sister = event.target.checked;
+                setIsSister(sister);
+                setRole(roleForScope(Boolean(crewId), sister, role));
+              }}
+            />
+            Sister
+          </label>
+          <p className="text-xs text-gray-500">Sisters can only be Support.</p>
+          <label className="block text-sm text-gray-700">
+            Trade
+            <select
+              className="mt-1 w-full rounded border px-2 py-2"
+              value={tradeTeamId}
+              onChange={(event) => {
+                setTradeTeamId(event.target.value);
+                setCrewId('');
+                setRole(roleForScope(false, isSister, role));
+              }}
+            >
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>{team.name}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm text-gray-700">
+            Crew
+            <select
+              className="mt-1 w-full rounded border px-2 py-2"
+              value={crewId}
+              onChange={(event) => {
+                const next = event.target.value;
+                setCrewId(next);
+                setRole(roleForScope(Boolean(next), isSister, role));
+              }}
+            >
+              <option value="">Team level</option>
+              {crews.map((crew) => (
+                <option key={crew.id} value={crew.id}>{crew.name}</option>
+              ))}
+            </select>
+          </label>
           <label className="block text-sm text-gray-700">
             Role
             <select className="mt-1 w-full rounded border px-2 py-2" value={role} onChange={(event) => setRole(event.target.value)}>
