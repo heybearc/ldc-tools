@@ -5,6 +5,9 @@ import * as path from 'path';
 // Load .env.test if it exists
 dotenv.config({ path: path.resolve(__dirname, '.env.test') });
 
+const baseURL = process.env.BASE_URL || 'http://localhost:3001';
+const remoteTarget = Boolean(process.env.BASE_URL) && !/localhost|127\.0\.0\.1/.test(process.env.BASE_URL);
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -17,7 +20,7 @@ export default defineConfig({
     ['list']
   ],
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3001',
+    baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -28,7 +31,7 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: (process.env.CI || process.env.NODE_ENV === 'test') ? undefined : {
+  webServer: (process.env.CI || process.env.NODE_ENV === 'test' || remoteTarget) ? undefined : {
     command: 'npm run dev',
     url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI,

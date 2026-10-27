@@ -5,7 +5,8 @@
   "main": "mcp-server-ops-ldc/src/index.js",
   "scripts": {
     "start": "node mcp-server-ops-ldc/src/index.js",
-    "test": "node mcp-server-ops-ldc/src/index.js < test-input.json"
+    "test": "node mcp-server-ops-ldc/src/index.js < test-input.json",
+    "test:e2e": "npm --prefix frontend run test:e2e"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"
