@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-26 (evening)  
+**Last updated:** 2026-10-27 (mid-day)  
 **Current phase:** Trade Leadership Directory v1  
-**Status:** CG 01.12 oversight imported (195/195); STANDBY green current; LIVE still blue
+**Status:** 190 people imported, all with headshots; STANDBY green current; LIVE still blue
 
 ---
 
@@ -14,7 +14,7 @@
 - [x] Product brief + import template for Trade Leadership Directory (effort: S)
 - [x] Import CG 01.12 hub scrape → oversight tables (effort: M)
 - [x] Place Hart + Miller-Sieving as TT Support on placeholder team TBD (effort: S)
-- [x] Show hub headshots on the directory (first capture: 26 people) (effort: S)
+- [x] Show hub headshots for all 190 imported people (effort: M)
 - [ ] Clean inferred/no-crew rows in UI (effort: M)
 - [ ] Soft-land homepage → directory; hide legacy noise (effort: M)
 - [ ] Smoke / `/test-release` on STANDBY before any `/release` (effort: S)
@@ -24,7 +24,7 @@
 - ✅ D-068 — blue IP `10.92.3.34` (Postgres VIP keeps `.23`)
 - ✅ HAProxy green ACL fix + blue server IP update
 - ✅ STANDBY deploy to green `10.92.3.25` success
-- ✅ Oversight import script + 193 assignments loaded
+- ✅ Oversight import: 195 rows, 190 people, all with photos
 
 ---
 
