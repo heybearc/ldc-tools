@@ -7,15 +7,15 @@
 ---
 
 ## Current Task
-**Clean inferred oversight rows** - IN PROGRESS
+**Spot-clean inferred oversight rows** — next
 
 ### What I'm doing right now
-CG 01.12 oversight is imported: **195 rows / 190 people**, all 190 have headshots. Hub list is 210; 20 Other Roles were not imported. Directory at `/trade-teams/overview`. Next is in-app cleanup of inferred household-trade and no-crew rows.
+v1.28.0 is LIVE on green (CT135) and synced to blue (CT133), both at `fe08a8c`. Directory is the home page. Search, copy email, add person, and edit are in. An end date deactivates an assignment and keeps the person listed until a replacement in that role has a start date. Empty duplicate trades are inactive. Next is the inferred household-trade and no-crew rows.
 
 ### Recent completions
-- ✅ Hart + Miller-Sieving as TT Support on placeholder team TBD (`302a253`, deployed)
-- ✅ Directory headshots (`9358935` on STANDBY green); photos on the containers, not in git
-- ✅ 190/190 oversight people have a photo (12 close-ups this morning)
+- ✅ Shipped v1.28.0 (`fe08a8c`); qa-01 short gate plus directory edit test passed
+- ✅ Retired empty duplicate trades (Electrical, Exteriors, Interiors, Mechanical, Plumbing, Site Support, Structural) and Test Electrical Team
+- ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
 Spot-clean inferred household-trade / no-crew rows in the directory UI
@@ -25,8 +25,9 @@ Spot-clean inferred household-trade / no-crew rows in the directory UI
 ## Known Issues
 - TypeScript error in `ImportExportButtons.tsx` (lines 52, 184) — deferred
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
-- ~9 TC Support without crew → parked as TT Support on inferred team
-- SSH `Host ldc` still points at old IP; use `root@10.92.3.34` / IdentityFile explicitly
+- ~9 TC Support without crew → parked as TT Support on an inferred team
+- Site/Civil is still an empty trade with no populated twin
+- qa-01 cannot read HAProxy CT136 from prox1, so standby detection for LDC fails until that host is fixed
 
 ---
 
