@@ -2,7 +2,7 @@
 
 import React, { useMemo, useRef, useState } from 'react';
 import { dateInputValue } from '@/lib/directory-assignments';
-import PhotoPositioner, { PhotoPositionerHandle } from '@/components/PhotoPositioner';
+import { PhotoPositioner, type PhotoPositionHandle } from '@/components/ProfilePhoto';
 
 type TeamOption = {
   id: string;
@@ -65,7 +65,9 @@ async function readProfilePhoto(file: File) {
     const context = canvas.getContext('2d');
     if (!context) throw new Error('Could not read that photo');
     context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', 0.9);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    if (dataUrl.length > 1_500_000) throw new Error('That photo is too large');
+    return dataUrl;
   } finally {
     bitmap.close();
   }
@@ -102,9 +104,9 @@ export default function DirectoryEntryDialog({
   const [email, setEmail] = useState(entry?.user.email || '');
   const [phone, setPhone] = useState(entry?.user.phone || '');
   const [image, setImage] = useState<string | null>(entry?.user.image || null);
-  const [photoTouched, setPhotoTouched] = useState(false);
+  const [photoAdjusted, setPhotoAdjusted] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
-  const photoRef = useRef<PhotoPositionerHandle>(null);
+  const positionerRef = useRef<PhotoPositionHandle>(null);
   const [isSister, setIsSister] = useState(entry?.user.isSister === true);
   const [tradeTeamId, setTradeTeamId] = useState(initialTeam);
   const [crewId, setCrewId] = useState(initialCrew);
@@ -125,13 +127,18 @@ export default function DirectoryEntryDialog({
   async function save() {
     setSaving(true);
     setError(null);
-    let photo = image;
-    if (photo && photoTouched) {
+    let nextImage = image;
+    if (image && photoAdjusted && positionerRef.current) {
       try {
-        photo = await photoRef.current?.crop() || photo;
-      } catch (err) {
+        nextImage = positionerRef.current.exportCrop();
+        if (nextImage.length > 400_000) {
+          setSaving(false);
+          setError('That crop is too large. Zoom out a little and try again.');
+          return;
+        }
+      } catch {
         setSaving(false);
-        setError(err instanceof Error ? err.message : 'Could not crop that photo');
+        setError('Could not crop that photo. Replace it and position it again.');
         return;
       }
     }
@@ -142,7 +149,7 @@ export default function DirectoryEntryDialog({
       lastName,
       email,
       phone,
-      image: photo,
+      image: nextImage,
       isSister,
       role,
       tradeTeamId,
@@ -184,13 +191,13 @@ export default function DirectoryEntryDialog({
               <input className="mt-1 w-full rounded border px-2 py-2" value={lastName} onChange={(event) => setLastName(event.target.value)} />
             </label>
           </div>
-          <div>
+          <div className="flex items-start gap-4">
             {image ? (
-              <PhotoPositioner ref={photoRef} src={image} onAdjust={() => setPhotoTouched(true)} />
+              <PhotoPositioner ref={positionerRef} src={image} onAdjust={() => setPhotoAdjusted(true)} />
             ) : (
-              <div className="mx-auto h-[180px] w-[180px] rounded-full bg-gray-200" />
+              <div className="h-40 w-40 rounded-full bg-gray-200" />
             )}
-            <div className="mt-2 text-center text-sm">
+            <div className="pt-2 text-sm">
               <label className="font-medium text-blue-700 hover:underline cursor-pointer">
                 {image ? 'Replace photo' : 'Add photo'}
                 <input
@@ -205,7 +212,7 @@ export default function DirectoryEntryDialog({
                     readProfilePhoto(file)
                       .then((next) => {
                         setImage(next);
-                        setPhotoTouched(true);
+                        setPhotoAdjusted(true);
                       })
                       .catch((err) => setPhotoError(err instanceof Error ? err.message : 'Could not read that photo'));
                   }}
@@ -214,10 +221,10 @@ export default function DirectoryEntryDialog({
               {image && (
                 <button
                   type="button"
-                  className="ml-3 text-gray-500 hover:text-gray-800"
+                  className="mt-2 block text-gray-500 hover:text-gray-800"
                   onClick={() => {
                     setImage(null);
-                    setPhotoTouched(true);
+                    setPhotoAdjusted(true);
                   }}
                 >
                   Remove
