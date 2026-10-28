@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Wrench, ArrowLeft, Edit, Trash2, Plus, X, 
-  CheckCircle, AlertCircle, Settings, Eye
+  AlertCircle
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
-import DirectoryTeamCard, { DirectoryTeam } from '@/components/DirectoryTeamCard';
+import { DirectoryAssignment, DirectoryTeam, assignmentsForRole, directoryPersonName } from '@/components/DirectoryTeamCard';
 
 interface Crew {
   id: string;
@@ -40,7 +40,6 @@ interface CrewFormData {
 export default function TradeTeamDetailPage() {
   const { canManageTradeTeams } = usePermissions();
   const params = useParams();
-  const router = useRouter();
   const teamId = params.id as string;
 
   const [team, setTeam] = useState<TradeTeam | null>(null);
@@ -214,8 +213,6 @@ export default function TradeTeamDetailPage() {
     );
   }
 
-  const activeCrews = team.crews.filter(c => c.is_active).length;
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -253,41 +250,18 @@ export default function TradeTeamDetailPage() {
           )}
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <Settings className="h-8 w-8 text-blue-500 mr-3" />
-              <div>
-                <p className="text-sm text-gray-500">Total Crews</p>
-                <p className="text-2xl font-bold text-gray-900">{team.crew_count}</p>
-              </div>
-            </div>
+        <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Team oversight</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <RoleLine label="Overseer" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TTO')} />
+            <RoleLine label="Assistant" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TTOA')} />
+            <RoleLine label="Support" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TT_SUPPORT')} />
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-500 mr-3" />
-              <div>
-                <p className="text-sm text-gray-500">Active Crews</p>
-                <p className="text-2xl font-bold text-gray-900">{activeCrews}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
 
-        {directoryTeam && (
-          <div className="mb-6">
-            <DirectoryTeamCard team={directoryTeam} />
-          </div>
-        )}
-
-        {/* Crews */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Settings className="h-5 w-5 mr-2 text-gray-500" />
-              Crews
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">Crews</h2>
             {canManageTradeTeams && (
               <button
                 onClick={() => openCrewModal()}
@@ -299,59 +273,40 @@ export default function TradeTeamDetailPage() {
             )}
           </div>
 
-          {team.crews.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No crews yet. Add your first crew to get started.</p>
+          {(directoryTeam?.crews.length || 0) === 0 ? (
+            <p className="text-gray-500 text-center py-8">No crews yet.</p>
           ) : (
-            <div className="divide-y divide-gray-200">
-              {team.crews.map((crew) => (
-                <div key={crew.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
-                  <div className="flex-1">
-                    <div className="flex items-center">
-                      <h3 className="text-sm font-medium text-gray-900">{crew.name}</h3>
-                      <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        crew.status.toUpperCase() === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                        crew.status.toUpperCase() === 'INACTIVE' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {crew.status}
-                      </span>
+            <div className="space-y-3">
+              {directoryTeam?.crews.map((crew) => {
+                const record = team.crews.find((item) => item.id === crew.id);
+                return (
+                  <div key={crew.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <Link href={`/trade-teams/${teamId}/crews/${crew.id}`} className="text-base font-semibold text-gray-900 hover:text-blue-700">
+                        {crew.name}
+                      </Link>
+                      {canManageTradeTeams && record && (
+                        <div className="flex shrink-0">
+                          <button onClick={() => openCrewModal(record)} className="p-2 text-gray-400 hover:text-blue-600" title="Edit crew">
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button onClick={() => handleDeleteCrew(record)} className="p-2 text-gray-400 hover:text-red-600" title="Delete crew">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    {crew.description && (
-                      <p className="text-sm text-gray-500 mt-1">{crew.description}</p>
-                    )}
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <RoleLine label="Overseer" assignments={assignmentsForRole(crew.oversight, 'TCO')} />
+                      <RoleLine label="Assistant" assignments={assignmentsForRole(crew.oversight, 'TCOA')} />
+                      <RoleLine label="Support" assignments={assignmentsForRole(crew.oversight, 'TC_SUPPORT')} />
+                    </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <Link
-                      href={`/trade-teams/${teamId}/crews/${crew.id}`}
-                      className="p-2 text-gray-400 hover:text-blue-600 rounded"
-                      title="View Crew Details"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                    {canManageTradeTeams && (
-                      <>
-                        <button
-                          onClick={() => openCrewModal(crew)}
-                          className="p-2 text-gray-400 hover:text-blue-600 rounded"
-                          title="Edit Crew"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCrew(crew)}
-                          className="p-2 text-gray-400 hover:text-red-600 rounded"
-                          title="Delete Crew"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
-        </div>
+        </section>
       </div>
 
       {/* Edit Team Modal */}
@@ -470,6 +425,20 @@ export default function TradeTeamDetailPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function RoleLine({ label, assignments }: { label: string; assignments: DirectoryAssignment[] }) {
+  const names = assignments.length === 0
+    ? '—'
+    : assignments
+        .map((assignment) => `${directoryPersonName(assignment.user)}${assignment.awaitingReplacement ? ' (ended)' : ''}`)
+        .join(', ');
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
+      <p className="mt-1 text-sm text-gray-900">{names}</p>
     </div>
   );
 }

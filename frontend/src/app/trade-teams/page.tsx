@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Wrench, Settings, AlertCircle, Plus, X, Edit, Trash2, Grid3X3, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { usePermissions } from '@/hooks/usePermissions';
-import DirectoryTeamCard, { DirectoryTeam } from '@/components/DirectoryTeamCard';
+import { DirectoryAssignment, DirectoryTeam, assignmentsForRole, directoryPersonName } from '@/components/DirectoryTeamCard';
 
 interface OversightStatus {
   tto: { filled: number; required: number };
@@ -216,7 +216,7 @@ export default function TradeTeamsPage() {
             <Wrench className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-3" />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Trade Teams</h1>
-              <p className="text-sm sm:text-base text-gray-600">Teams and the crews under them</p>
+              <p className="text-sm sm:text-base text-gray-600">Open a team to see its crews and oversight</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:space-x-3">
@@ -290,22 +290,32 @@ export default function TradeTeamsPage() {
           </div>
         </div>
 
-        <div className="space-y-6">
-          {filteredDirectory.map((team, teamIdx) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredDirectory.map((team) => {
             const record = teams.find((item) => item.id === team.id);
+            const overseer = personLine(assignmentsForRole(team.oversight, 'TTO'));
             return (
-              <div key={team.id}>
+              <div key={team.id} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                <Link href={`/trade-teams/${team.id}`} className="block p-5">
+                  <h2 className="text-lg font-semibold text-gray-900">{team.name}</h2>
+                  <p className="mt-2 text-sm text-gray-600">
+                    <span className="text-gray-500">Overseer</span>{' '}
+                    <span className="font-medium text-gray-900">{overseer}</span>
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {team.crews.length} crew{team.crews.length === 1 ? '' : 's'}
+                  </p>
+                </Link>
                 {canManageTradeTeams && record && (
-                  <div className="flex justify-end gap-1 mb-1">
-                    <button onClick={() => openEditModal(record)} className="p-1 text-gray-400 hover:text-blue-600" title="Edit team">
+                  <div className="flex justify-end gap-1 px-3 pb-3">
+                    <button onClick={() => openEditModal(record)} className="p-2 text-gray-400 hover:text-blue-600" title="Edit team">
                       <Edit className="h-4 w-4" />
                     </button>
-                    <button onClick={() => handleDelete(record)} className="p-1 text-gray-400 hover:text-red-600" title="Delete team">
+                    <button onClick={() => handleDelete(record)} className="p-2 text-gray-400 hover:text-red-600" title="Delete team">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 )}
-                <DirectoryTeamCard team={team} colorIndex={teamIdx} linkTeam linkCrews />
               </div>
             );
           })}
@@ -387,4 +397,11 @@ export default function TradeTeamsPage() {
       )}
     </div>
   );
+}
+
+function personLine(assignments: DirectoryAssignment[]) {
+  if (assignments.length === 0) return '—';
+  return assignments
+    .map((assignment) => `${directoryPersonName(assignment.user)}${assignment.awaitingReplacement ? ' (ended)' : ''}`)
+    .join(', ');
 }
