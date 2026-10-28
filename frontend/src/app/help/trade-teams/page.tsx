@@ -49,7 +49,7 @@ export default async function TradeTeamsHelpPage() {
           <h2>Trade team cards</h2>
           <ol>
             <li>Click <strong>Trade Teams</strong> in the main navigation</li>
-            <li>Each card shows the team, its crews, and whether oversight roles are filled</li>
+            <li>Each card lists the same people as the directory: team overseer, assistant, and support, then each crew’s overseer, assistant, and support</li>
             <li>Open a team to add or edit a crew</li>
           </ol>
           <p>Add or edit a person from the Directory. The cards are for the team and crew structure.</p>

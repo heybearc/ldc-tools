@@ -9,6 +9,7 @@ import {
   Users, ChevronDown, ChevronRight, Printer, Copy, UserPlus
 } from 'lucide-react';
 import DirectoryEntryDialog, { DirectoryEditTarget } from '@/components/DirectoryEntryDialog';
+import DirectoryTeamCard, { directoryTeamColors } from '@/components/DirectoryTeamCard';
 
 interface OversightAssignment {
   id: string;
@@ -287,17 +288,7 @@ export default function TradeTeamsOverviewPage() {
         })
         .filter((team): team is TradeTeam => team !== null);
 
-  // Color scheme for trade teams (matching spreadsheet style)
-  const teamColors = [
-    { bg: 'bg-green-600', header: 'bg-green-700', light: 'bg-green-50', border: 'border-green-200' },
-    { bg: 'bg-blue-600', header: 'bg-blue-700', light: 'bg-blue-50', border: 'border-blue-200' },
-    { bg: 'bg-purple-600', header: 'bg-purple-700', light: 'bg-purple-50', border: 'border-purple-200' },
-    { bg: 'bg-orange-600', header: 'bg-orange-700', light: 'bg-orange-50', border: 'border-orange-200' },
-    { bg: 'bg-teal-600', header: 'bg-teal-700', light: 'bg-teal-50', border: 'border-teal-200' },
-    { bg: 'bg-pink-600', header: 'bg-pink-700', light: 'bg-pink-50', border: 'border-pink-200' },
-    { bg: 'bg-indigo-600', header: 'bg-indigo-700', light: 'bg-indigo-50', border: 'border-indigo-200' },
-    { bg: 'bg-amber-600', header: 'bg-amber-700', light: 'bg-amber-50', border: 'border-amber-200' },
-  ];
+  const teamColors = directoryTeamColors;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -393,77 +384,25 @@ export default function TradeTeamsOverviewPage() {
         {viewMode === 'grid' ? (
           /* Grid View - Vertical stack of team cards */
           <div className="space-y-6">
-              {shownTeams.map((team, teamIdx) => {
-                const colors = teamColors[teamIdx % teamColors.length];
-                return (
-                  <div key={team.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                    {/* Trade Team Header */}
-                    <div className={`${colors.header} text-white p-3 rounded-t-lg`}>
-                      <h2 className="font-bold text-lg text-center">{team.name}</h2>
-                    </div>
-                    
-                    {/* Trade Team Oversight */}
-                    <div className={`${colors.light} ${colors.border} border-x p-3`}>
-                      <div className="text-xs font-semibold text-gray-500 mb-1">Trade Team Assistant</div>
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div>
-                          <div className="font-medium text-gray-600">Overseer</div>
-                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTO')} tradeTeamId={team.id} crewId={null} /></div>
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-600">Assistant</div>
-                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TTOA')} tradeTeamId={team.id} crewId={null} /></div>
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-600">Support</div>
-                          <div className="text-gray-900"><PersonList assignments={getOversightByRole(team.oversight, 'TT_SUPPORT')} tradeTeamId={team.id} crewId={null} /></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Crew Header */}
-                    <div className={`${colors.bg} text-white p-2`}>
-                      <div className="grid grid-cols-4 gap-1 text-xs font-medium">
-                        <div>Discipline</div>
-                        <div>TCO</div>
-                        <div>TCOA</div>
-                        <div>Support</div>
-                      </div>
-                    </div>
-
-                    {/* Crews */}
-                    <div className={`${colors.border} border-x border-b rounded-b-lg overflow-hidden`}>
-                      {team.crews.length === 0 ? (
-                        <div className="p-4 text-center text-gray-500 text-sm italic">
-                          No crews assigned
-                        </div>
-                      ) : (
-                        team.crews.map((crew, crewIdx) => (
-                          <div 
-                            key={crew.id} 
-                            className={`p-2 text-xs ${crewIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-b last:border-b-0`}
-                          >
-                            <div className="grid grid-cols-4 gap-1">
-                              <div className="font-medium text-gray-900" title={crew.scopeOfWork || ''}>
-                                {crew.name}
-                              </div>
-                              <div className="text-gray-700">
-                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCO')} tradeTeamId={team.id} crewId={crew.id} />
-                              </div>
-                              <div className="text-gray-700">
-                                <PersonList assignments={getOversightByRole(crew.oversight, 'TCOA')} tradeTeamId={team.id} crewId={crew.id} />
-                              </div>
-                              <div className="text-gray-700">
-                                <PersonList assignments={getOversightByRole(crew.oversight, 'TC_SUPPORT')} tradeTeamId={team.id} crewId={crew.id} />
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              {shownTeams.map((team, teamIdx) => (
+                <DirectoryTeamCard
+                  key={team.id}
+                  team={team}
+                  colorIndex={teamIdx}
+                  onEdit={(assignment, tradeTeamId, crewId) => setEditor({
+                    mode: 'edit',
+                    entry: {
+                      id: assignment.id,
+                      role: assignment.role,
+                      startDate: assignment.startDate,
+                      endDate: assignment.endDate,
+                      tradeTeamId,
+                      crewId,
+                      user: assignment.user,
+                    },
+                  })}
+                />
+              ))}
           </div>
         ) : (
           /* Table View */

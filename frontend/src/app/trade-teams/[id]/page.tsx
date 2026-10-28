@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
-  Wrench, Users, ArrowLeft, Edit, Trash2, Plus, X, 
-  CheckCircle, AlertCircle, Settings, Eye, Building2
+  Wrench, ArrowLeft, Edit, Trash2, Plus, X, 
+  CheckCircle, AlertCircle, Settings, Eye
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
+import DirectoryTeamCard, { DirectoryTeam } from '@/components/DirectoryTeamCard';
 
 interface Crew {
   id: string;
@@ -30,16 +31,6 @@ interface TradeTeam {
   updated_at: string;
 }
 
-interface Volunteer {
-  id: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  phone?: string;
-  congregation?: string;
-  trade_team_name?: string;
-}
-
 interface CrewFormData {
   name: string;
   description: string;
@@ -53,7 +44,7 @@ export default function TradeTeamDetailPage() {
   const teamId = params.id as string;
 
   const [team, setTeam] = useState<TradeTeam | null>(null);
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [directoryTeam, setDirectoryTeam] = useState<DirectoryTeam | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,34 +67,21 @@ export default function TradeTeamDetailPage() {
   useEffect(() => {
     if (teamId) {
       fetchTeam();
-      fetchTeamVolunteers();
+      fetchDirectory();
     }
   }, [teamId]);
 
-  const fetchTeamVolunteers = async () => {
+  const fetchDirectory = async () => {
     try {
-      const res = await fetch('/api/v1/volunteers');
-      if (res.ok) {
-        const data = await res.json();
-        const allVolunteers = Array.isArray(data) ? data : (data.volunteers || []);
-        // Filter to volunteers assigned to this team's crews or with trade team level roles
-        const teamVolunteers = allVolunteers.filter((v: Volunteer) => 
-          v.trade_team_name === team?.name || 
-          ['Trade Team Overseer', 'Trade Team Overseer Assistant', 'Trade Team Support'].includes(v.role)
-        );
-        setVolunteers(teamVolunteers);
-      }
+      const response = await fetch('/api/v1/trade-teams/overview');
+      if (!response.ok) return;
+      const data = await response.json();
+      const match = (data.tradeTeams || []).find((item: DirectoryTeam) => item.id === teamId);
+      setDirectoryTeam(match || null);
     } catch (err) {
-      console.error('Failed to fetch volunteers:', err);
+      console.error('Failed to fetch directory:', err);
     }
   };
-
-  // Re-fetch volunteers when team loads
-  useEffect(() => {
-    if (team) {
-      fetchTeamVolunteers();
-    }
-  }, [team?.name]);
 
   const fetchTeam = async () => {
     try {
@@ -121,11 +99,6 @@ export default function TradeTeamDetailPage() {
       setLoading(false);
     }
   };
-
-  // Group volunteers by role
-  const overseers = volunteers.filter(v => v.role === 'Trade Team Overseer');
-  const assistants = volunteers.filter(v => v.role === 'Trade Team Overseer Assistant');
-  const support = volunteers.filter(v => v.role === 'Trade Team Support');
 
   const openEditModal = () => {
     if (team) {
@@ -149,6 +122,7 @@ export default function TradeTeamDetailPage() {
       });
       if (response.ok) {
         fetchTeam();
+        fetchDirectory();
         setIsEditModalOpen(false);
       }
     } catch (err) {
@@ -189,6 +163,7 @@ export default function TradeTeamDetailPage() {
       });
       if (response.ok) {
         fetchTeam();
+        fetchDirectory();
         setIsCrewModalOpen(false);
       } else {
         const data = await response.json();
@@ -209,6 +184,7 @@ export default function TradeTeamDetailPage() {
       });
       if (response.ok) {
         fetchTeam();
+        fetchDirectory();
       }
     } catch (err) {
       console.error('Failed to delete crew:', err);
@@ -299,80 +275,11 @@ export default function TradeTeamDetailPage() {
           </div>
         </div>
 
-        {/* Trade Team Oversight */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Users className="h-5 w-5 mr-2 text-gray-500" />
-              Trade Team Oversight ({overseers.length + assistants.length + support.length})
-            </h2>
-            {canManageTradeTeams && (
-              <Link 
-                href="/trade-teams/overview" 
-                className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Add in Directory
-              </Link>
-            )}
+        {directoryTeam && (
+          <div className="mb-6">
+            <DirectoryTeamCard team={directoryTeam} />
           </div>
-
-          {/* Overseers */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded">
-                Trade Team Overseer
-              </span>
-              <span className="text-sm text-gray-500">({overseers.length}/1)</span>
-            </div>
-            {overseers.length > 0 ? (
-              <div className="space-y-2">
-                {overseers.map(v => (
-                  <VolunteerCard key={v.id} volunteer={v} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 italic ml-2">No Trade Team Overseer assigned</p>
-            )}
-          </div>
-
-          {/* Assistants */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                Trade Team Overseer Assistant
-              </span>
-              <span className="text-sm text-gray-500">({assistants.length}/2)</span>
-            </div>
-            {assistants.length > 0 ? (
-              <div className="space-y-2">
-                {assistants.map(v => (
-                  <VolunteerCard key={v.id} volunteer={v} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 italic ml-2">No Trade Team Overseer Assistant assigned</p>
-            )}
-          </div>
-
-          {/* Support */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs font-medium rounded">
-                Trade Team Support
-              </span>
-            </div>
-            {support.length > 0 ? (
-              <div className="space-y-2">
-                {support.map(v => (
-                  <VolunteerCard key={v.id} volunteer={v} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 italic ml-2">No Trade Team Support assigned</p>
-            )}
-          </div>
-        </div>
+        )}
 
         {/* Crews */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -563,34 +470,6 @@ export default function TradeTeamDetailPage() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function VolunteerCard({ volunteer }: { volunteer: Volunteer }) {
-  const initials = `${volunteer.first_name?.[0] || ''}${volunteer.last_name?.[0] || ''}`;
-  
-  return (
-    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-          <span className="text-blue-600 font-medium">{initials || '?'}</span>
-        </div>
-        <div>
-          <p className="font-medium text-gray-900">
-            {volunteer.first_name || ''} {volunteer.last_name || ''}
-          </p>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            {volunteer.congregation && (
-              <span className="flex items-center">
-                <Building2 className="h-3 w-3 mr-1" />
-                {volunteer.congregation}
-              </span>
-            )}
-            {volunteer.phone && <span>• {volunteer.phone}</span>}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

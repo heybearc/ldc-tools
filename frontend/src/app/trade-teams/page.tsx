@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Wrench, Settings, AlertCircle, Plus, X, Edit, Trash2, Eye, Grid3X3, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Search, Wrench, Settings, AlertCircle, Plus, X, Edit, Trash2, Grid3X3, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { usePermissions } from '@/hooks/usePermissions';
+import DirectoryTeamCard, { DirectoryTeam } from '@/components/DirectoryTeamCard';
 
 interface OversightStatus {
   tto: { filled: number; required: number };
@@ -39,6 +40,7 @@ interface TradeTeamFormData {
 export default function TradeTeamsPage() {
   const { canManageTradeTeams } = usePermissions();
   const [teams, setTeams] = useState<TradeTeam[]>([]);
+  const [directoryTeams, setDirectoryTeams] = useState<DirectoryTeam[]>([]);
   const [stats, setStats] = useState<TradeTeamsStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,13 +65,20 @@ export default function TradeTeamsPage() {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/v1/trade-teams');
+      const [response, overviewResponse] = await Promise.all([
+        fetch('/api/v1/trade-teams'),
+        fetch('/api/v1/trade-teams/overview'),
+      ]);
       if (!response.ok) {
         throw new Error(`Failed to fetch trade teams: ${response.statusText}`);
       }
       
       const teamsData = await response.json();
       setTeams(teamsData);
+      if (overviewResponse.ok) {
+        const overview = await overviewResponse.json();
+        setDirectoryTeams(overview.tradeTeams || []);
+      }
       
       const calculatedStats: TradeTeamsStats = {
         total_teams: teamsData.length,
@@ -163,44 +172,17 @@ export default function TradeTeamsPage() {
     }
   };
 
-  const filteredTeams = teams.filter(team =>
-    team.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getTeamIcon = (name: string) => {
-    const icons: { [key: string]: string } = {
-      'Electrical': '⚡',
-      'Mechanical': '⚙️',
-      'Plumbing': '🔧',
-      'Interiors': '🏠',
-      'Exteriors': '🏗️',
-      'Structural': '🏛️',
-      'Site Work': '🚧',
-      'Roofing': '🏠'
-    };
-    return icons[name] || '🔨';
-  };
-
-  // Helper to render oversight status badge
-  const OversightBadge = ({ filled, required, label }: { filled: number; required: number; label: string }) => {
-    if (required === 0 && filled === 0) return null;
-    
-    const isFilled = filled >= required;
-    const isPartial = filled > 0 && filled < required;
-    
-    return (
-      <span 
-        className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
-          isFilled ? 'bg-green-100 text-green-800' : 
-          isPartial ? 'bg-yellow-100 text-yellow-800' : 
-          required > 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-600'
-        }`}
-        title={`${label}: ${filled}/${required || '∞'} filled`}
-      >
-        {label}: {filled}/{required || '∞'}
-      </span>
-    );
-  };
+  const query = searchTerm.trim().toLowerCase();
+  const filteredDirectory = !query
+    ? directoryTeams
+    : directoryTeams.filter((team) => {
+        const people = [...team.oversight, ...team.crews.flatMap((crew) => crew.oversight)];
+        const personHit = people.some((row) =>
+          `${row.user.name || ''} ${row.user.email || ''} ${row.role}`.toLowerCase().includes(query)
+        );
+        const crewHit = team.crews.some((crew) => crew.name.toLowerCase().includes(query));
+        return team.name.toLowerCase().includes(query) || personHit || crewHit;
+      });
 
   if (loading) {
     return (
@@ -300,7 +282,7 @@ export default function TradeTeamsPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search trade teams..."
+              placeholder="Search trade, crew, or person"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -308,81 +290,28 @@ export default function TradeTeamsPage() {
           </div>
         </div>
 
-        {/* Trade Teams Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredTeams.map((team) => (
-            <div key={team.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-2">{getTeamIcon(team.name)}</span>
-                    <h3 className="text-lg font-semibold text-gray-900">{team.name}</h3>
-                  </div>
-                  <div className="flex space-x-1">
-                    <Link href={`/trade-teams/${team.id}`} className="p-1 text-gray-400 hover:text-blue-600" title="View">
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                    {canManageTradeTeams && (
-                      <>
-                        <button onClick={() => openEditModal(team)} className="p-1 text-gray-400 hover:text-blue-600" title="Edit">
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button onClick={() => handleDelete(team)} className="p-1 text-gray-400 hover:text-red-600" title="Delete">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mb-3 ${
-                  team.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {team.is_active ? 'Active' : 'Inactive'}
-                </span>
-
-                {/* Oversight Status */}
-                {team.oversight && (
-                  <div className="mb-3 space-y-1">
-                    <div className="flex flex-wrap gap-1">
-                      <OversightBadge filled={team.oversight.tto.filled} required={team.oversight.tto.required} label="TTO" />
-                      <OversightBadge filled={team.oversight.ttoa.filled} required={team.oversight.ttoa.required} label="TTOA" />
-                      {team.oversight.tts.filled > 0 && (
-                        <OversightBadge filled={team.oversight.tts.filled} required={0} label="TTS" />
-                      )}
-                    </div>
-                    {team.oversight.crews_needing_tco > 0 && (
-                      <div className="flex items-center text-xs text-amber-600">
-                        <AlertTriangle className="h-3 w-3 mr-1" />
-                        {team.oversight.crews_needing_tco} crew{team.oversight.crews_needing_tco > 1 ? 's' : ''} need TCO
-                      </div>
-                    )}
+        <div className="space-y-6">
+          {filteredDirectory.map((team, teamIdx) => {
+            const record = teams.find((item) => item.id === team.id);
+            return (
+              <div key={team.id}>
+                {canManageTradeTeams && record && (
+                  <div className="flex justify-end gap-1 mb-1">
+                    <button onClick={() => openEditModal(record)} className="p-1 text-gray-400 hover:text-blue-600" title="Edit team">
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => handleDelete(record)} className="p-1 text-gray-400 hover:text-red-600" title="Delete team">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 )}
-
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex justify-between">
-                    <span>Total Crews:</span>
-                    <span className="font-medium text-gray-900">{team.crew_count}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Active Crews:</span>
-                    <span className="font-medium text-green-600">{team.active_crews}</span>
-                  </div>
-                </div>
-
-                <Link
-                  href={`/trade-teams/${team.id}`}
-                  className="mt-4 block w-full text-center px-4 py-2 border border-blue-300 text-blue-600 rounded-md hover:bg-blue-50 text-sm font-medium"
-                >
-                  Show Crews
-                </Link>
+                <DirectoryTeamCard team={team} colorIndex={teamIdx} linkTeam linkCrews />
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {filteredTeams.length === 0 && (
+        {filteredDirectory.length === 0 && (
           <div className="text-center py-12">
             <Wrench className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900">No trade teams found</h3>
