@@ -217,7 +217,7 @@ export default function TradeTeamsOverviewPage() {
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Trade Teams & Crews Overview', 105, 15, { align: 'center' });
+    doc.text('Trade Leadership Directory', 105, 15, { align: 'center' });
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
     const tableData: any[] = [];
@@ -308,14 +308,14 @@ export default function TradeTeamsOverviewPage() {
             <div className="flex flex-col gap-3">
               <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-4">
                 <Link
-                  href="/trade-teams"
+                  href="/"
                   className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 min-h-[44px]"
                 >
                   <ArrowLeft className="h-4 w-4 mr-1" />
-                  <span className="hidden sm:inline">Back to Trade Teams</span>
+                  <span className="hidden sm:inline">Dashboard</span>
                   <span className="sm:hidden">Back</span>
                 </Link>
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Trade Teams Overview</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Directory</h1>
                 <input
                   type="search"
                   value={search}
@@ -384,7 +384,7 @@ export default function TradeTeamsOverviewPage() {
 
       {/* Print Header */}
       <div className="hidden print:block text-center py-4">
-        <h1 className="text-2xl font-bold">Trade Teams & Crews Overview</h1>
+        <h1 className="text-2xl font-bold">Trade Leadership Directory</h1>
         <p className="text-sm text-gray-500">Generated: {new Date().toLocaleDateString()}</p>
       </div>
 

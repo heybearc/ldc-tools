@@ -12,7 +12,6 @@ import CGSelector from './CGSelector';
 import ServerIndicator from './ServerIndicator';
 import { APP_VERSION } from '@/lib/version';
 import { canAccessAdmin } from '@/lib/permissions';
-import { usePermissions } from '@/hooks/usePermissions';
 import { ChevronDown, Menu, X } from 'lucide-react';
 
 interface ConditionalLayoutProps {
@@ -20,10 +19,13 @@ interface ConditionalLayoutProps {
   releaseHighlight?: string;
 }
 
+function isTradeTeamCards(pathname: string | null) {
+  return Boolean(pathname?.startsWith('/trade-teams') && !pathname.startsWith('/trade-teams/overview'));
+}
+
 export default function ConditionalLayout({ children, releaseHighlight }: ConditionalLayoutProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { canManageVolunteers } = usePermissions();
   const [userLastSeenVersion, setUserLastSeenVersion] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -59,6 +61,9 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
     return <>{children}</>;
   }
 
+  const navClass = (active: boolean | undefined) =>
+    active ? 'text-blue-600 font-medium' : 'text-gray-900 hover:text-blue-600 font-medium';
+
   return (
     <div className="min-h-screen bg-gray-50">
       <ReleaseBanner 
@@ -88,37 +93,18 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-6">
               <nav className="flex space-x-6">
-                <Link href="/trade-teams/overview" className="text-gray-900 hover:text-blue-600 font-medium">
+                <Link href="/" className={navClass(pathname === '/')}>
+                  Dashboard
+                </Link>
+                <Link href="/trade-teams/overview" className={navClass(pathname?.startsWith('/trade-teams/overview'))}>
                   Directory
                 </Link>
-
-                <div className="relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenDropdown(openDropdown === 'more' ? null : 'more');
-                    }}
-                    className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1"
-                  >
-                    <span>More</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                  {openDropdown === 'more' && (
-                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                      <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Former dashboard</Link>
-                      <Link href="/volunteers" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Volunteers</Link>
-                      <Link href="/trade-teams" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Trade Teams</Link>
-                      <Link href="/congregations" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Congregations</Link>
-                      <Link href="/projects" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Projects</Link>
-                      <Link href="/calendar" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Calendar</Link>
-                      <Link href="/crew-request" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Submit Request</Link>
-                      <Link href="/my-requests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Requests</Link>
-                      {canManageVolunteers && (
-                        <Link href="/crew-requests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage Requests</Link>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <Link
+                  href="/trade-teams"
+                  className={navClass(isTradeTeamCards(pathname))}
+                >
+                  Trade Teams
+                </Link>
 
                 {/* Admin Dropdown */}
                 {canAccessAdmin(session) && (
@@ -203,7 +189,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
             </div>
 
             <nav className="p-4 space-y-1">
-              {/* Dashboard */}
+              <Link 
+                href="/" 
+                className="block px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
               <Link 
                 href="/trade-teams/overview" 
                 className="block px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
@@ -212,91 +204,12 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                 Directory
               </Link>
               <Link 
-                href="/dashboard" 
-                className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
+                href="/trade-teams" 
+                className="block px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Former dashboard
+                Trade Teams
               </Link>
-
-              {/* People Section */}
-              <div className="pt-2">
-                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  People
-                </div>
-                <Link 
-                  href="/volunteers" 
-                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  👥 Volunteers
-                </Link>
-                <Link 
-                  href="/trade-teams" 
-                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  🔧 Trade Teams
-                </Link>
-                <Link 
-                  href="/congregations" 
-                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  ⛪ Congregations
-                </Link>
-              </div>
-
-              {/* Projects Section */}
-              <div className="pt-2">
-                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Projects
-                </div>
-                <Link 
-                  href="/projects" 
-                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  📋 Projects List
-                </Link>
-                <Link 
-                  href="/calendar" 
-                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  📅 Calendar
-                </Link>
-              </div>
-
-              {/* Requests Section */}
-              <div className="pt-2">
-                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Requests
-                </div>
-                <Link 
-                  href="/crew-request" 
-                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  ✏️ Submit Request
-                </Link>
-                <Link 
-                  href="/my-requests" 
-                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  📝 My Requests
-                </Link>
-                {canManageVolunteers && (
-                  <Link 
-                    href="/crew-requests" 
-                    className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    ⚙️ Manage Requests
-                  </Link>
-                )}
-              </div>
 
               {/* Admin Section */}
               {canAccessAdmin(session) && (

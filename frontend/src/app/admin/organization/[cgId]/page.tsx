@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import OversightSection from '@/components/oversight/OversightSection';
 import { PERSONNEL_CONTACT_CONFIG, CG_STAFF_CONFIG, REGIONAL_STAFF_CONFIG } from '@/lib/oversight-types';
-import { Building2, ArrowLeft, Users, Wrench, FolderKanban, MapPin, Calendar, AlertCircle, RefreshCw, Save, ExternalLink } from "lucide-react";
+import { Building2, ArrowLeft, Users, Wrench, MapPin, Calendar, AlertCircle, RefreshCw, Save, ExternalLink } from "lucide-react";
 
 interface ConstructionGroup {
   id: string;
@@ -184,7 +184,7 @@ export default function ConstructionGroupDetailPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center">
               <Users className="h-8 w-8 text-blue-600" />
@@ -209,15 +209,6 @@ export default function ConstructionGroupDetailPage() {
               <div className="ml-4">
                 <h3 className="text-sm font-medium text-gray-500">Crews</h3>
                 <p className="text-2xl font-bold text-gray-900">{cg._count?.crews || 0}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <FolderKanban className="h-8 w-8 text-orange-600" />
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Projects</h3>
-                <p className="text-2xl font-bold text-gray-900">{cg._count?.projects || 0}</p>
               </div>
             </div>
           </div>
@@ -328,23 +319,13 @@ export default function ConstructionGroupDetailPage() {
               </div>
             </Link>
             <Link
-              href="/projects"
-              className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <FolderKanban className="h-6 w-6 text-orange-600" />
-              <div>
-                <p className="font-medium">Projects</p>
-                <p className="text-sm text-gray-500">View and manage projects</p>
-              </div>
-            </Link>
-            <Link
-              href="/volunteers"
+              href="/trade-teams/overview"
               className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Users className="h-6 w-6 text-blue-600" />
               <div>
-                <p className="font-medium">Volunteers</p>
-                <p className="text-sm text-gray-500">Manage volunteer roster</p>
+                <p className="font-medium">Directory</p>
+                <p className="text-sm text-gray-500">Trade and crew leadership</p>
               </div>
             </Link>
           </div>

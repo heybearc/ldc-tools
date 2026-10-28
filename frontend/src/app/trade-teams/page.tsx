@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Wrench, Users, Settings, AlertCircle, Plus, X, Edit, Trash2, Eye, Grid3X3, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Search, Wrench, Settings, AlertCircle, Plus, X, Edit, Trash2, Eye, Grid3X3, CheckCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { usePermissions } from '@/hooks/usePermissions';
 
@@ -234,13 +234,13 @@ export default function TradeTeamsPage() {
             <Wrench className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-3" />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Trade Teams</h1>
-              <p className="text-sm sm:text-base text-gray-600">Construction trade team management and crew organization</p>
+              <p className="text-sm sm:text-base text-gray-600">Teams and the crews under them</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:space-x-3">
             <Link href="/trade-teams/overview" className="inline-flex items-center px-4 py-2 min-h-[44px] border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
               <Grid3X3 className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Overview</span>
+              <span className="hidden sm:inline">Directory</span>
             </Link>
             {canManageTradeTeams && (
               <button onClick={openCreateModal} className="inline-flex items-center px-4 py-2 min-h-[44px] border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
@@ -368,10 +368,6 @@ export default function TradeTeamsPage() {
                   <div className="flex justify-between">
                     <span>Active Crews:</span>
                     <span className="font-medium text-green-600">{team.active_crews}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Total Members:</span>
-                    <span className="font-medium text-gray-900">{team.total_members}</span>
                   </div>
                 </div>
 

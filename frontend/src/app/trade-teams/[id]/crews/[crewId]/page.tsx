@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Users, ArrowLeft, XCircle,
-  FileText, Calendar, Tag, UserCheck, UserPlus, Building2
+  FileText, Calendar, Tag, UserPlus, Building2
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
 
@@ -93,10 +93,6 @@ export default function CrewDetailPage() {
   );
   const support = volunteers.filter(v => 
     v.roles?.some(r => r.roleCode === 'TC-Support' && r.crewId === crewId)
-  );
-  const crewVolunteers = volunteers.filter(v => 
-    v.roles?.some(r => r.roleCode === 'TCV' && r.crewId === crewId) ||
-    (v.trade_crew_id === crewId && !v.roles?.some(r => ['TCO', 'TCOA', 'TC-Support'].includes(r.roleCode)))
   );
 
   if (loading) {
@@ -198,11 +194,11 @@ export default function CrewDetailPage() {
             </h2>
             {canManageTradeTeams && (
               <Link 
-                href="/volunteers" 
+                href="/trade-teams/overview" 
                 className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
               >
                 <UserPlus className="h-4 w-4 mr-1" />
-                Add via Volunteers
+                Add in Directory
               </Link>
             )}
           </div>
@@ -264,30 +260,6 @@ export default function CrewDetailPage() {
           </div>
         </div>
 
-        {/* Crew Volunteers Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-              <UserCheck className="h-5 w-5 mr-2 text-gray-500" />
-              Crew Volunteers ({crewVolunteers.length})
-            </h2>
-          </div>
-          
-          {crewVolunteers.length > 0 ? (
-            <div className="space-y-2">
-              {crewVolunteers.map(v => (
-                <VolunteerCard key={v.id} volunteer={v} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic">
-              No volunteers assigned to this crew yet. 
-              <Link href="/volunteers" className="text-blue-600 hover:underline ml-1">
-                Add volunteers
-              </Link>
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -317,12 +289,6 @@ function VolunteerCard({ volunteer }: { volunteer: Volunteer }) {
           </div>
         </div>
       </div>
-      <Link 
-        href="/volunteers"
-        className="text-sm text-blue-600 hover:text-blue-800"
-      >
-        Edit
-      </Link>
     </div>
   );
 }

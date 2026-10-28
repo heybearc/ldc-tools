@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Wrench, Users, ArrowLeft, Edit, Trash2, Plus, X, 
-  CheckCircle, AlertCircle, UserPlus, Settings, Eye, Building2
+  CheckCircle, AlertCircle, Settings, Eye, Building2
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
 
@@ -278,22 +278,13 @@ export default function TradeTeamDetailPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <Settings className="h-8 w-8 text-blue-500 mr-3" />
               <div>
                 <p className="text-sm text-gray-500">Total Crews</p>
                 <p className="text-2xl font-bold text-gray-900">{team.crew_count}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <UserPlus className="h-8 w-8 text-green-500 mr-3" />
-              <div>
-                <p className="text-sm text-gray-500">Total Members</p>
-                <p className="text-2xl font-bold text-gray-900">{team.total_members}</p>
               </div>
             </div>
           </div>
@@ -317,11 +308,11 @@ export default function TradeTeamDetailPage() {
             </h2>
             {canManageTradeTeams && (
               <Link 
-                href="/volunteers" 
+                href="/trade-teams/overview" 
                 className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
               >
                 <Plus className="h-4 w-4 mr-1" />
-                Add
+                Add in Directory
               </Link>
             )}
           </div>
@@ -421,7 +412,6 @@ export default function TradeTeamDetailPage() {
                     {crew.description && (
                       <p className="text-sm text-gray-500 mt-1">{crew.description}</p>
                     )}
-                    <p className="text-xs text-gray-400 mt-1">{crew.member_count} members</p>
                   </div>
                   <div className="flex space-x-2">
                     <Link
@@ -601,12 +591,6 @@ function VolunteerCard({ volunteer }: { volunteer: Volunteer }) {
           </div>
         </div>
       </div>
-      <Link 
-        href="/volunteers"
-        className="text-sm text-blue-600 hover:text-blue-800"
-      >
-        Edit
-      </Link>
     </div>
   );
 }

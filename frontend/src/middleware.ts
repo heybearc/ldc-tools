@@ -25,7 +25,45 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(signinUrl)
   }
 
+  const retired = retiredDestination(pathname)
+  if (retired) {
+    return NextResponse.redirect(new URL(retired, request.url))
+  }
+
   return NextResponse.next()
+}
+
+function retiredDestination(pathname: string): string | null {
+  if (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) {
+    return '/'
+  }
+
+  const retiredHelp = [
+    '/help/projects',
+    '/help/volunteers',
+    '/help/volunteer-roles',
+    '/help/crew-requests',
+    '/help/schedule-notifications',
+  ]
+  if (retiredHelp.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+    return '/help'
+  }
+
+  const retiredApp = [
+    '/volunteers',
+    '/contacts',
+    '/congregations',
+    '/projects',
+    '/calendar',
+    '/crew-request',
+    '/crew-requests',
+    '/my-requests',
+  ]
+  if (retiredApp.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+    return '/'
+  }
+
+  return null
 }
 
 export const config = {

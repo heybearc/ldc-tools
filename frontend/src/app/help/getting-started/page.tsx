@@ -31,7 +31,7 @@ export default async function GettingStartedPage() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
             <h2 className="text-xl font-semibold text-blue-900 mt-0 mb-3">Welcome to LDC Tools!</h2>
             <p className="text-blue-800 mb-0">
-              LDC Tools is your comprehensive system for managing personnel contacts, trade teams, and construction projects for LDC Region 01.12.
+              LDC Tools is the trade leadership directory: who owns each trade and crew, so you know who to add in Builder Assistant and who to contact.
             </p>
           </div>
 
@@ -39,21 +39,21 @@ export default async function GettingStartedPage() {
           <h2>⚡ Quick Start</h2>
           <ol>
             <li><strong>Log In</strong> - Navigate to the login page and enter your credentials</li>
-            <li><strong>Explore the Dashboard</strong> - See an overview of your projects and teams</li>
-            <li><strong>Navigate the Menu</strong> - Use the dropdown menus at the top to access different features (People, Projects, Requests, Admin, Help)</li>
-            <li><strong>Get Help</strong> - Click "Help" dropdown anytime you need assistance</li>
+            <li><strong>Open the Dashboard</strong> - See trade teams, crews, and leadership contacts</li>
+            <li><strong>Use the Directory</strong> - Search by trade, person, or role</li>
+            <li><strong>Get Help</strong> - Click "Help" anytime you need assistance</li>
           </ol>
 
           {/* Navigation */}
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 my-6">
             <h3 className="text-lg font-semibold text-green-900 mt-0 mb-3">🎯 Using the Navigation Menu</h3>
             <p className="text-green-800 mb-3">
-              The main menu is organized into dropdown menus to help you find features quickly:
+              The main menu has the pages this app is for:
             </p>
             <ul className="text-green-800 space-y-2">
-              <li><strong>People</strong> → Volunteers, Trade Teams, Congregations</li>
-              <li><strong>Projects</strong> → Projects List, Calendar</li>
-              <li><strong>Requests</strong> → Submit Request, My Requests, Manage Requests</li>
+              <li><strong>Dashboard</strong> → Home, with counts and links into the directory</li>
+              <li><strong>Directory</strong> → Trade and crew leadership, search, and export</li>
+              <li><strong>Trade Teams</strong> → The teams and the crews under them</li>
               <li><strong>Admin</strong> → Admin Dashboard (administrators only)</li>
               <li><strong>Help</strong> → Help Center, My Feedback, Release Notes</li>
             </ul>
@@ -87,12 +87,12 @@ export default async function GettingStartedPage() {
 
           <div className="bg-white border border-gray-200 rounded-lg p-4 my-4">
             <h4 className="font-semibold text-gray-900 mt-0">Zone Overseer</h4>
-            <p className="text-sm text-gray-600 mb-0">Manage projects, teams, and assignments for your zone</p>
+            <p className="text-sm text-gray-600 mb-0">Look up and maintain trade and crew leadership for your group</p>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg p-4 my-4">
             <h4 className="font-semibold text-gray-900 mt-0">Personnel Contact</h4>
-            <p className="text-sm text-gray-600 mb-0">Coordinate trade teams and manage volunteer information</p>
+            <p className="text-sm text-gray-600 mb-0">Keep the directory current when leadership changes</p>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg p-4 my-4">
@@ -103,36 +103,24 @@ export default async function GettingStartedPage() {
           {/* Main Features */}
           <h2>✨ Main Features</h2>
 
-          <h3>📋 Dashboard</h3>
-          <p>Your home base showing:</p>
+          <h3>Dashboard</h3>
+          <p>Your home page, with counts for trade teams, crews, and leadership contacts, plus links into the directory and trade teams.</p>
+
+          <h3>Directory</h3>
+          <p>The list you use day to day:</p>
           <ul>
-            <li>Quick stats and overview</li>
-            <li>Recent activity</li>
-            <li>Quick actions</li>
+            <li>Search by trade, person, or role</li>
+            <li>Copy an email</li>
+            <li>Add or edit a leadership contact</li>
+            <li>Export or print the current list</li>
           </ul>
 
-          <h3>👥 Trade Teams</h3>
-          <p>Manage your construction trade teams:</p>
+          <h3>Trade Teams</h3>
+          <p>The structure behind the directory:</p>
           <ul>
-            <li>View all trade teams</li>
-            <li>Manage crews within teams</li>
-            <li>Track team members</li>
-          </ul>
-
-          <h3>📊 Projects</h3>
-          <p>Track construction projects:</p>
-          <ul>
-            <li>Create new projects</li>
-            <li>Assign teams to projects</li>
-            <li>Monitor project status</li>
-          </ul>
-
-          <h3>🙋 Volunteers</h3>
-          <p>Manage volunteer information:</p>
-          <ul>
-            <li>Track volunteer details</li>
-            <li>View availability</li>
-            <li>Manage assignments</li>
+            <li>View each trade team</li>
+            <li>See the crews under that team</li>
+            <li>Add or edit a team or crew when the structure changes</li>
           </ul>
 
           {/* Navigation Tips */}

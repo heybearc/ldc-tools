@@ -98,7 +98,7 @@ function HelpLayoutContent({ children, title }: HelpLayoutProps) {
               <img src="/logo.svg" alt="LDC Logo" className="h-8 w-8" />
               <span className="text-lg font-semibold text-gray-900">LDC Tools</span>
             </div>
-            <p className="text-sm text-gray-600 mb-3">Personnel Contact & Project Management System</p>
+            <p className="text-sm text-gray-600 mb-3">Trade leadership directory</p>
             <p className="text-xs text-gray-500 mb-4">Version {version}</p>
             <div className="flex items-center justify-center space-x-4 text-sm">
               <Link href="/help" className="text-blue-600 hover:text-blue-800 font-medium">📚 Help Center</Link>
