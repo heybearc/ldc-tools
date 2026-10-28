@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { dateInputValue } from '@/lib/directory-assignments';
-import ProfilePhoto, { cropPhotoAroundFace } from '@/components/ProfilePhoto';
+import PhotoPositioner, { PhotoPositionerHandle } from '@/components/PhotoPositioner';
 
 type TeamOption = {
   id: string;
@@ -57,9 +57,15 @@ async function readProfilePhoto(file: File) {
   if (!file.type.startsWith('image/')) throw new Error('Choose an image file');
   const bitmap = await createImageBitmap(file);
   try {
-    const dataUrl = await cropPhotoAroundFace(bitmap);
-    if (dataUrl.length > 400_000) throw new Error('That photo is too large');
-    return dataUrl;
+    const max = 1200;
+    const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Could not read that photo');
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', 0.9);
   } finally {
     bitmap.close();
   }
@@ -96,7 +102,9 @@ export default function DirectoryEntryDialog({
   const [email, setEmail] = useState(entry?.user.email || '');
   const [phone, setPhone] = useState(entry?.user.phone || '');
   const [image, setImage] = useState<string | null>(entry?.user.image || null);
+  const [photoTouched, setPhotoTouched] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const photoRef = useRef<PhotoPositionerHandle>(null);
   const [isSister, setIsSister] = useState(entry?.user.isSister === true);
   const [tradeTeamId, setTradeTeamId] = useState(initialTeam);
   const [crewId, setCrewId] = useState(initialCrew);
@@ -117,6 +125,16 @@ export default function DirectoryEntryDialog({
   async function save() {
     setSaving(true);
     setError(null);
+    let photo = image;
+    if (photo && photoTouched) {
+      try {
+        photo = await photoRef.current?.crop() || photo;
+      } catch (err) {
+        setSaving(false);
+        setError(err instanceof Error ? err.message : 'Could not crop that photo');
+        return;
+      }
+    }
     const payload = {
       id: entry?.id,
       scope: crewId ? 'crew' : 'team',
@@ -124,7 +142,7 @@ export default function DirectoryEntryDialog({
       lastName,
       email,
       phone,
-      image,
+      image: photo,
       isSister,
       role,
       tradeTeamId,
@@ -166,13 +184,13 @@ export default function DirectoryEntryDialog({
               <input className="mt-1 w-full rounded border px-2 py-2" value={lastName} onChange={(event) => setLastName(event.target.value)} />
             </label>
           </div>
-          <div className="flex items-center gap-3">
+          <div>
             {image ? (
-              <ProfilePhoto src={image} className="h-14 w-14 rounded-full object-cover bg-gray-200" />
+              <PhotoPositioner ref={photoRef} src={image} onAdjust={() => setPhotoTouched(true)} />
             ) : (
-              <div className="h-14 w-14 rounded-full bg-gray-200" />
+              <div className="mx-auto h-[180px] w-[180px] rounded-full bg-gray-200" />
             )}
-            <div className="text-sm">
+            <div className="mt-2 text-center text-sm">
               <label className="font-medium text-blue-700 hover:underline cursor-pointer">
                 {image ? 'Replace photo' : 'Add photo'}
                 <input
@@ -185,13 +203,23 @@ export default function DirectoryEntryDialog({
                     if (!file) return;
                     setPhotoError(null);
                     readProfilePhoto(file)
-                      .then(setImage)
+                      .then((next) => {
+                        setImage(next);
+                        setPhotoTouched(true);
+                      })
                       .catch((err) => setPhotoError(err instanceof Error ? err.message : 'Could not read that photo'));
                   }}
                 />
               </label>
               {image && (
-                <button type="button" className="ml-3 text-gray-500 hover:text-gray-800" onClick={() => setImage(null)}>
+                <button
+                  type="button"
+                  className="ml-3 text-gray-500 hover:text-gray-800"
+                  onClick={() => {
+                    setImage(null);
+                    setPhotoTouched(true);
+                  }}
+                >
                   Remove
                 </button>
               )}
