@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-27 (mid-day)  
+**Last updated:** 2026-10-28 (mid-day)  
 **Current phase:** Trade Leadership Directory v1  
-**Status:** v1.28.0 LIVE green; STANDBY blue synced; inferred rows still need a human pass
+**Status:** v1.29.0 LIVE blue; STANDBY green synced; inferred rows still need a human pass
 
 ---
 
@@ -18,12 +18,15 @@
 - [x] Soft-land homepage → directory; hide legacy noise (effort: M)
 - [x] Directory search, copy email, add person, edit, end date (effort: M)
 - [x] qa-01 release gate, then `/ship` v1.28.0 (effort: S)
+- [x] Move people across trades and roles; sisters only Support; `/ship` v1.29.0 (effort: M)
+- [x] Retire empty Site/Civil (Sitework/Civil stays) (effort: S)
 - [ ] Clean inferred/no-crew rows in UI (effort: M)
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
 - ✅ D-068 — blue IP `10.92.3.34` (Postgres VIP keeps `.23`)
 - ✅ v1.28.0 LIVE green CT135, STANDBY blue CT133, both `fe08a8c` (2026-10-27)
+- ✅ v1.29.0 LIVE blue CT133, STANDBY green CT135, both `3222e09` (2026-10-27)
 - ✅ Oversight import: 195 rows, 190 people, all with photos
 
 ---
@@ -33,7 +36,7 @@
 ### High Priority
 - [ ] Rework admin portal to match TheoShift approach (effort: XL)
 - [ ] Mobile optimization and PWA support (effort: L)
-- [ ] Fix TypeScript error in ImportExportButtons.tsx (lines 52, 184) (effort: S)
+- [x] Fix TypeScript error in ImportExportButtons.tsx (effort: S)
 
 ### Medium Priority
 - [ ] Expand LDC smoke coverage beyond qa-01 quick suite (effort: M)
@@ -49,4 +52,4 @@
 
 - HAProxy ACL: `is_ldc` → LIVE backend; `is_ldc_blue` / `is_ldc_green` for color hosts
 - DB: `postgresql://…@10.92.3.23:5432/ldc_tools` (RW VIP)
-- LIVE is green as of the v1.28.0 switch
+- LIVE is blue as of the v1.29.0 switch
