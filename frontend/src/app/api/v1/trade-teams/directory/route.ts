@@ -98,6 +98,14 @@ async function moveAssignment(
   return saved;
 }
 
+function profileImage(value: unknown): { image: string | null; error?: string } {
+  if (value == null || value === '') return { image: null };
+  const image = String(value);
+  if (image.length > 400_000) return { image: null, error: 'Photo is too large' };
+  if (image.startsWith('data:image/') || image.startsWith('https://')) return { image };
+  return { image: null, error: 'Choose an image file' };
+}
+
 async function requireUser() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return null;
@@ -169,11 +177,15 @@ export async function POST(request: NextRequest) {
     const lastName = String(body.lastName || '').trim();
     const email = String(body.email || '').trim().toLowerCase();
     const phone = String(body.phone || '').trim() || null;
+    const photo = profileImage(body.image);
     const role = String(body.role || '');
     const tradeTeamId = String(body.tradeTeamId || '');
     const crewId = body.crewId ? String(body.crewId) : null;
     const isSister = body.isSister === true;
     const startDate = parseDirectoryDate(body.startDate) || new Date();
+
+    if (photo.error) return NextResponse.json({ error: photo.error }, { status: 400 });
+    const image = photo.image;
 
     if (!firstName || !lastName || !email || !tradeTeamId) {
       return NextResponse.json({ error: 'Name, email, and trade team are required' }, { status: 400 });
@@ -203,6 +215,7 @@ export async function POST(request: NextRequest) {
           firstName,
           lastName,
           isSister,
+          ...(image ? { image } : {}),
           role: 'READ_ONLY',
           status: 'INVITED',
           constructionGroupId: team.constructionGroupId,
@@ -216,6 +229,7 @@ export async function POST(request: NextRequest) {
           firstName: user.firstName || firstName,
           lastName: user.lastName || lastName,
           isSister,
+          ...(image ? { image } : {}),
           constructionGroupId: user.constructionGroupId || team.constructionGroupId,
         },
       });
@@ -285,6 +299,7 @@ export async function PATCH(request: NextRequest) {
     const lastName = String(body.lastName || '').trim();
     const email = String(body.email || '').trim().toLowerCase();
     const phone = String(body.phone || '').trim() || null;
+    const photo = profileImage(body.image);
     const role = String(body.role || '');
     const tradeTeamId = String(body.tradeTeamId || '');
     const crewId = body.crewId ? String(body.crewId) : null;
@@ -293,6 +308,9 @@ export async function PATCH(request: NextRequest) {
     const endDate = body.endDate === '' || body.endDate == null ? null : parseDirectoryDate(body.endDate);
     const isActive = endDate == null;
     const destScope = crewId ? 'crew' : 'team';
+
+    if (photo.error) return NextResponse.json({ error: photo.error }, { status: 400 });
+    const image = photo.image;
 
     if (!id || !firstName || !email || !tradeTeamId) {
       return NextResponse.json({ error: 'Name, email, and trade are required' }, { status: 400 });
@@ -349,7 +367,7 @@ export async function PATCH(request: NextRequest) {
     }
     await prisma.user.update({
       where: { id: current.userId },
-      data: { email, firstName, lastName, isSister, name: `${firstName} ${lastName}`.trim() },
+      data: { email, firstName, lastName, isSister, image, name: `${firstName} ${lastName}`.trim() },
     });
     await ensureVolunteer(current.userId, team.constructionGroupId, {
       firstName,

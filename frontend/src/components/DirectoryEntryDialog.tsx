@@ -13,6 +13,7 @@ type EntryUser = {
   id: string;
   name: string | null;
   email: string;
+  image?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   phone?: string | null;
@@ -51,6 +52,23 @@ function roleForScope(hasCrew: boolean, sister: boolean, current: string) {
   return allowed.includes(current) ? current : allowed[0];
 }
 
+async function readProfilePhoto(file: File) {
+  if (!file.type.startsWith('image/')) throw new Error('Choose an image file');
+  const bitmap = await createImageBitmap(file);
+  const max = 256;
+  const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Could not read that photo');
+  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  if (dataUrl.length > 400_000) throw new Error('That photo is too large');
+  return dataUrl;
+}
+
 function nameParts(user: EntryUser) {
   if (user.firstName || user.lastName) {
     return { firstName: user.firstName || '', lastName: user.lastName || '' };
@@ -81,6 +99,8 @@ export default function DirectoryEntryDialog({
   const [lastName, setLastName] = useState(initialName.lastName);
   const [email, setEmail] = useState(entry?.user.email || '');
   const [phone, setPhone] = useState(entry?.user.phone || '');
+  const [image, setImage] = useState<string | null>(entry?.user.image || null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [isSister, setIsSister] = useState(entry?.user.isSister === true);
   const [tradeTeamId, setTradeTeamId] = useState(initialTeam);
   const [crewId, setCrewId] = useState(initialCrew);
@@ -108,6 +128,7 @@ export default function DirectoryEntryDialog({
       lastName,
       email,
       phone,
+      image,
       isSister,
       role,
       tradeTeamId,
@@ -148,6 +169,38 @@ export default function DirectoryEntryDialog({
               Last name
               <input className="mt-1 w-full rounded border px-2 py-2" value={lastName} onChange={(event) => setLastName(event.target.value)} />
             </label>
+          </div>
+          <div className="flex items-center gap-3">
+            {image ? (
+              <img src={image} alt="" className="h-14 w-14 rounded-full object-cover bg-gray-200" />
+            ) : (
+              <div className="h-14 w-14 rounded-full bg-gray-200" />
+            )}
+            <div className="text-sm">
+              <label className="font-medium text-blue-700 hover:underline cursor-pointer">
+                {image ? 'Replace photo' : 'Add photo'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = '';
+                    if (!file) return;
+                    setPhotoError(null);
+                    readProfilePhoto(file)
+                      .then(setImage)
+                      .catch((err) => setPhotoError(err instanceof Error ? err.message : 'Could not read that photo'));
+                  }}
+                />
+              </label>
+              {image && (
+                <button type="button" className="ml-3 text-gray-500 hover:text-gray-800" onClick={() => setImage(null)}>
+                  Remove
+                </button>
+              )}
+              {photoError && <p className="mt-1 text-red-700">{photoError}</p>}
+            </div>
           </div>
           <label className="block text-sm text-gray-700">
             Email
