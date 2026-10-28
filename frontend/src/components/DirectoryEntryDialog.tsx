@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { dateInputValue } from '@/lib/directory-assignments';
+import ProfilePhoto, { cropPhotoAroundFace } from '@/components/ProfilePhoto';
 
 type TeamOption = {
   id: string;
@@ -55,18 +56,13 @@ function roleForScope(hasCrew: boolean, sister: boolean, current: string) {
 async function readProfilePhoto(file: File) {
   if (!file.type.startsWith('image/')) throw new Error('Choose an image file');
   const bitmap = await createImageBitmap(file);
-  const max = 256;
-  const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-  const context = canvas.getContext('2d');
-  if (!context) throw new Error('Could not read that photo');
-  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-  if (dataUrl.length > 400_000) throw new Error('That photo is too large');
-  return dataUrl;
+  try {
+    const dataUrl = await cropPhotoAroundFace(bitmap);
+    if (dataUrl.length > 400_000) throw new Error('That photo is too large');
+    return dataUrl;
+  } finally {
+    bitmap.close();
+  }
 }
 
 function nameParts(user: EntryUser) {
@@ -172,7 +168,7 @@ export default function DirectoryEntryDialog({
           </div>
           <div className="flex items-center gap-3">
             {image ? (
-              <img src={image} alt="" className="h-14 w-14 rounded-full object-cover bg-gray-200" />
+              <ProfilePhoto src={image} className="h-14 w-14 rounded-full object-cover bg-gray-200" />
             ) : (
               <div className="h-14 w-14 rounded-full bg-gray-200" />
             )}

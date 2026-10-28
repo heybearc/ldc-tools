@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import DirectoryEntryDialog, { DirectoryEditTarget } from '@/components/DirectoryEntryDialog';
 import DirectoryTeamCard, { directoryTeamColors } from '@/components/DirectoryTeamCard';
+import ProfilePhoto from '@/components/ProfilePhoto';
 
 interface OversightAssignment {
   id: string;
@@ -135,9 +136,8 @@ export default function TradeTeamsOverviewPage() {
               })}
             >
               {assignment.user.image ? (
-                <img
+                <ProfilePhoto
                   src={assignment.user.image}
-                  alt=""
                   className="h-7 w-7 rounded-full object-cover flex-shrink-0 bg-gray-200"
                 />
               ) : null}

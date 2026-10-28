@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Copy } from 'lucide-react';
+import ProfilePhoto from '@/components/ProfilePhoto';
 
 export const directoryTeamColors = [
   { bg: 'bg-green-600', header: 'bg-green-700', light: 'bg-green-50', border: 'border-green-200' },
@@ -75,9 +76,8 @@ export function OversightNames({
         const label = (
           <>
             {assignment.user.image ? (
-              <img
+              <ProfilePhoto
                 src={assignment.user.image}
-                alt=""
                 className="h-7 w-7 rounded-full object-cover flex-shrink-0 bg-gray-200"
               />
             ) : null}
