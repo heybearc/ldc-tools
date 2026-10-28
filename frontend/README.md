@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.29.0**
+Current: **1.30.0**
 
 ## Version History
+- **v1.30.0** (2026-10-28) - Open a trade team, and place a profile photo in the circle before saving
 - **v1.29.0** (2026-10-27) - Move people between trades and roles; sisters stay in Support
 - **v1.28.0** (2026-10-27) - Trade Leadership Directory is the home page, with search, edit, and end dates
 - **v1.27.4** (2026-04-28) - Fixed feedback submission reliability and qa-01 test runner setup

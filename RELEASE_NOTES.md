@@ -1,5 +1,15 @@
 # LDC Tools Release Notes
 
+## v1.30.0 - Place a profile photo and open a trade team
+
+**Release Date:** October 28, 2026
+
+### ✨ New Features
+
+- Drag a profile photo into the circle, then save that crop
+- Open a trade team to see its crews and oversight
+- The home page is the trade leadership directory
+
 ## v1.29.0 - Move people and keep sisters in Support
 
 **Release Date:** October 27, 2026
