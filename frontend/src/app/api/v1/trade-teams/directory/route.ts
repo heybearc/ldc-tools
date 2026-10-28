@@ -98,9 +98,12 @@ async function moveAssignment(
   return saved;
 }
 
+const STORED_DIRECTORY_PHOTO = /^\/api\/v1\/directory-photos\/[a-zA-Z0-9._-]+$/;
+
 function profileImage(value: unknown): { image: string | null; error?: string } {
   if (value == null || value === '') return { image: null };
   const image = String(value);
+  if (STORED_DIRECTORY_PHOTO.test(image)) return { image };
   if (image.length > 400_000) return { image: null, error: 'Photo is too large' };
   if (image.startsWith('data:image/') || image.startsWith('https://')) return { image };
   return { image: null, error: 'Choose an image file' };
