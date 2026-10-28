@@ -69,3 +69,8 @@ For shared architectural decisions that apply to all apps, see `.cloudy-work/_cl
 - **Decision:** Treat HAProxy config inspection (`use_backend ... if is_ldc`) as the authoritative runtime source before release/sync decisions whenever MCP status output is ambiguous.
 - **Operational rule:** If MCP status and observed version differ, verify HAProxy first, then perform role-based action (LIVE/STANDBY), then re-verify versions on both nodes.
 - **Naming standard:** Prefer `ldctools-blue` / `ldctools-green` aliases and avoid `prod/staging` language in deployment workflows.
+
+## D-LDC-009: Profile photos are cropped only when the user frames them
+- **Date:** 2026-10-28
+- **Decision:** The edit form lets someone drag and zoom a photo. Save stores that circle. The directory does not auto-center faces.
+- **Why:** Automatic face placement clipped the tops of heads. Imported files stay until someone replaces or repositions them.

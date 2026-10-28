@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-28 (mid-day)  
 **Current phase:** Trade Leadership Directory v1  
-**Status:** v1.29.0 LIVE blue; STANDBY green synced; inferred rows still need a human pass
+**Status:** v1.30.0 LIVE green; STANDBY blue synced; inferred rows still need a human pass
 
 ---
 
@@ -20,6 +20,7 @@
 - [x] qa-01 release gate, then `/ship` v1.28.0 (effort: S)
 - [x] Move people across trades and roles; sisters only Support; `/ship` v1.29.0 (effort: M)
 - [x] Retire empty Site/Civil (Sitework/Civil stays) (effort: S)
+- [x] Home is the directory; open a team; place a photo; `/ship` v1.30.0 (effort: M)
 - [ ] Clean inferred/no-crew rows in UI (effort: M)
 
 ### Completed This Phase
@@ -27,6 +28,7 @@
 - ✅ D-068 — blue IP `10.92.3.34` (Postgres VIP keeps `.23`)
 - ✅ v1.28.0 LIVE green CT135, STANDBY blue CT133, both `fe08a8c` (2026-10-27)
 - ✅ v1.29.0 LIVE blue CT133, STANDBY green CT135, both `3222e09` (2026-10-27)
+- ✅ v1.30.0 LIVE green CT135, STANDBY blue CT133, both `e11cb3d` (2026-10-28)
 - ✅ Oversight import: 195 rows, 190 people, all with photos
 
 ---
