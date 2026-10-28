@@ -16,7 +16,7 @@ async function signIn(page: Page) {
 test('a sister can only be support and an entry can move trade or crew', async ({ page }) => {
   await signIn(page);
   await page.goto('/trade-teams/overview');
-  await expect(page.getByRole('heading', { name: 'Trade Teams Overview' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Directory' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Export CSV' })).toBeVisible();
 
   await page.locator('img.h-7.rounded-full').first().click();

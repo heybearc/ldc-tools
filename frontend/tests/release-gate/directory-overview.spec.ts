@@ -54,7 +54,7 @@ test('directory lists oversight people, role columns, and a CSV export', async (
 
   const firstName = teams[0].name || '';
   expect(firstName.length).toBeGreaterThan(0);
-  await expect(page.getByRole('heading', { name: 'Trade Teams Overview' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Directory' })).toBeVisible();
   await expect(page.getByRole('heading', { name: firstName, exact: true })).toBeVisible();
 
   const withPhoto = people.filter((person) => person.user?.image);

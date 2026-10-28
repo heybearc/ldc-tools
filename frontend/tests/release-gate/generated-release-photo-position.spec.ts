@@ -30,7 +30,7 @@ test('home is the trade leadership directory and retired routes leave the old pr
 test('a trade team opens into its crews and the edit form can place a photo', async ({ page }) => {
   await signIn(page);
   await page.goto('/trade-teams/overview');
-  await expect(page.getByRole('heading', { name: 'Trade Teams Overview' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Directory' })).toBeVisible();
 
   await page.getByRole('link', { name: 'Open team' }).first().click();
   await expect(page.getByRole('heading', { name: 'Crews' })).toBeVisible();
