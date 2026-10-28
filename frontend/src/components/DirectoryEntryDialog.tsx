@@ -62,26 +62,30 @@ function nameParts(user: EntryUser) {
 export default function DirectoryEntryDialog({
   mode,
   entry,
+  defaults,
   teams,
   onClose,
   onSaved,
 }: {
   mode: 'add' | 'edit';
   entry: DirectoryEditTarget | null;
+  defaults?: { tradeTeamId?: string; crewId?: string | null };
   teams: TeamOption[];
   onClose: () => void;
   onSaved: () => void;
 }) {
   const initialName = entry ? nameParts(entry.user) : { firstName: '', lastName: '' };
+  const initialCrew = entry?.crewId || defaults?.crewId || '';
+  const initialTeam = entry?.tradeTeamId || defaults?.tradeTeamId || teams[0]?.id || '';
   const [firstName, setFirstName] = useState(initialName.firstName);
   const [lastName, setLastName] = useState(initialName.lastName);
   const [email, setEmail] = useState(entry?.user.email || '');
   const [phone, setPhone] = useState(entry?.user.phone || '');
   const [isSister, setIsSister] = useState(entry?.user.isSister === true);
-  const [tradeTeamId, setTradeTeamId] = useState(entry?.tradeTeamId || teams[0]?.id || '');
-  const [crewId, setCrewId] = useState(entry?.crewId || '');
+  const [tradeTeamId, setTradeTeamId] = useState(initialTeam);
+  const [crewId, setCrewId] = useState(initialCrew);
   const [role, setRole] = useState(
-    roleForScope(Boolean(entry?.crewId), entry?.user.isSister === true, entry?.role || (entry?.crewId ? 'TCO' : 'TTO'))
+    roleForScope(Boolean(initialCrew), entry?.user.isSister === true, entry?.role || (initialCrew ? 'TCO' : 'TTO'))
   );
   const [startDate, setStartDate] = useState(dateInputValue(entry?.startDate) || dateInputValue(new Date()));
   const [endDate, setEndDate] = useState(dateInputValue(entry?.endDate));

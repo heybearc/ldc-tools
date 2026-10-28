@@ -50,7 +50,7 @@ export default async function TradeTeamsHelpPage() {
           <ol>
             <li>Click <strong>Trade Teams</strong> in the main navigation</li>
             <li>Each card is one trade team. It shows the overseer and how many crews it has.</li>
-            <li>Open a team to see its crews and the people in each oversight role</li>
+            <li>Open a team to see its crews and the people in each oversight role. Click a name to edit it. The directory has an Open team link on each trade.</li>
           </ol>
           <p>Add or edit a person from the Directory. The cards are for the team and crew structure.</p>
 

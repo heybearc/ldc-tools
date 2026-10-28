@@ -66,7 +66,7 @@ export default function TradeTeamsOverviewPage() {
   const fetchOverviewData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/v1/trade-teams/overview');
+      const response = await fetch('/api/v1/trade-teams/overview', { cache: 'no-store' });
       if (!response.ok) throw new Error('Failed to fetch overview data');
       const data = await response.json();
       setTradeTeams(data.tradeTeams || []);
@@ -389,6 +389,8 @@ export default function TradeTeamsOverviewPage() {
                   key={team.id}
                   team={team}
                   colorIndex={teamIdx}
+                  linkTeam
+                  linkCrews
                   onEdit={(assignment, tradeTeamId, crewId) => setEditor({
                     mode: 'edit',
                     entry: {
@@ -450,6 +452,13 @@ export default function TradeTeamsOverviewPage() {
                             <div className="flex items-center">
                               {isExpanded ? <ChevronDown className="h-4 w-4 mr-2" /> : <ChevronRight className="h-4 w-4 mr-2" />}
                               <span className="font-medium text-gray-900">{team.name}</span>
+                              <Link
+                                href={`/trade-teams/${team.id}`}
+                                className="ml-3 text-xs font-medium text-blue-700 hover:underline print:hidden"
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                Open team
+                              </Link>
                               <span className="ml-2 text-xs text-gray-500">({team.crews.length} crews)</span>
                             </div>
                           </td>
@@ -475,7 +484,9 @@ export default function TradeTeamsOverviewPage() {
                             <td className="px-4 py-2 whitespace-nowrap">
                               <div className="flex items-center">
                                 <Users className="h-4 w-4 mr-2 text-gray-400" />
-                                <span className="text-sm text-gray-900">{crew.name}</span>
+                                <Link href={`/trade-teams/${team.id}/crews/${crew.id}`} className="text-sm text-blue-700 hover:underline">
+                                  {crew.name}
+                                </Link>
                                 {!crew.isRequired && (
                                   <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Optional</span>
                                 )}

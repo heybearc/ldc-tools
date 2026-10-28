@@ -7,8 +7,8 @@ import {
   ArrowLeft, XCircle,
   FileText, Calendar, Tag, UserPlus
 } from 'lucide-react';
-import { usePermissions } from '@/hooks/usePermissions';
-import DirectoryTeamCard, { DirectoryTeam } from '@/components/DirectoryTeamCard';
+import DirectoryEntryDialog, { DirectoryEditTarget } from '@/components/DirectoryEntryDialog';
+import DirectoryTeamCard, { DirectoryAssignment, DirectoryTeam } from '@/components/DirectoryTeamCard';
 
 interface Crew {
   id: string;
@@ -27,13 +27,17 @@ interface Crew {
 }
 
 export default function CrewDetailPage() {
-  const { canManageTradeTeams } = usePermissions();
   const params = useParams();
   const teamId = params.id as string;
   const crewId = params.crewId as string;
 
   const [crew, setCrew] = useState<Crew | null>(null);
-  const [directoryTeam, setDirectoryTeam] = useState<DirectoryTeam | null>(null);
+  const [directoryTeams, setDirectoryTeams] = useState<DirectoryTeam[]>([]);
+  const [editor, setEditor] = useState<
+    | null
+    | { mode: 'edit'; entry: DirectoryEditTarget }
+    | { mode: 'add' }
+  >(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,15 +67,26 @@ export default function CrewDetailPage() {
 
   const fetchDirectory = async () => {
     try {
-      const response = await fetch('/api/v1/trade-teams/overview');
+      const response = await fetch('/api/v1/trade-teams/overview', { cache: 'no-store' });
       if (!response.ok) return;
       const data = await response.json();
-      const match = (data.tradeTeams || []).find((item: DirectoryTeam) => item.id === teamId);
-      setDirectoryTeam(match || null);
+      setDirectoryTeams(data.tradeTeams || []);
     } catch (err) {
       console.error('Failed to fetch directory:', err);
     }
   };
+
+  const directoryTeam = directoryTeams.find((item) => item.id === teamId) || null;
+
+  const editEntry = (assignment: DirectoryAssignment): DirectoryEditTarget => ({
+    id: assignment.id,
+    role: assignment.role,
+    startDate: assignment.startDate,
+    endDate: assignment.endDate,
+    tradeTeamId: teamId,
+    crewId,
+    user: assignment.user,
+  });
 
   if (loading) {
     return (
@@ -166,21 +181,42 @@ export default function CrewDetailPage() {
         {directoryTeam && (
           <div className="mb-6">
             <div className="flex justify-end mb-2">
-              {canManageTradeTeams && (
-                <Link
-                  href="/trade-teams/overview"
-                  className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
-                >
-                  <UserPlus className="h-4 w-4 mr-1" />
-                  Add in Directory
-                </Link>
-              )}
+              <button
+                type="button"
+                onClick={() => setEditor({ mode: 'add' })}
+                className="inline-flex items-center px-3 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800"
+              >
+                <UserPlus className="h-4 w-4 mr-1" />
+                Add person
+              </button>
             </div>
-            <DirectoryTeamCard team={directoryTeam} onlyCrewId={crewId} />
+            <DirectoryTeamCard
+              team={directoryTeam}
+              onlyCrewId={crewId}
+              onEdit={(assignment) => setEditor({ mode: 'edit', entry: editEntry(assignment) })}
+            />
           </div>
         )}
 
       </div>
+      {editor && (
+        <DirectoryEntryDialog
+          key={editor.mode === 'edit' ? editor.entry.id : 'add'}
+          mode={editor.mode}
+          entry={editor.mode === 'edit' ? editor.entry : null}
+          defaults={{ tradeTeamId: teamId, crewId }}
+          teams={directoryTeams.map((item) => ({
+            id: item.id,
+            name: item.name,
+            crews: item.crews.map((crew) => ({ id: crew.id, name: crew.name })),
+          }))}
+          onClose={() => setEditor(null)}
+          onSaved={() => {
+            setEditor(null);
+            fetchDirectory();
+          }}
+        />
+      )}
     </div>
   );
 }

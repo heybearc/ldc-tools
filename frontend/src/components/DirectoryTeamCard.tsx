@@ -61,7 +61,7 @@ export function directoryPersonName(user: { name: string | null; email: string }
   return user.name || user.email.split('@')[0];
 }
 
-function PersonList({
+export function OversightNames({
   assignments,
   onEdit,
 }: {
@@ -139,17 +139,19 @@ export default function DirectoryTeamCard({
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className={`${colors.header} text-white p-3 rounded-t-lg`}>
-        <h2 className="font-bold text-lg text-center">
-          {linkTeam && !onlyCrewId ? (
-            <Link href={`/trade-teams/${team.id}`} className="hover:underline">
-              {title}
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-bold text-lg">{title}</h2>
+          {linkTeam && !onlyCrewId && (
+            <Link
+              href={`/trade-teams/${team.id}`}
+              className="shrink-0 rounded bg-white/15 px-2 py-1 text-xs font-medium hover:bg-white/25 print:hidden"
+            >
+              Open team
             </Link>
-          ) : (
-            title
           )}
-        </h2>
+        </div>
         {onlyCrewId && (
-          <p className="text-center text-xs text-white/80 mt-1">{team.name}</p>
+          <p className="text-xs text-white/80 mt-1">{team.name}</p>
         )}
       </div>
 
@@ -160,7 +162,7 @@ export default function DirectoryTeamCard({
             <div>
               <div className="font-medium text-gray-600">Overseer</div>
               <div className="text-gray-900">
-                <PersonList
+                <OversightNames
                   assignments={assignmentsForRole(team.oversight, 'TTO')}
                   onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, null) : undefined}
                 />
@@ -169,7 +171,7 @@ export default function DirectoryTeamCard({
             <div>
               <div className="font-medium text-gray-600">Assistant</div>
               <div className="text-gray-900">
-                <PersonList
+                <OversightNames
                   assignments={assignmentsForRole(team.oversight, 'TTOA')}
                   onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, null) : undefined}
                 />
@@ -178,7 +180,7 @@ export default function DirectoryTeamCard({
             <div>
               <div className="font-medium text-gray-600">Support</div>
               <div className="text-gray-900">
-                <PersonList
+                <OversightNames
                   assignments={assignmentsForRole(team.oversight, 'TT_SUPPORT')}
                   onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, null) : undefined}
                 />
@@ -209,7 +211,7 @@ export default function DirectoryTeamCard({
               <div className="grid grid-cols-4 gap-1">
                 <div className="font-medium text-gray-900" title={crew.scopeOfWork || ''}>
                   {linkCrews && !onlyCrewId ? (
-                    <Link href={`/trade-teams/${team.id}/crews/${crew.id}`} className="hover:underline">
+                    <Link href={`/trade-teams/${team.id}/crews/${crew.id}`} className="text-blue-700 hover:underline">
                       {crew.name}
                     </Link>
                   ) : (
@@ -217,19 +219,19 @@ export default function DirectoryTeamCard({
                   )}
                 </div>
                 <div className="text-gray-700">
-                  <PersonList
+                  <OversightNames
                     assignments={assignmentsForRole(crew.oversight, 'TCO')}
                     onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, crew.id) : undefined}
                   />
                 </div>
                 <div className="text-gray-700">
-                  <PersonList
+                  <OversightNames
                     assignments={assignmentsForRole(crew.oversight, 'TCOA')}
                     onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, crew.id) : undefined}
                   />
                 </div>
                 <div className="text-gray-700">
-                  <PersonList
+                  <OversightNames
                     assignments={assignmentsForRole(crew.oversight, 'TC_SUPPORT')}
                     onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, crew.id) : undefined}
                   />

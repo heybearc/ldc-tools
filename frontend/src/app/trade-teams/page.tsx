@@ -67,7 +67,7 @@ export default function TradeTeamsPage() {
       
       const [response, overviewResponse] = await Promise.all([
         fetch('/api/v1/trade-teams'),
-        fetch('/api/v1/trade-teams/overview'),
+        fetch('/api/v1/trade-teams/overview', { cache: 'no-store' }),
       ]);
       if (!response.ok) {
         throw new Error(`Failed to fetch trade teams: ${response.statusText}`);

@@ -8,7 +8,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
-import { DirectoryAssignment, DirectoryTeam, assignmentsForRole, directoryPersonName } from '@/components/DirectoryTeamCard';
+import DirectoryEntryDialog, { DirectoryEditTarget } from '@/components/DirectoryEntryDialog';
+import { DirectoryAssignment, DirectoryTeam, OversightNames, assignmentsForRole } from '@/components/DirectoryTeamCard';
 
 interface Crew {
   id: string;
@@ -43,7 +44,12 @@ export default function TradeTeamDetailPage() {
   const teamId = params.id as string;
 
   const [team, setTeam] = useState<TradeTeam | null>(null);
-  const [directoryTeam, setDirectoryTeam] = useState<DirectoryTeam | null>(null);
+  const [directoryTeams, setDirectoryTeams] = useState<DirectoryTeam[]>([]);
+  const [editor, setEditor] = useState<
+    | null
+    | { mode: 'edit'; entry: DirectoryEditTarget }
+    | { mode: 'add'; tradeTeamId: string; crewId: string | null }
+  >(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,11 +78,10 @@ export default function TradeTeamDetailPage() {
 
   const fetchDirectory = async () => {
     try {
-      const response = await fetch('/api/v1/trade-teams/overview');
+      const response = await fetch('/api/v1/trade-teams/overview', { cache: 'no-store' });
       if (!response.ok) return;
       const data = await response.json();
-      const match = (data.tradeTeams || []).find((item: DirectoryTeam) => item.id === teamId);
-      setDirectoryTeam(match || null);
+      setDirectoryTeams(data.tradeTeams || []);
     } catch (err) {
       console.error('Failed to fetch directory:', err);
     }
@@ -213,6 +218,18 @@ export default function TradeTeamDetailPage() {
     );
   }
 
+  const directoryTeam = directoryTeams.find((item) => item.id === teamId) || null;
+
+  const editEntry = (assignment: DirectoryAssignment, crewId: string | null): DirectoryEditTarget => ({
+    id: assignment.id,
+    role: assignment.role,
+    startDate: assignment.startDate,
+    endDate: assignment.endDate,
+    tradeTeamId: teamId,
+    crewId,
+    user: assignment.user,
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -251,11 +268,21 @@ export default function TradeTeamDetailPage() {
         </div>
 
         <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Team oversight</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Team oversight</h2>
+            <button
+              type="button"
+              onClick={() => setEditor({ mode: 'add', tradeTeamId: teamId, crewId: null })}
+              className="inline-flex items-center px-3 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add person
+            </button>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <RoleLine label="Overseer" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TTO')} />
-            <RoleLine label="Assistant" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TTOA')} />
-            <RoleLine label="Support" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TT_SUPPORT')} />
+            <RoleLine label="Overseer" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TTO')} onEdit={(assignment) => setEditor({ mode: 'edit', entry: editEntry(assignment, null) })} />
+            <RoleLine label="Assistant" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TTOA')} onEdit={(assignment) => setEditor({ mode: 'edit', entry: editEntry(assignment, null) })} />
+            <RoleLine label="Support" assignments={assignmentsForRole(directoryTeam?.oversight || [], 'TT_SUPPORT')} onEdit={(assignment) => setEditor({ mode: 'edit', entry: editEntry(assignment, null) })} />
           </div>
         </section>
 
@@ -285,21 +312,30 @@ export default function TradeTeamDetailPage() {
                       <Link href={`/trade-teams/${teamId}/crews/${crew.id}`} className="text-base font-semibold text-gray-900 hover:text-blue-700">
                         {crew.name}
                       </Link>
-                      {canManageTradeTeams && record && (
-                        <div className="flex shrink-0">
-                          <button onClick={() => openCrewModal(record)} className="p-2 text-gray-400 hover:text-blue-600" title="Edit crew">
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button onClick={() => handleDeleteCrew(record)} className="p-2 text-gray-400 hover:text-red-600" title="Delete crew">
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex shrink-0 items-center">
+                        <button
+                          type="button"
+                          onClick={() => setEditor({ mode: 'add', tradeTeamId: teamId, crewId: crew.id })}
+                          className="px-2 py-1 text-sm font-medium text-blue-700 hover:underline"
+                        >
+                          Add person
+                        </button>
+                        {canManageTradeTeams && record && (
+                          <>
+                            <button onClick={() => openCrewModal(record)} className="p-2 text-gray-400 hover:text-blue-600" title="Edit crew">
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button onClick={() => handleDeleteCrew(record)} className="p-2 text-gray-400 hover:text-red-600" title="Delete crew">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <RoleLine label="Overseer" assignments={assignmentsForRole(crew.oversight, 'TCO')} />
-                      <RoleLine label="Assistant" assignments={assignmentsForRole(crew.oversight, 'TCOA')} />
-                      <RoleLine label="Support" assignments={assignmentsForRole(crew.oversight, 'TC_SUPPORT')} />
+                      <RoleLine label="Overseer" assignments={assignmentsForRole(crew.oversight, 'TCO')} onEdit={(assignment) => setEditor({ mode: 'edit', entry: editEntry(assignment, crew.id) })} />
+                      <RoleLine label="Assistant" assignments={assignmentsForRole(crew.oversight, 'TCOA')} onEdit={(assignment) => setEditor({ mode: 'edit', entry: editEntry(assignment, crew.id) })} />
+                      <RoleLine label="Support" assignments={assignmentsForRole(crew.oversight, 'TC_SUPPORT')} onEdit={(assignment) => setEditor({ mode: 'edit', entry: editEntry(assignment, crew.id) })} />
                     </div>
                   </div>
                 );
@@ -425,20 +461,43 @@ export default function TradeTeamDetailPage() {
           </div>
         </div>
       )}
+      {editor && (
+        <DirectoryEntryDialog
+          key={editor.mode === 'edit' ? editor.entry.id : `add-${editor.crewId || 'team'}`}
+          mode={editor.mode}
+          entry={editor.mode === 'edit' ? editor.entry : null}
+          defaults={editor.mode === 'add' ? { tradeTeamId: editor.tradeTeamId, crewId: editor.crewId } : undefined}
+          teams={directoryTeams.map((item) => ({
+            id: item.id,
+            name: item.name,
+            crews: item.crews.map((crew) => ({ id: crew.id, name: crew.name })),
+          }))}
+          onClose={() => setEditor(null)}
+          onSaved={() => {
+            setEditor(null);
+            fetchDirectory();
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function RoleLine({ label, assignments }: { label: string; assignments: DirectoryAssignment[] }) {
-  const names = assignments.length === 0
-    ? '—'
-    : assignments
-        .map((assignment) => `${directoryPersonName(assignment.user)}${assignment.awaitingReplacement ? ' (ended)' : ''}`)
-        .join(', ');
+function RoleLine({
+  label,
+  assignments,
+  onEdit,
+}: {
+  label: string;
+  assignments: DirectoryAssignment[];
+  onEdit: (assignment: DirectoryAssignment) => void;
+}) {
   return (
     <div>
       <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
-      <p className="mt-1 text-sm text-gray-900">{names}</p>
+      <div className="mt-1 text-sm text-gray-900">
+        <OversightNames assignments={assignments} onEdit={onEdit} />
+      </div>
     </div>
   );
 }
