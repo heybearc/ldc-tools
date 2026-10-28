@@ -33,7 +33,8 @@ test('a trade team opens into its crews and the edit form can place a photo', as
   await expect(page.getByRole('heading', { name: 'Directory' })).toBeVisible();
 
   await page.getByRole('link', { name: 'Open team' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Crews' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Team oversight' })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole('heading', { name: 'Crews', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Add person' }).first()).toBeVisible();
 
   await page.goto('/trade-teams/overview');
