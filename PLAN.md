@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
 **Last updated:** 2026-10-29  
-**Current phase:** Trade Leadership Directory v1, then region work queue  
-**Status:** v1.30.0 LIVE green; STANDBY blue synced. Hub dates are paused. Direction is directory plus projects, process checklists, and claimable work, scoped per region.
+**Current phase:** Region work queue  
+**Status:** Directory v1.30.0 is LIVE on green. Standby blue is `41a19b8` (hierarchy admin removed). Hub dates are paused. Build the slices below in order.
 
 ---
 
@@ -21,14 +21,8 @@
 - [x] Move people across trades and roles; sisters only Support; `/ship` v1.29.0 (effort: M)
 - [x] Retire empty Site/Civil (Sitework/Civil stays) (effort: S)
 - [x] Home is the directory; open a team; place a photo; `/ship` v1.30.0 (effort: M)
-- [ ] Clean inferred/no-crew rows in UI (effort: M) — paused; waiting on a hub export for start and end dates
-- [ ] Add Construction Group and ancillary region people to the directory (effort: M)
-- [ ] Enforce construction-group scope on every list and write (effort: L)
-- [ ] Projects page: Oversight assigns Personnel; schedule dated work; no crews, budget, or congregations (effort: L)
-- [ ] Personnel Contact, Assistant, and Support assign tasks; claimable tasks can be claimed by the team (effort: M)
-- [ ] Process checklists with explanations and reference docs (effort: XL)
-- [ ] Import crew requests as checklist items; notify the requestor when complete (effort: L)
-- [ ] Post a task, notify the team, let someone claim it (effort: L)
+- [x] Slice 1 — directory groups (Construction group and ancillary, same construction group only)
+- [ ] Slices 2–6 below, in order
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
@@ -40,14 +34,81 @@
 
 ---
 
+## Build order
+
+Each slice ships to standby before the next one starts. Every new list is limited to the signed-in construction group. CG 01.12 is the first group. Another region sees only its own rows.
+
+People already on the construction group:
+
+- **Personnel** assign tasks: Personnel Contact, Assistant, and Support (`PC`, `PCA`, `PC-Support`). Support for Amber Allen, Kennedy Allen, Ruth Hirsch, Amber Williams, and Cory L Test is a volunteer role, not a `PersonnelContact` row. Read both.
+- **Oversight** assigns Personnel to projects: Construction Group Overseer, Assistant, and Support (`CGO`, `ACGO`, `CG-Support`).
+- A claimable task can be claimed, or self-assigned, by anyone signed in to that construction group.
+
+### 1. Directory groups — done
+
+Show three groups on the directory, all for the signed-in construction group:
+
+- Trade teams and crews (already there)
+- Construction group: Personnel Contact, Assistant, Support
+- Ancillary: other region-support and construction-group staff who are not trade oversight
+
+A directory contact who is not Personnel stays a contact. Do not create a login for them. Splitting those contacts off the user table waits until after slice 6.
+
+Done when the directory lists Personnel and ancillary people beside the trades, and a person from another construction group does not appear.
+
+### 2. Work list
+
+Add one work item, scoped to the construction group. This is the list processes, project dates, and crew requests all feed.
+
+Fields: title, detail, optional explanation, optional reference link, timing, project (optional), claimable or not, assignee, status, requestor name and email (optional).
+
+Timing is one of: a deadline, a date on a project, or a repeat of monthly or yearly.
+
+Personnel can create a task and assign it. If it is claimable, a signed-in teammate can claim it or assign themselves. The list shows the timing on the row.
+
+Done when Personnel can post a task, assign it, and a teammate can claim a claimable one. The row shows deadline, project date, or repeat.
+
+### 3. Projects
+
+Unhide a short projects page. Fields to show: name, number, location, status, start, end, Builder Assistant link. Oversight assigns Personnel to the project. No crew assignment, no budget, no congregation.
+
+Done when Oversight can put a Personnel person on a project, and the project list is only that construction group.
+
+### 4. Project schedule
+
+Dated work on a project, such as PPS meeting prep or assessment queues setup. Each entry is also a work item with that date, so it shows on the work list. Do not bring back the old trade-crew calendar. `ProjectScheduleEntry` is shaped for trade crews and volunteer counts; store these items as work items with a project and a date instead of reusing that shape.
+
+Done when a dated project item appears on the project and on the work list.
+
+### 5. Processes
+
+A process template belongs to the construction group. Each step has an explanation and an optional reference document. Starting a process creates work items for those steps, on a project when one is chosen.
+
+Done when a template can be started and its steps show on the work list with their explanations.
+
+### 6. Crew-request import
+
+Import the Microsoft Form spreadsheet. Each row becomes a work item. There is no form to fill out. Use the detail already stored on a crew-change request: requestor, volunteer, crew, project, comments. Map the sheet’s columns once, when the file is in hand. Completing the item records that it is done and keeps the requestor on the row so they can be told. Send email when mail is already configured. Do not block this slice on new email setup.
+
+Done when a spreadsheet import creates claimable tasks, someone can finish one, and the requestor is still on that task.
+
+### Paused
+
+Hub start and end dates. Waiting on the Persons export. If a person has an older assignment and a newer one, keep the current assignment.
+
+### Do not build
+
+Volunteer roster, congregation assignment, budget, crew-to-project assignment, the hierarchy editor, a separate calendar, and logins for directory contacts who are not Personnel.
+
+Mobile and PWA wait until the work list is in use.
+
 ## Prioritized Backlog
 
 ### High Priority
-- [ ] Region-scoped directory, projects, processes, and claimable work (see product brief, 2026-10-29)
-- [ ] Mobile optimization and PWA support (effort: L)
+- [ ] Slices 1–6 above
 
 ### Do not archive
-Projects, the project schedule, and crew-change requests stay. Personnel assign themselves to a project. The schedule holds dated work. Crew requests become imported tasks. Archive the volunteer roster, congregations, budget, crew-to-project assignment, and admin modules that are not sign-in or construction-group setup.
+Projects and crew-change requests stay. The schedule is dated work on the work list, not the old crew calendar. Archive the volunteer roster, congregations, budget, and crew-to-project assignment.
 - [x] Fix TypeScript error in ImportExportButtons.tsx (effort: S)
 
 ### Medium Priority
@@ -64,4 +125,4 @@ Projects, the project schedule, and crew-change requests stay. Personnel assign 
 
 - HAProxy ACL: `is_ldc` → LIVE backend; `is_ldc_blue` / `is_ldc_green` for color hosts
 - DB: `postgresql://…@10.92.3.23:5432/ldc_tools` (RW VIP)
-- LIVE is blue as of the v1.29.0 switch
+- LIVE is green (CT135). STANDBY is blue (CT133) at `41a19b8`

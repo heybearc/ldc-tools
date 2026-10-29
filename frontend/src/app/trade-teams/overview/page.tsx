@@ -10,6 +10,11 @@ import {
 } from 'lucide-react';
 import DirectoryEntryDialog, { DirectoryEditTarget } from '@/components/DirectoryEntryDialog';
 import DirectoryTeamCard, { directoryTeamColors } from '@/components/DirectoryTeamCard';
+import DirectoryPeople, {
+  directoryGroupsHavePeople,
+  filterDirectoryGroups,
+  type DirectoryGroups,
+} from '@/components/DirectoryPeople';
 import ProfilePhoto from '@/components/ProfilePhoto';
 
 interface OversightAssignment {
@@ -53,6 +58,10 @@ type ViewMode = 'grid' | 'table';
 
 export default function TradeTeamsOverviewPage() {
   const [tradeTeams, setTradeTeams] = useState<TradeTeam[]>([]);
+  const [directoryGroups, setDirectoryGroups] = useState<DirectoryGroups>({
+    personnel: { contact: [], assistant: [], support: [] },
+    ancillary: [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -71,6 +80,10 @@ export default function TradeTeamsOverviewPage() {
       if (!response.ok) throw new Error('Failed to fetch overview data');
       const data = await response.json();
       setTradeTeams(data.tradeTeams || []);
+      setDirectoryGroups(data.directoryGroups || {
+        personnel: { contact: [], assistant: [], support: [] },
+        ancillary: [],
+      });
       // Expand all teams by default
       setExpandedTeams(new Set(data.tradeTeams?.map((t: TradeTeam) => t.id) || []));
     } catch (err) {
@@ -200,6 +213,29 @@ export default function TradeTeamsOverviewPage() {
       }
     });
 
+    const groupRows: string[][] = [['Group', 'Role', 'Name', 'Email', 'Phone']];
+    const pushPeople = (group: string, role: string, people: { user: OversightAssignment['user'] }[]) => {
+      for (const person of people) {
+        groupRows.push([
+          group,
+          role,
+          formatUserName(person.user),
+          person.user.email || '',
+          person.user.phone || '',
+        ]);
+      }
+    };
+    pushPeople('Construction group', 'Contact', directoryGroups.personnel.contact);
+    pushPeople('Construction group', 'Assistant', directoryGroups.personnel.assistant);
+    pushPeople('Construction group', 'Support', directoryGroups.personnel.support);
+    for (const group of directoryGroups.ancillary) {
+      pushPeople('Ancillary', group.role, group.people);
+    }
+    if (groupRows.length > 1) {
+      rows.push([]);
+      rows.push(...groupRows);
+    }
+
     const csvContent = rows.map(row => 
       row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',')
     ).join('\n');
@@ -269,6 +305,8 @@ export default function TradeTeamsOverviewPage() {
   }
 
   const query = search.trim().toLowerCase();
+  const shownGroups = filterDirectoryGroups(directoryGroups, query);
+  const showGroups = !query || directoryGroupsHavePeople(shownGroups);
   const shownTeams = !query
     ? tradeTeams
     : tradeTeams
@@ -381,6 +419,11 @@ export default function TradeTeamsOverviewPage() {
 
       {/* Content */}
       <div className="max-w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-x-auto">
+        {showGroups && (
+          <div className="mb-6">
+            <DirectoryPeople groups={shownGroups} />
+          </div>
+        )}
         {viewMode === 'grid' ? (
           /* Grid View - Vertical stack of team cards */
           <div className="space-y-6">

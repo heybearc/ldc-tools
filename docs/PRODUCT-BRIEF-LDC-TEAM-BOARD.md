@@ -102,11 +102,6 @@ The volunteer roster, contacts, congregations, budget, congregation-to-project a
 
 ---
 
-## Immediate next build slice
+## Build order
 
-1. Confirm / clean Trade Team + Crew master list (names + trade mapping)  
-2. Assign / import TTO·TTOA·TT Support and TCO·TCOA·TC Support with contact info  
-3. Directory UX: search by trade, person, or role; one-click copy email; export  
-4. Soft-land homepage → this directory (legacy modules behind “More” or admin-only)
-
-**Data source:** Spreadsheet populated by the team, then imported. Template: `docs/templates/LDC-Trade-Leadership-Import-Template.xlsx` (also on Desktop).
+See `PLAN.md`. Slices, in order: directory groups, work list, projects, project dates on that list, process checklists, crew-request spreadsheet import. The directory import for trade oversight is already done.

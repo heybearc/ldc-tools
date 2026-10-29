@@ -39,15 +39,23 @@ export default function HomePage() {
           const overview = await overviewRes.json();
           const teams: OverviewTeam[] = overview.tradeTeams || [];
           const people = new Set<string>();
+          const addPerson = (assignment?: { user?: { id?: string } }) => {
+            if (assignment?.user?.id) people.add(assignment.user.id);
+          };
           for (const team of teams) {
-            for (const assignment of team.oversight || []) {
-              if (assignment.user?.id) people.add(assignment.user.id);
-            }
+            for (const assignment of team.oversight || []) addPerson(assignment);
             for (const crew of team.crews || []) {
-              for (const assignment of crew.oversight || []) {
-                if (assignment.user?.id) people.add(assignment.user.id);
-              }
+              for (const assignment of crew.oversight || []) addPerson(assignment);
             }
+          }
+          const groups = overview.directoryGroups;
+          if (groups?.personnel) {
+            for (const row of [...groups.personnel.contact, ...groups.personnel.assistant, ...groups.personnel.support]) {
+              addPerson(row);
+            }
+          }
+          for (const group of groups?.ancillary || []) {
+            for (const row of group.people || []) addPerson(row);
           }
           setStats({
             teams: overview.totalTeams ?? teams.length,
@@ -79,7 +87,7 @@ export default function HomePage() {
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Trade leadership</h1>
         <p className="mt-2 text-base sm:text-lg text-gray-600 max-w-3xl">
-          Who owns each trade and crew{groupName ? ` for ${groupName}` : ''}. Look someone up before you add them in Builder Assistant, or when you need a contact.
+          Who to contact for each trade, the construction group, and the region{groupName ? ` in ${groupName}` : ''}. Look someone up before you add them in Builder Assistant.
         </p>
       </div>
 
@@ -101,7 +109,7 @@ export default function HomePage() {
             <h2 className="ml-4 text-lg font-semibold text-gray-900">Directory</h2>
           </div>
           <p className="text-gray-600">
-            Search by trade, person, or role. Copy an email, add someone, or export the current oversight list.
+            Search by trade, person, or role. Construction group and ancillary contacts are listed with the trades.
           </p>
         </Link>
         <Link
