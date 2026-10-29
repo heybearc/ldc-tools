@@ -74,3 +74,8 @@ For shared architectural decisions that apply to all apps, see `.cloudy-work/_cl
 - **Date:** 2026-10-28
 - **Decision:** The edit form lets someone drag and zoom a photo. Save stores that circle. The directory does not auto-center faces.
 - **Why:** Automatic face placement clipped the tops of heads. Imported files stay until someone replaces or repositions them.
+
+## D-LDC-010: The directory is the front door; work stays inside the construction group
+- **Date:** 2026-10-29
+- **Decision:** Directory lists trades, construction group contacts, and ancillary region people. Oversight assigns Personnel to projects. Personnel Contact, Assistant, and Support assign tasks. A claimable task can be taken by anyone signed in to that construction group. No hierarchy editor.
+- **Why:** Other regions may use the same app. A person belongs to the construction group where they serve, and that group's data does not leak.
