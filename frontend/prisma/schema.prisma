@@ -78,6 +78,8 @@ model User {
   announcements       Announcement[]
   assignedCrewRequests CrewChangeRequest[] @relation("AssignedCrewRequests")
   completedCrewRequests CrewChangeRequest[] @relation("CompletedCrewRequests")
+  assignedWorkItems   WorkItem[]          @relation("WorkItemAssignee")
+  createdWorkItems    WorkItem[]          @relation("WorkItemCreator")
 }
 
 model VerificationToken {
@@ -221,6 +223,7 @@ model Project {
   crewAssignments     ProjectCrewAssignment[]
   scheduleVersions    ProjectScheduleVersion[]
   congregationAssignments ProjectCongregationAssignment[]
+  workItems           WorkItem[]
 
   @@map("projects")
 }
@@ -426,6 +429,7 @@ model ConstructionGroup {
   congregations   Congregation[]
   announcements   Announcement[]
   crewChangeRequests CrewChangeRequest[]
+  workItems       WorkItem[]
   auditLogsFrom   AuditLog[]  @relation("AuditLogFromCG")
   auditLogsTo     AuditLog[]  @relation("AuditLogToCG")
 
@@ -979,4 +983,49 @@ model CrewChangeRequest {
   @@index([createdAt])
   @@index([batchId])
   @@map("crew_change_requests")
+}
+
+enum WorkTimingKind {
+  DEADLINE
+  PROJECT_DATE
+  MONTHLY
+  YEARLY
+}
+
+enum WorkStatus {
+  OPEN
+  DONE
+}
+
+// One work item for the construction group. Processes, project dates, and crew requests feed this list.
+model WorkItem {
+  id                  String         @id @default(cuid())
+  constructionGroupId String
+  title               String
+  detail              String         @db.Text
+  explanation         String?        @db.Text
+  referenceUrl        String?
+  timingKind          WorkTimingKind
+  dueOn               DateTime?
+  projectId           String?
+  claimable           Boolean        @default(false)
+  assigneeId          String?
+  status              WorkStatus     @default(OPEN)
+  requestorName       String?
+  requestorEmail      String?
+  createdById         String
+  claimedAt           DateTime?
+  completedAt         DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  constructionGroup   ConstructionGroup @relation(fields: [constructionGroupId], references: [id], onDelete: Cascade)
+  project             Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  assignee            User?             @relation("WorkItemAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  createdBy           User              @relation("WorkItemCreator", fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([constructionGroupId])
+  @@index([status])
+  @@index([assigneeId])
+  @@map("work_items")
 }

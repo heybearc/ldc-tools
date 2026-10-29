@@ -14,7 +14,8 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - Support for those five is a volunteer role, not a PersonnelContact row.
 - Saving a profile accepts an existing `/api/v1/directory-photos/` path. Zoom is only for a new crop.
 - Shipped v1.31.0 (`7bbb610`). LIVE blue CT133, STANDBY green CT135. qa-01 directory+admin gate plus directory-groups tests passed. Docs note `9681859` is after the release and is not on the nodes.
-- Hub start and end dates stay paused until the Persons export is back. 
+- Hub start and end dates stay paused until the Persons export is back.
+- Work list is at `/work`. Personnel (Personnel Contact rows and volunteer PC, PCA, PC-Support) add and assign tasks. Admins can add them too. A claimable open task with no assignee can be claimed by an active user in that construction group. Timing on the row is a deadline, a project date, or Monthly / Yearly. 
 
 ### 2026-10-28
 - Import export alerts were escaped backticks, so the component did not typecheck. Restored real template literals.

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ComponentType } from 'react';
 import Link from 'next/link';
-import { BookOpen, Users, Wrench } from 'lucide-react';
+import { BookOpen, ClipboardList, Users, Wrench } from 'lucide-react';
 
 interface OverviewPerson {
   user: { id: string };
@@ -97,7 +97,7 @@ export default function HomePage() {
         <Stat label="Leadership contacts" value={loading ? '—' : stats.people} icon={Users} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <Link
           href="/trade-teams/overview"
           className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 block"
@@ -110,6 +110,20 @@ export default function HomePage() {
           </div>
           <p className="text-gray-600">
             Search by trade, person, or role. Construction group and ancillary contacts are listed with the trades.
+          </p>
+        </Link>
+        <Link
+          href="/work"
+          className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 block"
+        >
+          <div className="flex items-center mb-3">
+            <div className="bg-amber-600 p-3 rounded-lg">
+              <ClipboardList className="h-6 w-6 text-white" />
+            </div>
+            <h2 className="ml-4 text-lg font-semibold text-gray-900">Work</h2>
+          </div>
+          <p className="text-gray-600">
+            Tasks for this construction group. Personnel assign them. Claimable tasks can be taken by the team.
           </p>
         </Link>
         <Link

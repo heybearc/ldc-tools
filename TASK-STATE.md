@@ -2,15 +2,15 @@
 
 **Last updated:** 2026-10-29  
 **Current branch:** main  
-**Working on:** Region work queue, slice 2 (work list)
+**Working on:** Region work queue, slice 3 (projects)
 
 ---
 
 ## Current Task
-**Work list** — next (slice 2)
+**Projects** — next (slice 3)
 
 ### What I'm doing right now
-v1.31.0 is LIVE on blue (CT133) and synced to green (CT135), both at `7bbb610`. The directory lists construction group contacts and ancillary people with the trades. Next is the work list.
+Slice 2 is the work list at `/work`. Personnel post a task and assign it. A signed-in teammate can claim a claimable one. The row shows a deadline, a project date, or a monthly or yearly repeat. Next is the projects page.
 
 ### Recent completions
 - ✅ Shipped v1.31.0 (`7bbb610`); qa-01 directory+admin gate and directory-groups tests passed
@@ -21,7 +21,7 @@ v1.31.0 is LIVE on blue (CT133) and synced to green (CT135), both at `7bbb610`. 
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Build the work list (slice 2)
+Unhide the projects page (slice 3)
 
 ---
 
@@ -33,4 +33,4 @@ Build the work list (slice 2)
 ---
 
 ## Exact Next Command
-Build the work list (slice 2)
+Unhide the projects page (slice 3)

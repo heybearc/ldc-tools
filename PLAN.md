@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-29  
 **Current phase:** Region work queue  
-**Status:** v1.31.0 is LIVE on blue (CT133) and synced to green (CT135), both `7bbb610`. Hub dates are paused. Slice 1 is shipped. Build slices 2–6 in order.
+**Status:** v1.31.0 is LIVE. Slice 2 (work list) is built and goes to STANDBY before slice 3. Hub dates are paused.
 
 ---
 
@@ -22,7 +22,8 @@
 - [x] Retire empty Site/Civil (Sitework/Civil stays) (effort: S)
 - [x] Home is the directory; open a team; place a photo; `/ship` v1.30.0 (effort: M)
 - [x] Slice 1 — directory groups (Construction group and ancillary, same construction group only)
-- [ ] Slices 2–6 below, in order
+- [x] Slice 2 — work list
+- [ ] Slices 3–6 below, in order
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
@@ -56,7 +57,7 @@ A directory contact who is not Personnel stays a contact. Do not create a login 
 
 Done when the directory lists Personnel and ancillary people beside the trades, and a person from another construction group does not appear.
 
-### 2. Work list
+### 2. Work list — done
 
 Add one work item, scoped to the construction group. This is the list processes, project dates, and crew requests all feed.
 
