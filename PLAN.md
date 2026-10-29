@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-28 (mid-day)  
-**Current phase:** Trade Leadership Directory v1  
-**Status:** v1.30.0 LIVE green; STANDBY blue synced; inferred rows still need a human pass
+**Last updated:** 2026-10-29  
+**Current phase:** Trade Leadership Directory v1, then region work queue  
+**Status:** v1.30.0 LIVE green; STANDBY blue synced. Hub dates are paused. Direction is directory plus projects, process checklists, and claimable work, scoped per region.
 
 ---
 
@@ -21,7 +21,14 @@
 - [x] Move people across trades and roles; sisters only Support; `/ship` v1.29.0 (effort: M)
 - [x] Retire empty Site/Civil (Sitework/Civil stays) (effort: S)
 - [x] Home is the directory; open a team; place a photo; `/ship` v1.30.0 (effort: M)
-- [ ] Clean inferred/no-crew rows in UI (effort: M)
+- [ ] Clean inferred/no-crew rows in UI (effort: M) — paused; waiting on a hub export for start and end dates
+- [ ] Add Construction Group and ancillary region people to the directory (effort: M)
+- [ ] Enforce construction-group scope on every list and write (effort: L)
+- [ ] Projects page: Oversight assigns Personnel; schedule dated work; no crews, budget, or congregations (effort: L)
+- [ ] Personnel Contact, Assistant, and Support assign tasks; claimable tasks can be claimed by the team (effort: M)
+- [ ] Process checklists with explanations and reference docs (effort: XL)
+- [ ] Import crew requests as checklist items; notify the requestor when complete (effort: L)
+- [ ] Post a task, notify the team, let someone claim it (effort: L)
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
@@ -36,8 +43,11 @@
 ## Prioritized Backlog
 
 ### High Priority
-- [ ] Rework admin portal to match TheoShift approach (effort: XL)
+- [ ] Region-scoped directory, projects, processes, and claimable work (see product brief, 2026-10-29)
 - [ ] Mobile optimization and PWA support (effort: L)
+
+### Do not archive
+Projects, the project schedule, and crew-change requests stay. Personnel assign themselves to a project. The schedule holds dated work. Crew requests become imported tasks. Archive the volunteer roster, congregations, budget, crew-to-project assignment, and admin modules that are not sign-in or construction-group setup.
 - [x] Fix TypeScript error in ImportExportButtons.tsx (effort: S)
 
 ### Medium Priority

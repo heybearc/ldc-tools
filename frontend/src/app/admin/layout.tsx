@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Shield, Users, Mail, Activity, BarChart, FileText, Settings, MessageSquare, FolderTree, Bell, Menu, X } from 'lucide-react';
+import { Shield, Users, Mail, Activity, BarChart, FileText, Settings, MessageSquare, Bell, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -76,12 +76,6 @@ export default function AdminLayout({
       href: '/admin/feedback',
       icon: MessageSquare,
       description: 'User feedback and bug reports'
-    },
-    {
-      name: 'Organization',
-      href: '/admin/organization',
-      icon: FolderTree,
-      description: 'Manage organizational hierarchy'
     },
     {
       name: 'System Operations',

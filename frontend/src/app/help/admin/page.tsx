@@ -29,16 +29,6 @@ export default function AdminHelpPage() {
       ]
     },
     {
-      title: 'Organization Management',
-      description: 'Manage branches, zones, regions, and construction groups',
-      icon: '🏢',
-      topics: [
-        { title: 'Organization Hierarchy', href: '/help/organization' },
-        { title: 'Construction Group Settings', href: '/help/organization/cg-settings' },
-        { title: 'Project URL Configuration', href: '/help/organization/project-urls' }
-      ]
-    },
-    {
       title: 'System Administration',
       description: 'System settings, health monitoring, and maintenance',
       icon: '⚙️',
@@ -103,10 +93,6 @@ export default function AdminHelpPage() {
           <li className="flex items-start">
             <span className="mr-2">🔧</span>
             <span><strong>Email Configuration:</strong> Improved email setup with better error handling and testing</span>
-          </li>
-          <li className="flex items-start">
-            <span className="mr-2">🏢</span>
-            <span><strong>CG Settings:</strong> Configure Builder Assistant project links per Construction Group</span>
           </li>
         </ul>
         <Link
