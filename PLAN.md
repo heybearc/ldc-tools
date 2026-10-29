@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-29  
 **Current phase:** Region work queue  
-**Status:** Directory v1.30.0 is LIVE on green. Standby blue is `41a19b8` (hierarchy admin removed). Hub dates are paused. Build the slices below in order.
+**Status:** v1.31.0 is LIVE on blue (CT133) and synced to green (CT135), both `7bbb610`. Hub dates are paused. Slice 1 is shipped. Build slices 2–6 in order.
 
 ---
 
