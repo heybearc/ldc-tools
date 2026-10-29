@@ -27,7 +27,7 @@ test('the directory lists construction group and ancillary people for this group
   expect(payload.directoryGroups?.personnel?.support).toBeDefined();
   expect(Array.isArray(payload.directoryGroups?.ancillary)).toBe(true);
 
-  await expect(page.getByRole('heading', { name: 'Directory' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Directory', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Construction group', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Ancillary', exact: true })).toBeVisible();
   await expect(page.getByText('Contact', { exact: true }).first()).toBeVisible();

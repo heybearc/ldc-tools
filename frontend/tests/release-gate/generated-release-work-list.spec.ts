@@ -16,12 +16,26 @@ async function signIn(page: Page) {
 test('personnel can post a task, see its timing, and claim a claimable one', async ({ page }) => {
   await signIn(page);
 
-  const listResponse = page.waitForResponse(
-    (response) => response.url().includes('/api/v1/work-items') && response.request().method() === 'GET'
-  );
-  await page.goto('/work');
-  const list = await (await listResponse).json();
+  let probe = await page.request.get('/api/v1/work-items');
+  if (probe.status() === 403) {
+    const groups = await page.request.get('/api/v1/construction-groups');
+    expect(groups.ok()).toBeTruthy();
+    const body = await groups.json();
+    const constructionGroups = body.constructionGroups || [];
+    const group = constructionGroups.find((item: { code?: string }) => item.code?.includes('01.12')) || constructionGroups[0];
+    expect(group?.id).toBeTruthy();
+    const filtered = await page.request.post('/api/v1/user/set-cg-filter', {
+      data: { constructionGroupId: group.id },
+    });
+    expect(filtered.ok()).toBeTruthy();
+    probe = await page.request.get('/api/v1/work-items');
+  }
+
+  expect(probe.ok()).toBeTruthy();
+  const list = await probe.json();
   expect(list.canAssign).toBe(true);
+
+  await page.goto('/work');
   await expect(page.getByRole('heading', { name: 'Work', exact: true })).toBeVisible();
 
   const stamp = Date.now();
