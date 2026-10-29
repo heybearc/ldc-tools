@@ -38,6 +38,13 @@ const helpTopics: HelpTopic[] = [
     icon: '📋'
   },
   {
+    id: 'work',
+    title: 'Work',
+    description: 'Add, assign, and claim tasks for this construction group',
+    roles: ['SUPER_ADMIN', 'ZONE_OVERSEER', 'PERSONNEL_CONTACT', 'READ_ONLY'],
+    icon: '📋'
+  },
+  {
     id: 'trade-teams',
     title: 'Directory and Trade Teams',
     description: 'Look up trade and crew leadership, and maintain the team structure',

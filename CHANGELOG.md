@@ -5,6 +5,14 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.32.0] - 2026-10-29
+
+### Added
+- Work list for the signed-in construction group
+- Personnel can add a task, assign it, and mark it done
+- A claimable task can be claimed by anyone signed in to that group
+- Each row shows a deadline, a project date, or a monthly or yearly repeat
+
 ## [1.31.0] - 2026-10-29
 
 ### Added

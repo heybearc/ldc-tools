@@ -3,9 +3,11 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.30.0**
+Current: **1.32.0**
 
 ## Version History
+- **v1.32.0** (2026-10-29) - Work list for the construction group
+- **v1.31.0** (2026-10-29) - Construction group contacts and ancillary people on the directory
 - **v1.30.0** (2026-10-28) - Open a trade team, and place a profile photo in the circle before saving
 - **v1.29.0** (2026-10-27) - Move people between trades and roles; sisters stay in Support
 - **v1.28.0** (2026-10-27) - Trade Leadership Directory is the home page, with search, edit, and end dates
@@ -24,6 +26,11 @@ Current: **1.30.0**
 - User invitation system with email notifications
 - Role-based access control (RBAC)
 - Personnel Contact, Admin, and Overseer roles
+
+### Work
+- Tasks for the signed-in construction group
+- Personnel add and assign them
+- Claimable tasks can be taken by anyone signed in to that group
 
 ### Trade Team Management
 - Trade team and crew organization

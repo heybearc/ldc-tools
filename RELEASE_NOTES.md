@@ -1,5 +1,16 @@
 # LDC Tools Release Notes
 
+## v1.32.0 - Work list
+
+**Release Date:** October 29, 2026
+
+### ✨ New Features
+
+- A work list for this construction group
+- Personnel can add a task and assign it
+- A claimable task can be taken by anyone signed in here
+- Each row shows a deadline, a project date, or a monthly or yearly repeat
+
 ## v1.31.0 - Construction group people on the directory
 
 **Release Date:** October 29, 2026
