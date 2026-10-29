@@ -1,5 +1,18 @@
 # LDC Tools Release Notes
 
+## v1.31.0 - Construction group people on the directory
+
+**Release Date:** October 29, 2026
+
+### ✨ New Features
+
+- Construction group contacts and ancillary region people are listed on the directory with the trades
+- Saving a person keeps the existing photo unless you reposition it
+
+### 🔧 Improvements
+
+- The admin hierarchy editor is removed. People belong to the construction group where they serve.
+
 ## v1.30.0 - Place a profile photo and open a trade team
 
 **Release Date:** October 28, 2026

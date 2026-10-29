@@ -5,6 +5,18 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.31.0] - 2026-10-29
+
+### Added
+- Directory groups for construction group contacts (Contact, Assistant, Support) and ancillary region roles, scoped to the signed-in construction group
+- Those people are included in directory search and CSV export
+
+### Changed
+- Removed the admin organization hierarchy editor. Signed-in users stay associated with their construction group.
+
+### Fixed
+- Profile save accepts an existing directory photo path, so a name-only save no longer returns "Choose an image file"
+
 ## [1.3.0] - 2024-12-16
 
 ### Added
