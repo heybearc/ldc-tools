@@ -53,7 +53,6 @@ function retiredDestination(pathname: string): string | null {
     '/volunteers',
     '/contacts',
     '/congregations',
-    '/projects',
     '/calendar',
     '/crew-request',
     '/crew-requests',

@@ -20,8 +20,7 @@ test('home is the trade leadership directory and retired routes leave the old pr
   await expect(page.getByRole('link', { name: 'Directory' }).first()).toBeVisible();
 
   await page.goto('/projects');
-  await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole('heading', { name: 'Trade leadership' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Projects', exact: true })).toBeVisible();
 
   await page.goto('/dashboard');
   await expect(page).toHaveURL(/\/$/);

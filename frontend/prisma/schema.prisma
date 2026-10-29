@@ -80,6 +80,7 @@ model User {
   completedCrewRequests CrewChangeRequest[] @relation("CompletedCrewRequests")
   assignedWorkItems   WorkItem[]          @relation("WorkItemAssignee")
   createdWorkItems    WorkItem[]          @relation("WorkItemCreator")
+  projectPersonnel    ProjectPersonnel[]
 }
 
 model VerificationToken {
@@ -224,6 +225,7 @@ model Project {
   scheduleVersions    ProjectScheduleVersion[]
   congregationAssignments ProjectCongregationAssignment[]
   workItems           WorkItem[]
+  personnel           ProjectPersonnel[]
 
   @@map("projects")
 }
@@ -1028,4 +1030,19 @@ model WorkItem {
   @@index([status])
   @@index([assigneeId])
   @@map("work_items")
+}
+
+model ProjectPersonnel {
+  id           String   @id @default(cuid())
+  projectId    String
+  userId       String
+  assignedById String
+  createdAt    DateTime @default(now())
+
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@map("project_personnel")
 }
