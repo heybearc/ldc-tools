@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Users, Plus, Mail, Search, Filter, MoreVertical, Edit, Trash2, UserCheck, UserX, Upload, UserPlus, Send, X } from 'lucide-react';
+import { useToast } from '@/components/ui/toast-provider';
 
 interface User {
   id: string;
@@ -32,6 +33,7 @@ interface ConstructionGroup {
 }
 
 export default function UserManagementPage() {
+  const toast = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [constructionGroups, setConstructionGroups] = useState<ConstructionGroup[]>([]);
@@ -40,7 +42,6 @@ export default function UserManagementPage() {
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
@@ -144,18 +145,17 @@ export default function UserManagementPage() {
       });
       
       if (response.ok) {
-        alert('User invitation sent successfully!');
+        toast.success('Invitation email sent.');
         setInviteForm({ name: '', email: '', role: '' });
-        setIsInviteModalOpen(false);
         loadUsers();
         loadUserStats();
       } else {
         const errorData = await response.json();
-        alert(`Failed to send invitation: ${errorData.error || errorData.message || 'Please try again.'}`);
+        toast.error(errorData.error || errorData.message || 'Failed to send invitation.');
       }
     } catch (error) {
       console.error('Failed to invite user:', error);
-      alert('Failed to send invitation. Please try again.');
+      toast.error('Failed to send invitation. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -173,17 +173,17 @@ export default function UserManagementPage() {
       });
       
       if (response.ok) {
-        alert('User created successfully!');
+        toast.success('User created.');
         setCreateForm({ name: '', email: '', role: '', password: '' });
         setIsCreateModalOpen(false);
         loadUsers();
         loadUserStats();
       } else {
-        alert('Failed to create user. Please try again.');
+        toast.error('Failed to create user. Please try again.');
       }
     } catch (error) {
       console.error('Failed to create user:', error);
-      alert('Failed to create user. Please try again.');
+      toast.error('Failed to create user. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -208,7 +208,7 @@ export default function UserManagementPage() {
       // Add password if changing
       if (passwordManagement.changePassword && passwordManagement.newPassword) {
         if (passwordManagement.newPassword.length < 8) {
-          alert('Password must be at least 8 characters');
+          toast.error('Password must be at least 8 characters');
           setIsSubmitting(false);
           return;
         }
@@ -222,7 +222,7 @@ export default function UserManagementPage() {
       });
       
       if (response.ok) {
-        alert('User updated successfully!');
+        toast.success('User updated.');
         setIsEditModalOpen(false);
         setSelectedUser(null);
         setPasswordManagement({ changePassword: false, newPassword: '', sendResetEmail: false });
@@ -230,20 +230,22 @@ export default function UserManagementPage() {
         loadUserStats();
       } else {
         const data = await response.json().catch(() => ({}));
-        alert(data.message || data.error || 'Failed to update user. Please try again.');
+        toast.error(data.message || data.error || 'Failed to update user. Please try again.');
       }
     } catch (error) {
       console.error('Failed to update user:', error);
-      alert('Failed to update user. Please try again.');
+      toast.error('Failed to update user. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleCancelInvitation = async (userId: string) => {
-    if (!confirm('Cancel this invitation? They will stay on the personnel list as inactive and cannot accept the invite.')) {
-      return;
-    }
+    const accepted = await toast.confirm(
+      'Cancel this invitation? They will stay on the personnel list as inactive and cannot accept the invite.',
+      { confirmLabel: 'Cancel invitation', cancelLabel: 'Keep invitation' }
+    );
+    if (!accepted) return;
 
     try {
       const response = await fetch(`/api/v1/admin/users/${userId}`, {
@@ -253,23 +255,25 @@ export default function UserManagementPage() {
       });
 
       if (response.ok) {
-        alert('Invitation cancelled.');
+        toast.success('Invitation cancelled.');
         loadUsers();
         loadUserStats();
       } else {
         const data = await response.json().catch(() => ({}));
-        alert(data.message || data.error || 'Failed to cancel invitation.');
+        toast.error(data.message || data.error || 'Failed to cancel invitation.');
       }
     } catch (error) {
       console.error('Failed to cancel invitation:', error);
-      alert('Failed to cancel invitation.');
+      toast.error('Failed to cancel invitation.');
     }
   };
 
   const handleResendInvitation = async (userId: string) => {
-    if (!confirm('Resend invitation email to this user?')) {
-      return;
-    }
+    const accepted = await toast.confirm(
+      'Resend the invitation email to this person?',
+      { confirmLabel: 'Send email', cancelLabel: 'Not now' }
+    );
+    if (!accepted) return;
     
     try {
       const response = await fetch(`/api/v1/admin/users/${userId}/resend-invite`, {
@@ -277,22 +281,24 @@ export default function UserManagementPage() {
       });
       
       if (response.ok) {
-        alert('Invitation resent successfully!');
+        toast.success('Invitation email sent.');
         loadUsers();
       } else {
         const data = await response.json();
-        alert(data.error || 'Failed to resend invitation. Please try again.');
+        toast.error(data.error || 'Failed to resend invitation. Please try again.');
       }
     } catch (error) {
       console.error('Failed to resend invitation:', error);
-      alert('Failed to resend invitation. Please try again.');
+      toast.error('Failed to resend invitation. Please try again.');
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-      return;
-    }
+    const accepted = await toast.confirm(
+      'Delete this user? This cannot be undone.',
+      { confirmLabel: 'Delete user', cancelLabel: 'Keep user' }
+    );
+    if (!accepted) return;
     
     try {
       const response = await fetch(`/api/v1/admin/users/${userId}`, {
@@ -300,15 +306,15 @@ export default function UserManagementPage() {
       });
       
       if (response.ok) {
-        alert('User deleted successfully!');
+        toast.success('User deleted.');
         loadUsers();
         loadUserStats();
       } else {
-        alert('Failed to delete user. Please try again.');
+        toast.error('Failed to delete user. Please try again.');
       }
     } catch (error) {
       console.error('Failed to delete user:', error);
-      alert('Failed to delete user. Please try again.');
+      toast.error('Failed to delete user. Please try again.');
     }
   };
 
@@ -326,16 +332,16 @@ export default function UserManagementPage() {
       
       if (response.ok) {
         const result = await response.json();
-        alert(`Successfully imported ${result.imported} users!`);
+        toast.success(`Imported ${result.imported} users.`);
         setIsBulkImportOpen(false);
         loadUsers();
         loadUserStats();
       } else {
-        alert('Failed to import users. Please check file format.');
+        toast.error('Failed to import users. Please check file format.');
       }
     } catch (error) {
       console.error('Failed to import users:', error);
-      alert('Failed to import users. Please try again.');
+      toast.error('Failed to import users. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -376,11 +382,12 @@ export default function UserManagementPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setIsInviteModalOpen(true)}
+            type="button"
+            onClick={() => document.getElementById('invite-email')?.focus()}
             className="inline-flex items-center justify-center px-4 py-2 min-h-[44px] border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 flex-1 sm:flex-none"
           >
-            <Mail className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline ml-2">Invite User</span>
+            <Mail className="h-4 w-4 mr-2" />
+            Invite someone
           </button>
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -398,6 +405,67 @@ export default function UserManagementPage() {
           </button>
         </div>
       </div>
+
+      <section id="invite-user" className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-medium text-gray-900 flex items-center">
+          <Mail className="mr-2 h-5 w-5 text-blue-600" />
+          Invite someone
+        </h3>
+        <p className="mt-1 mb-4 text-sm text-gray-600">
+          This sends an email with a link to set up their account. The link expires in 7 days.
+          A person already marked Invited has not finished setup. Use Resend Invitation on their row to send the email again.
+        </p>
+        <form onSubmit={handleInviteUser} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Name
+            <input
+              type="text"
+              required
+              value={inviteForm.name}
+              onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="First and last name"
+            />
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
+            Email
+            <input
+              id="invite-email"
+              type="email"
+              required
+              value={inviteForm.email}
+              onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="name@example.com"
+            />
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
+            Access
+            <select
+              required
+              value={inviteForm.role}
+              onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select access</option>
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+              <option value="SUPER_ADMIN">Super Admin</option>
+              <option value="READ_ONLY_ADMIN">Read Only Admin</option>
+            </select>
+          </label>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {isSubmitting ? 'Sending...' : 'Send invitation email'}
+            </button>
+          </div>
+        </form>
+      </section>
 
       {/* Stats Cards */}
       {stats && (
@@ -712,104 +780,6 @@ export default function UserManagementPage() {
           </div>
         </div>
       </div>
-
-      {/* Invite User Modal */}
-      {isInviteModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                <Mail className="mr-2 h-5 w-5 text-blue-600" />
-                Invite User
-              </h3>
-              <button
-                onClick={() => setIsInviteModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleInviteUser} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={inviteForm.name}
-                  onChange={(e) => setInviteForm({...inviteForm, name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="John Doe"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={inviteForm.email}
-                  onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="user@example.com"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  System Role *
-                </label>
-                <select
-                  required
-                  value={inviteForm.role}
-                  onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Role</option>
-                  <option value="USER">User</option>
-                  <option value="ADMIN">Admin</option>
-                  <option value="SUPER_ADMIN">Super Admin</option>
-                  <option value="READ_ONLY_ADMIN">Read Only Admin</option>
-                </select>
-                <p className="mt-1 text-xs text-gray-500">
-                  System role controls platform access. Organizational roles are assigned through the volunteer record.
-                </p>
-              </div>
-              
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsInviteModalOpen(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Send Invitation
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Create User Modal */}
       {isCreateModalOpen && (
@@ -1185,7 +1155,11 @@ Alice Williams,alice.williams@example.com,READ_ONLY,,01.12,01,INVITED
                       type="button"
                       onClick={async () => {
                         if (!selectedUser) return;
-                        if (!confirm(`Send password reset email to ${selectedUser.email}?`)) return;
+                        const accepted = await toast.confirm(
+                          `Send a password reset email to ${selectedUser.email}?`,
+                          { confirmLabel: 'Send email', cancelLabel: 'Not now' }
+                        );
+                        if (!accepted) return;
                         
                         try {
                           const response = await fetch(`/api/v1/admin/users/${selectedUser.id}/reset-password`, {
@@ -1193,13 +1167,13 @@ Alice Williams,alice.williams@example.com,READ_ONLY,,01.12,01,INVITED
                           });
                           
                           if (response.ok) {
-                            alert('Password reset email sent successfully!');
+                            toast.success('Password reset email sent.');
                           } else {
-                            alert('Failed to send password reset email.');
+                            toast.error('Failed to send password reset email.');
                           }
                         } catch (error) {
                           console.error('Failed to send reset email:', error);
-                          alert('Failed to send password reset email.');
+                          toast.error('Failed to send password reset email.');
                         }
                       }}
                       className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"

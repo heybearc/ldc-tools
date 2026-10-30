@@ -105,15 +105,18 @@ test('an admin can type a user name and email, and can cancel an invitation', as
   await expect(editor).toHaveCount(0);
   await expect(row).toContainText(person.name);
 
+  await expect(page.getByRole('heading', { name: 'Invite someone' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Send invitation email' })).toBeVisible();
+
   const invited = users.find((user) => user.status === 'INVITED');
   if (invited) {
-    page.once('dialog', (dialog) => {
-      expect(dialog.message()).toContain('Cancel this invitation?');
-      dialog.dismiss();
-    });
     const invitedRow = page.locator('tr').filter({ hasText: invited.email });
     await invitedRow.getByTitle('More actions').click();
     await page.getByRole('button', { name: 'Cancel Invitation' }).click();
+    const notice = page.getByText('Cancel this invitation?');
+    await expect(notice).toBeVisible();
+    await page.getByRole('button', { name: 'Keep invitation' }).click();
+    await expect(notice).toHaveCount(0);
     await expect(invitedRow).toContainText('INVITED');
     return;
   }

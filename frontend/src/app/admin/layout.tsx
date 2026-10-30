@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Shield, Users, Mail, Activity, BarChart, FileText, Settings, MessageSquare, Bell, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ToastProvider } from '@/components/ui/toast-provider';
 
 export default function AdminLayout({
   children,
@@ -260,7 +261,7 @@ export default function AdminLayout({
 
           {/* Main Content Area */}
           <div className="flex-1 min-w-0">
-            {children}
+            <ToastProvider>{children}</ToastProvider>
           </div>
         </div>
       </div>

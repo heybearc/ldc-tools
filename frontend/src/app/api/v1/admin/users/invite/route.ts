@@ -49,6 +49,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const emailConfig = await prisma.emailConfiguration.findFirst({
+      where: { isActive: true }
+    });
+
+    if (!emailConfig) {
+      return NextResponse.json(
+        { error: 'Email is not set up yet. Open Admin → Email Configuration, then try again.' },
+        { status: 500 }
+      );
+    }
+
     // Generate a random token for the invitation
     const crypto = require('crypto');
     const inviteToken = crypto.randomBytes(32).toString('hex');
@@ -93,18 +104,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Get email configuration
-    const emailConfig = await prisma.emailConfiguration.findFirst({
-      where: { isActive: true }
-    });
-
-    if (!emailConfig) {
-      return NextResponse.json(
-        { error: 'Email configuration not found. Please configure email settings first.' },
-        { status: 500 }
-      );
-    }
-
     // Decrypt the password using proper decryption
     const password = decryptPassword(emailConfig.appPasswordEncrypted || '');
 
@@ -135,6 +134,7 @@ export async function POST(request: NextRequest) {
     // Personalize greeting
     const greeting = name ? `Dear ${name},` : 'Hello,';
 
+    try {
     // Send invitation email
     await transporter.sendMail({
       from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
@@ -176,6 +176,15 @@ export async function POST(request: NextRequest) {
         </div>
       `,
     });
+    } catch (mailError) {
+      await prisma.userInvitation.delete({ where: { id: invitation.id } }).catch(() => undefined);
+      await prisma.user.delete({ where: { id: newUser.id } }).catch(() => undefined);
+      console.error('Invite email failed:', mailError);
+      return NextResponse.json(
+        { error: 'The invitation email could not be sent. Nothing was saved. Check Email Configuration and try again.' },
+        { status: 502 }
+      );
+    }
 
     // Mark invitation as sent
     await prisma.userInvitation.update({

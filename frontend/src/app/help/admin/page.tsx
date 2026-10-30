@@ -59,9 +59,10 @@ export default function AdminHelpPage() {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold text-gray-900 mb-2">User accounts</h2>
         <p className="text-gray-700">
-          Open User Management. Choose the pencil to change a name or email, then choose Update User.
+          Open User Management. The invite form at the top sends an email with a setup link.
+          Choose the pencil to change a name or email, then choose Update User.
           For someone who has not accepted an invitation, open More actions and choose Cancel Invitation.
-          They stay on the personnel list as inactive and cannot accept that invite.
+          A notice asks you to confirm. They stay on the personnel list as inactive and cannot accept that invite.
         </p>
       </div>
 
