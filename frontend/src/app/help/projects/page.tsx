@@ -32,6 +32,11 @@ export default async function ProjectsHelpPage() {
             </p>
           </div>
 
+          <h2>Add a project</h2>
+          <p>
+            Personnel and a super admin can add a project for this construction group. Open Projects, choose Add project, enter a name, and choose Save project. Number and location are optional.
+          </p>
+
           <h2>See a project</h2>
           <p>
             Open Projects. Each row shows the name, status, number, location, and dates when those are on file.

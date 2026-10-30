@@ -5,6 +5,16 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.36.0] - 2026-10-30
+
+### Fixed
+- Admin opens the Admin Control Center directly
+- User management lists the Personnel team for this region, with edit and delete still on screen
+- Work and Projects stay in the signed-in construction group for Personnel and a super admin
+
+### Added
+- Add a project from the Projects page
+
 ## [1.35.0] - 2026-10-30
 
 ### Added

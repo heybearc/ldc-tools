@@ -1,5 +1,19 @@
 # LDC Tools Release Notes
 
+## v1.36.0 - Construction group access
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- Add a project for this construction group
+
+### 🐛 Bug Fixes
+
+- Admin opens the Admin Control Center
+- User management lists the Personnel team for this region
+- Work and Projects open for Personnel and a super admin in their construction group
+
 ## v1.35.0 - Processes and Personnel
 
 **Release Date:** October 30, 2026
