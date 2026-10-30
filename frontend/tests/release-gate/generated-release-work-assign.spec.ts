@@ -48,11 +48,13 @@ test('work uses the construction group already chosen in the header', async ({ p
   });
   expect(cleared.ok()).toBeTruthy();
 
+  const ready = page.waitForResponse(
+    (response) => response.url().includes('/api/v1/work-items') && response.request().method() === 'GET' && response.ok(),
+  );
   await page.goto('/work');
+  await ready;
   await expect(page.getByRole('heading', { name: 'Work', exact: true })).toBeVisible();
   await expect(page.getByText('No construction group assigned')).toHaveCount(0);
-  const list = await page.request.get('/api/v1/work-items');
-  expect(list.ok()).toBeTruthy();
 });
 
 test('a task can have no deadline and several tasks can be assigned together', async ({ page }) => {
@@ -90,7 +92,7 @@ test('a task can have no deadline and several tasks can be assigned together', a
 
   await page.goto('/work');
   const row = page.locator('article').filter({ hasText: firstTitle });
-  await expect(row.getByText('No deadline')).toBeVisible();
+  await expect(row.getByText('No deadline', { exact: true })).toBeVisible();
   await expect(row.getByRole('checkbox', { name: `Select ${firstTitle}` })).toBeVisible();
   await expect(row.getByText(assignee.name || assignee.email)).toBeVisible();
 
