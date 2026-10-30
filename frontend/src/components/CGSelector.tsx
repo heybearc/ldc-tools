@@ -24,6 +24,7 @@ export default function CGSelector() {
 
   useEffect(() => {
     if (!isSuperAdmin) return;
+    let cancelled = false;
 
     const loadCGs = async () => {
       try {
@@ -31,6 +32,7 @@ export default function CGSelector() {
           fetch('/api/v1/construction-groups'),
           fetch('/api/v1/user/set-cg-filter'),
         ]);
+        if (cancelled) return;
         const data = groupsResponse.ok ? await groupsResponse.json() : {};
         const filter = filterResponse.ok ? await filterResponse.json() : {};
         setConstructionGroups(data.constructionGroups || []);
@@ -43,9 +45,8 @@ export default function CGSelector() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ constructionGroupId: storedCG }),
           });
-          if (saved.ok) {
-            window.location.replace(window.location.pathname + window.location.search);
-            return;
+          if (saved.ok && !cancelled) {
+            window.dispatchEvent(new CustomEvent('cg-filter-changed'));
           }
         } else if (filter.viewingAll) {
           setSelectedCG(null);
@@ -57,12 +58,15 @@ export default function CGSelector() {
       } catch (error) {
         console.error('Failed to load construction groups:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     loadCGs();
-  }, [isSuperAdmin]);
+    return () => {
+      cancelled = true;
+    };
+  }, [isSuperAdmin, pathname]);
 
   const handleCGChange = async (cgId: string | null) => {
     const previousCG = selectedCG;

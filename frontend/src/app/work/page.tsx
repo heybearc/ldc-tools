@@ -67,10 +67,13 @@ export default function WorkPage() {
   const [bulkAssigneeId, setBulkAssigneeId] = useState('');
   const [assigning, setAssigning] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const loadGeneration = useRef(0);
 
   const load = useCallback(async () => {
+    const generation = ++loadGeneration.current;
     setError('');
     const response = await fetch('/api/v1/work-items', { cache: 'no-store' });
+    if (generation !== loadGeneration.current) return;
     const body = await response.json();
     if (!response.ok) {
       setError(body.error || 'Failed to load work');
