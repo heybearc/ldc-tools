@@ -19,7 +19,8 @@ test('a sister can only be support and an entry can move trade or crew', async (
   await expect(page.getByRole('heading', { name: 'Directory' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Export CSV' })).toBeVisible();
 
-  await page.locator('img.h-7.rounded-full').first().click();
+  const teamCard = page.locator('div.shadow-sm').filter({ has: page.getByRole('link', { name: 'Open team' }) }).filter({ has: page.locator('img.h-7') }).first();
+  await teamCard.locator('img.h-7.rounded-full').first().click();
   await expect(page.getByRole('heading', { name: 'Edit entry' })).toBeVisible();
   await expect(page.getByLabel('Trade').locator('option')).not.toHaveCount(0);
   await expect(page.getByLabel('Crew')).toBeVisible();

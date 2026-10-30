@@ -56,7 +56,7 @@ test('team chat, a help reply, and finishing several tasks', async ({ page }) =>
 
   await page.goto(`/chat?channel=${team.id}`);
   await expect(page.getByRole('heading', { name: 'Chat', exact: true })).toBeVisible();
-  await expect(page.getByText(message)).toBeVisible();
+  await expect(page.getByRole('article').getByText(message)).toBeVisible();
 
   const titles = [`QA finish A ${stamp}`, `QA finish B ${stamp}`];
   const createdIds: string[] = [];

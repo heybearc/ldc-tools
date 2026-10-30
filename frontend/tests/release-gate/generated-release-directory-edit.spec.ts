@@ -26,7 +26,8 @@ test('directory edit keeps an ended person until a replacement starts', async ({
   await page.getByRole('button', { name: 'Cancel' }).click();
   await expect(page.getByRole('heading', { name: 'Add person' })).toBeHidden();
 
-  await page.locator('img.h-7.rounded-full').first().click();
+  const teamCard = page.locator('div.shadow-sm').filter({ has: page.getByRole('link', { name: 'Open team' }) }).filter({ has: page.locator('img.h-7') }).first();
+  await teamCard.locator('img.h-7.rounded-full').first().click();
   await expect(page.getByRole('heading', { name: 'Edit entry' })).toBeVisible();
   await expect(page.getByLabel('Trade')).toBeVisible();
   await expect(page.getByLabel('Crew')).toBeVisible();

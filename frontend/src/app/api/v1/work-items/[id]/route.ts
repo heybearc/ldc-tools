@@ -96,6 +96,8 @@ export async function PATCH(
       id: updated.id,
       status: updated.status,
       completedAt: updated.completedAt?.toISOString() || null,
+      requestorName: updated.requestorName,
+      requestorEmail: updated.requestorEmail,
       emailSent,
     });
   } catch (error) {
