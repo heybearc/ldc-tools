@@ -14,7 +14,16 @@ const PERSONNEL_BUCKET: Record<string, 'contact' | 'assistant' | 'support'> = {
   'PC-Support': 'support',
 };
 
-const ANCILLARY_CATEGORIES = new Set(['CG_OVERSIGHT', 'CG_STAFF', 'REGION_SUPPORT_SERVICES']);
+const CONSTRUCTION_GROUP_BUCKET: Record<string, 'contact' | 'assistant' | 'support'> = {
+  CGO: 'contact',
+  ACGO: 'assistant',
+  CGOA: 'assistant',
+  'CGO-Support': 'support',
+  'CG-Support': 'support',
+  CG_SUPPORT: 'support',
+};
+
+const ANCILLARY_CATEGORIES = new Set(['CG_STAFF', 'REGION_SUPPORT_SERVICES']);
 
 type DirectoryContact = {
   id: string;
@@ -116,15 +125,24 @@ async function loadDirectoryGroups(scope: CGScope) {
   ]);
 
   const personnel = { contact: [] as DirectoryContact[], assistant: [] as DirectoryContact[], support: [] as DirectoryContact[] };
+  const constructionGroup = { contact: [] as DirectoryContact[], assistant: [] as DirectoryContact[], support: [] as DirectoryContact[] };
   const seenPersonnel = new Set<string>();
-  const addPersonnel = (row: DirectoryContact) => {
-    const bucket = PERSONNEL_BUCKET[row.role];
-    if (!bucket) return;
+  const seenConstruction = new Set<string>();
+  const addToColumns = (
+    columns: typeof personnel,
+    seen: Set<string>,
+    buckets: Record<string, 'contact' | 'assistant' | 'support'>,
+    row: DirectoryContact,
+  ) => {
+    const bucket = buckets[row.role];
+    if (!bucket) return false;
     const key = `${row.user.id}:${bucket}`;
-    if (seenPersonnel.has(key)) return;
-    seenPersonnel.add(key);
-    personnel[bucket].push(row);
+    if (seen.has(key)) return true;
+    seen.add(key);
+    columns[bucket].push(row);
+    return true;
   };
+  const addPersonnel = (row: DirectoryContact) => addToColumns(personnel, seenPersonnel, PERSONNEL_BUCKET, row);
 
   for (const row of personnelContacts) {
     addPersonnel(contactFromUser({
@@ -146,8 +164,19 @@ async function loadDirectoryGroups(scope: CGScope) {
         user: volunteer.user,
         volunteer,
       });
-      if (PERSONNEL_BUCKET[role.roleCode]) {
-        addPersonnel(person);
+      if (addPersonnel(person)) continue;
+      if (role.roleCategory === 'CG_OVERSIGHT' || CONSTRUCTION_GROUP_BUCKET[role.roleCode]) {
+        const bucket = CONSTRUCTION_GROUP_BUCKET[role.roleCode]
+          || (role.roleName.toLowerCase().includes('support')
+            ? 'support'
+            : role.roleName.toLowerCase().includes('assistant')
+              ? 'assistant'
+              : 'contact');
+        const key = `${person.user.id}:${bucket}`;
+        if (!seenConstruction.has(key)) {
+          seenConstruction.add(key);
+          constructionGroup[bucket].push(person);
+        }
         continue;
       }
       if (!ANCILLARY_CATEGORIES.has(role.roleCategory)) continue;
@@ -165,8 +194,12 @@ async function loadDirectoryGroups(scope: CGScope) {
   personnel.contact.sort(byName);
   personnel.assistant.sort(byName);
   personnel.support.sort(byName);
+  constructionGroup.contact.sort(byName);
+  constructionGroup.assistant.sort(byName);
+  constructionGroup.support.sort(byName);
 
   return {
+    constructionGroup,
     personnel,
     ancillary: Array.from(ancillary.entries())
       .sort(([a], [b]) => a.localeCompare(b))

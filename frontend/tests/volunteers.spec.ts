@@ -14,6 +14,6 @@ test('the volunteer roster route returns to the directory home', async ({ page }
 
   await page.goto('/volunteers');
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole('heading', { name: 'Trade leadership' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Volunteers', exact: true })).toHaveCount(0);
 });

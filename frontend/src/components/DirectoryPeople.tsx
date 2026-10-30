@@ -11,12 +11,15 @@ export type DirectoryContact = {
   user: DirectoryUser;
 };
 
+export type DirectoryRoleColumns = {
+  contact: DirectoryContact[];
+  assistant: DirectoryContact[];
+  support: DirectoryContact[];
+};
+
 export type DirectoryGroups = {
-  personnel: {
-    contact: DirectoryContact[];
-    assistant: DirectoryContact[];
-    support: DirectoryContact[];
-  };
+  constructionGroup: DirectoryRoleColumns;
+  personnel: DirectoryRoleColumns;
   ancillary: { role: string; people: DirectoryContact[] }[];
 };
 
@@ -51,14 +54,23 @@ function matches(person: DirectoryContact, query: string) {
   return haystack.includes(query);
 }
 
+function filterColumns(columns: DirectoryRoleColumns, query: string): DirectoryRoleColumns {
+  return {
+    contact: columns.contact.filter((person) => matches(person, query)),
+    assistant: columns.assistant.filter((person) => matches(person, query)),
+    support: columns.support.filter((person) => matches(person, query)),
+  };
+}
+
+function columnCount(columns: DirectoryRoleColumns) {
+  return columns.contact.length + columns.assistant.length + columns.support.length;
+}
+
 export function filterDirectoryGroups(groups: DirectoryGroups, query: string): DirectoryGroups {
   const q = query.trim().toLowerCase();
   return {
-    personnel: {
-      contact: groups.personnel.contact.filter((person) => matches(person, q)),
-      assistant: groups.personnel.assistant.filter((person) => matches(person, q)),
-      support: groups.personnel.support.filter((person) => matches(person, q)),
-    },
+    constructionGroup: filterColumns(groups.constructionGroup, q),
+    personnel: filterColumns(groups.personnel, q),
     ancillary: groups.ancillary
       .map((group) => ({
         role: group.role,
@@ -70,43 +82,57 @@ export function filterDirectoryGroups(groups: DirectoryGroups, query: string): D
 
 export function directoryGroupsHavePeople(groups: DirectoryGroups) {
   return (
-    groups.personnel.contact.length
-    + groups.personnel.assistant.length
-    + groups.personnel.support.length
+    columnCount(groups.constructionGroup)
+    + columnCount(groups.personnel)
     + groups.ancillary.reduce((sum, group) => sum + group.people.length, 0)
   ) > 0;
 }
 
-export default function DirectoryPeople({ groups }: { groups: DirectoryGroups }) {
-  const columns = [
-    { label: 'Contact', people: groups.personnel.contact },
-    { label: 'Assistant', people: groups.personnel.assistant },
-    { label: 'Support', people: groups.personnel.support },
+function RoleCard({
+  title,
+  headerClass,
+  columns,
+}: {
+  title: string;
+  headerClass: string;
+  columns: DirectoryRoleColumns;
+}) {
+  const labeled = [
+    { label: 'Contact', people: columns.contact },
+    { label: 'Assistant', people: columns.assistant },
+    { label: 'Support', people: columns.support },
   ];
 
   return (
+    <section className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className={`${headerClass} text-white p-3`}>
+        <h2 className="font-bold text-lg">{title}</h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3">
+        {labeled.map((column) => (
+          <div key={column.label}>
+            <div className="text-xs font-medium text-gray-600 mb-1">{column.label}</div>
+            {column.people.length === 0 ? (
+              <span className="text-sm text-gray-400">—</span>
+            ) : (
+              <div className="flex flex-col gap-1 text-sm">
+                {column.people.map((person) => (
+                  <PersonLine key={person.id} person={person} />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function DirectoryPeople({ groups }: { groups: DirectoryGroups }) {
+  return (
     <div className="space-y-6">
-      <section className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="bg-slate-700 text-white p-3">
-          <h2 className="font-bold text-lg">Construction group</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3">
-          {columns.map((column) => (
-            <div key={column.label}>
-              <div className="text-xs font-medium text-gray-600 mb-1">{column.label}</div>
-              {column.people.length === 0 ? (
-                <span className="text-sm text-gray-400">—</span>
-              ) : (
-                <div className="flex flex-col gap-1 text-sm">
-                  {column.people.map((person) => (
-                    <PersonLine key={person.id} person={person} />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+      <RoleCard title="Construction group" headerClass="bg-slate-700" columns={groups.constructionGroup} />
+      <RoleCard title="Personnel" headerClass="bg-teal-700" columns={groups.personnel} />
 
       <section className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="bg-stone-600 text-white p-3">

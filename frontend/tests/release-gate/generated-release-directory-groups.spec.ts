@@ -22,6 +22,9 @@ test('the directory lists construction group and ancillary people for this group
   await page.goto('/trade-teams/overview');
   const payload = await (await overviewResponse).json();
 
+  expect(payload.directoryGroups?.constructionGroup?.contact).toBeDefined();
+  expect(payload.directoryGroups?.constructionGroup?.assistant).toBeDefined();
+  expect(payload.directoryGroups?.constructionGroup?.support).toBeDefined();
   expect(payload.directoryGroups?.personnel?.contact).toBeDefined();
   expect(payload.directoryGroups?.personnel?.assistant).toBeDefined();
   expect(payload.directoryGroups?.personnel?.support).toBeDefined();
@@ -29,6 +32,7 @@ test('the directory lists construction group and ancillary people for this group
 
   await expect(page.getByRole('heading', { name: 'Directory', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Construction group', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Personnel', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Ancillary', exact: true })).toBeVisible();
   await expect(page.getByText('Contact', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('Assistant', { exact: true }).first()).toBeVisible();

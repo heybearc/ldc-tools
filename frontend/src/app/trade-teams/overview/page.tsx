@@ -59,6 +59,7 @@ type ViewMode = 'grid' | 'table';
 export default function TradeTeamsOverviewPage() {
   const [tradeTeams, setTradeTeams] = useState<TradeTeam[]>([]);
   const [directoryGroups, setDirectoryGroups] = useState<DirectoryGroups>({
+    constructionGroup: { contact: [], assistant: [], support: [] },
     personnel: { contact: [], assistant: [], support: [] },
     ancillary: [],
   });
@@ -81,6 +82,7 @@ export default function TradeTeamsOverviewPage() {
       const data = await response.json();
       setTradeTeams(data.tradeTeams || []);
       setDirectoryGroups(data.directoryGroups || {
+        constructionGroup: { contact: [], assistant: [], support: [] },
         personnel: { contact: [], assistant: [], support: [] },
         ancillary: [],
       });
@@ -225,9 +227,12 @@ export default function TradeTeamsOverviewPage() {
         ]);
       }
     };
-    pushPeople('Construction group', 'Contact', directoryGroups.personnel.contact);
-    pushPeople('Construction group', 'Assistant', directoryGroups.personnel.assistant);
-    pushPeople('Construction group', 'Support', directoryGroups.personnel.support);
+    pushPeople('Construction group', 'Contact', directoryGroups.constructionGroup.contact);
+    pushPeople('Construction group', 'Assistant', directoryGroups.constructionGroup.assistant);
+    pushPeople('Construction group', 'Support', directoryGroups.constructionGroup.support);
+    pushPeople('Personnel', 'Contact', directoryGroups.personnel.contact);
+    pushPeople('Personnel', 'Assistant', directoryGroups.personnel.assistant);
+    pushPeople('Personnel', 'Support', directoryGroups.personnel.support);
     for (const group of directoryGroups.ancillary) {
       pushPeople('Ancillary', group.role, group.people);
     }

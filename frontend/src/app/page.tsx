@@ -49,8 +49,9 @@ export default function HomePage() {
             }
           }
           const groups = overview.directoryGroups;
-          if (groups?.personnel) {
-            for (const row of [...groups.personnel.contact, ...groups.personnel.assistant, ...groups.personnel.support]) {
+          for (const columns of [groups?.constructionGroup, groups?.personnel]) {
+            if (!columns) continue;
+            for (const row of [...columns.contact, ...columns.assistant, ...columns.support]) {
               addPerson(row);
             }
           }
@@ -85,7 +86,7 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Trade leadership</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="mt-2 text-base sm:text-lg text-gray-600 max-w-3xl">
           Who to contact for each trade, the construction group, and the region{groupName ? ` in ${groupName}` : ''}. Look someone up before you add them in Builder Assistant.
         </p>
@@ -109,7 +110,7 @@ export default function HomePage() {
             <h2 className="ml-4 text-lg font-semibold text-gray-900">Directory</h2>
           </div>
           <p className="text-gray-600">
-            Search by trade, person, or role. Construction group and ancillary contacts are listed with the trades.
+            Search by trade, person, or role. Construction group, Personnel, and ancillary contacts are listed with the trades.
           </p>
         </Link>
         <Link

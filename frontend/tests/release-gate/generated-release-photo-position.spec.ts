@@ -16,7 +16,7 @@ async function signIn(page: Page) {
 test('home is the trade leadership directory and retired routes leave the old product', async ({ page }) => {
   await signIn(page);
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Trade leadership' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Directory' }).first()).toBeVisible();
 
   await page.goto('/projects');
