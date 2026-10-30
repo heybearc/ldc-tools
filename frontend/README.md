@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.39.0**
+Current: **1.40.0**
 
 ## Version History
+- **v1.40.0** (2026-10-30) - Tasks can have no deadline, and several can be assigned at once
 - **v1.39.0** (2026-10-30) - Import a crew-update spreadsheet onto the work list
 - **v1.38.1** (2026-10-30) - Resend an invitation email for someone who is already invited
 - **v1.38.0** (2026-10-30) - Invite someone from User Management, and confirm actions with a notice

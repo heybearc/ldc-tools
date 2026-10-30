@@ -5,6 +5,15 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.40.0] - 2026-10-30
+
+### Added
+- A task can have no deadline
+- Personnel can select several open tasks and assign them to one person
+
+### Fixed
+- Work opens on the construction group already chosen in the header
+
 ## [1.39.0] - 2026-10-30
 
 ### Added

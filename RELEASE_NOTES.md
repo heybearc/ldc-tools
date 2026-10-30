@@ -1,5 +1,18 @@
 # LDC Tools Release Notes
 
+## v1.40.0 - Work without a deadline
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- A task can have no deadline
+- Select several open tasks and assign them to one person
+
+### 🐛 Bug Fixes
+
+- Work lists the tasks for the construction group already shown in the header
+
 ## v1.39.0 - Import crew requests
 
 **Release Date:** October 30, 2026
