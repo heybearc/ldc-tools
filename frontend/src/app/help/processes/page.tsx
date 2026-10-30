@@ -40,7 +40,7 @@ export default async function ProcessesHelpPage() {
 
           <h2>Start a process</h2>
           <p>
-            Choose Start. Pick a project when the steps belong on one. Each step becomes a task on the work list, with its explanation.
+            Choose Start. Pick a project when the process belongs on one. The work list shows the process as one claimable item. The steps stay inside it and are not separate tasks. Claiming it assigns the whole process. Marking it Done records the date.
           </p>
         </div>
       </div>

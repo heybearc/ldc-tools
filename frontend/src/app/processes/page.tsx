@@ -125,7 +125,7 @@ export default function ProcessesPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Processes</h1>
           <p className="mt-2 text-gray-600 max-w-3xl">
-            A checklist for this construction group. Starting it adds each step to the work list, on a project when you choose one.
+            A checklist for this construction group. Starting it adds one claimable process to the work list. The steps stay inside that process.
           </p>
         </div>
         {canPost && (

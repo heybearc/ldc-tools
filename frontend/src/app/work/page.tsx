@@ -9,6 +9,22 @@ interface Person {
   email: string;
 }
 
+interface Step {
+  id: string;
+  title: string;
+  detail: string;
+  explanation: string | null;
+  referenceUrl: string | null;
+}
+
+interface WorkNote {
+  id: string;
+  kind: 'NOTE' | 'HELP';
+  body: string;
+  createdAt: string;
+  author: Person;
+}
+
 interface WorkItem {
   id: string;
   title: string;
@@ -23,6 +39,15 @@ interface WorkItem {
   assignee: Person | null;
   requestorName: string | null;
   requestorEmail: string | null;
+  completedAt: string | null;
+  steps: Step[];
+  notes: WorkNote[];
+}
+
+interface ProcessOffer {
+  id: string;
+  name: string;
+  steps: Step[];
 }
 
 interface WorkResponse {
@@ -31,7 +56,10 @@ interface WorkResponse {
   items: WorkItem[];
   teammates: Person[];
   projects: { id: string; name: string }[];
+  processes: ProcessOffer[];
 }
+
+const PAGE_SIZES = [10, 25, 50, 100];
 
 const EMPTY_FORM = {
   title: '',
@@ -52,6 +80,20 @@ function personName(person: Person | null) {
   return person.name || person.email;
 }
 
+function formatDone(value: string | null) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function pageSlice<T>(items: T[], page: number, pageSize: number) {
+  const pages = Math.max(1, Math.ceil(items.length / pageSize));
+  const current = Math.min(page, pages - 1);
+  const start = current * pageSize;
+  return { current, pages, slice: items.slice(start, start + pageSize) };
+}
+
 export default function WorkPage() {
   const [data, setData] = useState<WorkResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,6 +108,11 @@ export default function WorkPage() {
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
   const [bulkAssigneeId, setBulkAssigneeId] = useState('');
   const [assigning, setAssigning] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useState(0);
+  const [donePage, setDonePage] = useState(0);
+  const [processPage, setProcessPage] = useState(0);
   const fileInput = useRef<HTMLInputElement>(null);
   const loadGeneration = useRef(0);
 
@@ -210,6 +257,49 @@ export default function WorkPage() {
     }
   }
 
+  async function claimProcess(id: string) {
+    setBusyId(id);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`/api/v1/processes/${id}/claim`, { method: 'POST' });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error || 'Failed to claim the process');
+        return;
+      }
+      setNotice('Process claimed. The steps stay on that process.');
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function markSelectedDone() {
+    if (selectedIds.length === 0) return;
+    setCompleting(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch('/api/v1/work-items/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error || 'Failed to mark work done');
+        return;
+      }
+      setNotice(`Marked ${body.completed} done.`);
+      setSelectedIds([]);
+      setLastSelectedIndex(null);
+      await load();
+    } finally {
+      setCompleting(false);
+    }
+  }
+
   async function setStatus(id: string, status: 'OPEN' | 'DONE') {
     setBusyId(id);
     setError('');
@@ -233,6 +323,20 @@ export default function WorkPage() {
   const items = data?.items || [];
   const openItems = items.filter((item) => item.status === 'OPEN');
   const doneItems = items.filter((item) => item.status === 'DONE');
+  const processes = data?.processes || [];
+  const currentUserId = data?.currentUserId || '';
+  const canAssign = Boolean(data?.canAssign);
+  const canSelect = (item: WorkItem) => canAssign || item.assignee?.id === currentUserId;
+  const selectableIds = openItems.filter(canSelect).map((item) => item.id);
+  const openView = pageSlice(openItems, page, pageSize);
+  const doneView = pageSlice(doneItems, donePage, pageSize);
+  const processView = pageSlice(processes, processPage, pageSize);
+
+  useEffect(() => {
+    if (page !== openView.current) setPage(openView.current);
+    if (donePage !== doneView.current) setDonePage(doneView.current);
+    if (processPage !== processView.current) setProcessPage(processView.current);
+  }, [page, donePage, processPage, openView.current, doneView.current, processView.current]);
 
   return (
     <div className="space-y-6">
@@ -240,7 +344,7 @@ export default function WorkPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Work</h1>
           <p className="mt-2 text-gray-600 max-w-3xl">
-            Tasks for this construction group. Personnel add and assign them. A claimable task can be taken by anyone signed in here.
+            Tasks for this construction group. A process is one claimable item, and its steps stay inside it. Personnel add and assign work.
           </p>
         </div>
         {data?.canAssign && (
@@ -426,69 +530,270 @@ export default function WorkPage() {
 
       {loading ? (
         <p className="text-gray-500">Loading work…</p>
-      ) : openItems.length === 0 && doneItems.length === 0 ? (
+      ) : openItems.length === 0 && doneItems.length === 0 && processes.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center text-gray-600">
           <ClipboardList className="h-8 w-8 mx-auto text-gray-400 mb-3" />
           No work yet for this construction group.
         </div>
       ) : (
-        <div className="space-y-3">
-          {data?.canAssign && selectedIds.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row sm:items-end gap-3">
-              <p className="text-sm font-medium text-gray-800 sm:mb-2">{selectedIds.length} selected</p>
-              <label className="block flex-1">
-                <span className="text-sm font-medium text-gray-700">Assign to</span>
-                <select
-                  value={bulkAssigneeId}
-                  onChange={(event) => setBulkAssigneeId(event.target.value)}
-                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
-                >
-                  <option value="">Choose a person</option>
-                  {data.teammates.map((person) => (
-                    <option key={person.id} value={person.id}>{personName(person)}</option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                disabled={assigning || !bulkAssigneeId}
-                onClick={assignSelected}
-                className="px-4 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
-              >
-                {assigning ? 'Assigning…' : 'Assign selected'}
-              </button>
-            </div>
+        <div className="space-y-6">
+          {processes.length > 0 && (
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Available processes</h2>
+              {processView.slice.map((process) => (
+                <article key={process.id} data-process-template={process.id} className="bg-white rounded-lg shadow p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-semibold text-gray-900">{process.name}</h3>
+                        <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                          Available
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-gray-600">
+                        {process.steps.length === 1 ? '1 step' : `${process.steps.length} steps`}. Claiming keeps every step on this process.
+                      </p>
+                      <StepList steps={process.steps} />
+                    </div>
+                    <button
+                      type="button"
+                      disabled={busyId === process.id}
+                      onClick={() => claimProcess(process.id)}
+                      className="px-3 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
+                    >
+                      Claim
+                    </button>
+                  </div>
+                </article>
+              ))}
+              <Pager
+                page={processView.current}
+                pages={processView.pages}
+                pageSize={pageSize}
+                total={processes.length}
+                onPage={setProcessPage}
+                onPageSize={(size) => {
+                  setPageSize(size);
+                  setProcessPage(0);
+                  setPage(0);
+                  setDonePage(0);
+                }}
+              />
+            </section>
           )}
-          {openItems.map((item, index) => (
-            <WorkRow
-              key={item.id}
-              item={item}
-              currentUserId={data?.currentUserId || ''}
-              canAssign={Boolean(data?.canAssign)}
-              busy={busyId === item.id}
-              selected={selectedIds.includes(item.id)}
-              onToggle={(shiftKey) => toggleSelected(item.id, index, shiftKey)}
-              onClaim={() => claim(item.id)}
-              onDone={() => setStatus(item.id, 'DONE')}
-            />
-          ))}
+
+          <section className="space-y-3">
+            {openItems.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-4 flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIds(selectableIds)}
+                    disabled={selectableIds.length === 0}
+                    className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
+                  >
+                    Select all
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedIds([]);
+                      setLastSelectedIndex(null);
+                    }}
+                    disabled={selectedIds.length === 0}
+                    className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
+                  >
+                    Deselect all
+                  </button>
+                  <p className="text-sm font-medium text-gray-800">{selectedIds.length} selected</p>
+                  <button
+                    type="button"
+                    disabled={completing || selectedIds.length === 0}
+                    onClick={markSelectedDone}
+                    className="px-3 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
+                  >
+                    {completing ? 'Marking done…' : 'Mark selected done'}
+                  </button>
+                </div>
+                {canAssign && (
+                  <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+                    <label className="block flex-1">
+                      <span className="text-sm font-medium text-gray-700">Assign to</span>
+                      <select
+                        value={bulkAssigneeId}
+                        onChange={(event) => setBulkAssigneeId(event.target.value)}
+                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
+                      >
+                        <option value="">Choose a person</option>
+                        {data?.teammates.map((person) => (
+                          <option key={person.id} value={person.id}>{personName(person)}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      disabled={assigning || !bulkAssigneeId || selectedIds.length === 0}
+                      onClick={assignSelected}
+                      className="px-4 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-800 disabled:opacity-60"
+                    >
+                      {assigning ? 'Assigning…' : 'Assign selected'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            {openView.slice.map((item) => {
+              const index = openItems.findIndex((candidate) => candidate.id === item.id);
+              return (
+                <WorkRow
+                  key={item.id}
+                  item={item}
+                  currentUserId={currentUserId}
+                  canAssign={canAssign}
+                  busy={busyId === item.id}
+                  selected={selectedIds.includes(item.id)}
+                  onToggle={canSelect(item) ? (shiftKey) => toggleSelected(item.id, index, shiftKey) : undefined}
+                  onClaim={() => claim(item.id)}
+                  onDone={() => setStatus(item.id, 'DONE')}
+                  onChanged={load}
+                />
+              );
+            })}
+            {openItems.length > 0 && (
+              <Pager
+                page={openView.current}
+                pages={openView.pages}
+                pageSize={pageSize}
+                total={openItems.length}
+                onPage={setPage}
+                onPageSize={(size) => {
+                  setPageSize(size);
+                  setPage(0);
+                  setDonePage(0);
+                  setProcessPage(0);
+                }}
+              />
+            )}
+            {openItems.length === 0 && processes.length > 0 && (
+              <p className="text-sm text-gray-500">No open tasks.</p>
+            )}
+          </section>
+
           {doneItems.length > 0 && (
-            <h2 className="pt-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Done</h2>
+            <details className="bg-white rounded-lg shadow">
+              <summary className="cursor-pointer px-5 py-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                Done ({doneItems.length})
+              </summary>
+              <div className="space-y-3 px-3 pb-4">
+                {doneView.slice.map((item) => (
+                  <WorkRow
+                    key={item.id}
+                    item={item}
+                    currentUserId={currentUserId}
+                    canAssign={canAssign}
+                    busy={busyId === item.id}
+                    onClaim={() => claim(item.id)}
+                    onDone={() => setStatus(item.id, 'OPEN')}
+                    onChanged={load}
+                  />
+                ))}
+                <Pager
+                  page={doneView.current}
+                  pages={doneView.pages}
+                  pageSize={pageSize}
+                  total={doneItems.length}
+                  onPage={setDonePage}
+                  onPageSize={(size) => {
+                    setPageSize(size);
+                    setPage(0);
+                    setDonePage(0);
+                    setProcessPage(0);
+                  }}
+                />
+              </div>
+            </details>
           )}
-          {doneItems.map((item) => (
-            <WorkRow
-              key={item.id}
-              item={item}
-              currentUserId={data?.currentUserId || ''}
-              canAssign={Boolean(data?.canAssign)}
-              busy={busyId === item.id}
-              onClaim={() => claim(item.id)}
-              onDone={() => setStatus(item.id, 'OPEN')}
-            />
-          ))}
         </div>
       )}
     </div>
+  );
+}
+
+function Pager({
+  page,
+  pages,
+  pageSize,
+  total,
+  onPage,
+  onPageSize,
+}: {
+  page: number;
+  pages: number;
+  pageSize: number;
+  total: number;
+  onPage: (page: number) => void;
+  onPageSize: (size: number) => void;
+}) {
+  const start = total === 0 ? 0 : page * pageSize + 1;
+  const end = Math.min(total, (page + 1) * pageSize);
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
+      <p>{total === 0 ? 'Nothing to show' : `${start}–${end} of ${total}`}</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="inline-flex items-center gap-2">
+          Show
+          <select
+            value={pageSize}
+            onChange={(event) => onPageSize(Number(event.target.value))}
+            className="rounded-md border border-gray-300 px-2 py-2 bg-white min-h-[44px]"
+            aria-label="How many to show"
+          >
+            {PAGE_SIZES.map((size) => (
+              <option key={size} value={size}>{size}</option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          disabled={page <= 0}
+          onClick={() => onPage(page - 1)}
+          className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 disabled:opacity-60"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          disabled={page >= pages - 1}
+          onClick={() => onPage(page + 1)}
+          className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 disabled:opacity-60"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StepList({ steps }: { steps: Step[] }) {
+  if (steps.length === 0) return null;
+  return (
+    <details className="mt-3">
+      <summary className="cursor-pointer text-sm font-medium text-gray-700">Steps ({steps.length})</summary>
+      <ol className="mt-2 space-y-2 list-decimal pl-5">
+        {steps.map((step) => (
+          <li key={step.id} className="text-sm text-gray-800">
+            <span className="font-medium">{step.title}</span>
+            <p className="text-gray-600">{step.detail}</p>
+            {step.explanation && <p className="text-gray-600">{step.explanation}</p>}
+            {step.referenceUrl && (
+              <a href={step.referenceUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                Reference
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+    </details>
   );
 }
 
@@ -501,6 +806,7 @@ function WorkRow({
   onToggle,
   onClaim,
   onDone,
+  onChanged,
 }: {
   item: WorkItem;
   currentUserId: string;
@@ -510,13 +816,44 @@ function WorkRow({
   onToggle?: (shiftKey: boolean) => void;
   onClaim: () => void;
   onDone: () => void;
+  onChanged: () => Promise<void>;
 }) {
+  const [note, setNote] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
+  const [noteError, setNoteError] = useState('');
   const canClaim = item.status === 'OPEN' && item.claimable && !item.assignee;
   const canFinish = item.status === 'OPEN' && (canAssign || item.assignee?.id === currentUserId);
   const canReopen = item.status === 'DONE' && (canAssign || item.assignee?.id === currentUserId);
+  const doneOn = item.status === 'DONE' ? formatDone(item.completedAt) : '';
+
+  async function saveNote(kind: 'NOTE' | 'HELP') {
+    const text = note.trim();
+    if (!text) {
+      setNoteError('Write a note');
+      return;
+    }
+    setSavingNote(true);
+    setNoteError('');
+    try {
+      const response = await fetch(`/api/v1/work-items/${item.id}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body: text, kind }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setNoteError(body.error || 'Failed to save the note');
+        return;
+      }
+      setNote('');
+      await onChanged();
+    } finally {
+      setSavingNote(false);
+    }
+  }
 
   return (
-    <article className="bg-white rounded-lg shadow p-5">
+    <article data-work-id={item.id} className="bg-white rounded-lg shadow p-5">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         {onToggle && (
           <input
@@ -539,6 +876,11 @@ function WorkRow({
                 Claimable
               </span>
             )}
+            {doneOn && (
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                Done {doneOn}
+              </span>
+            )}
           </div>
           <p className="mt-2 text-gray-700 whitespace-pre-wrap">{item.detail}</p>
           {item.explanation && (
@@ -556,6 +898,53 @@ function WorkRow({
               Reference
             </a>
           )}
+          <StepList steps={item.steps || []} />
+          {(item.notes || []).length > 0 && (
+            <ul className="mt-3 space-y-2">
+              {item.notes.map((entry) => (
+                <li key={entry.id} className={`rounded-md px-3 py-2 text-sm ${entry.kind === 'HELP' ? 'bg-amber-50 text-amber-950' : 'bg-gray-50 text-gray-800'}`}>
+                  <p className="font-medium">
+                    {entry.kind === 'HELP' ? 'Asked for help' : 'Note'}
+                    {' · '}
+                    {personName(entry.author)}
+                    {' · '}
+                    {formatDone(entry.createdAt)}
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap">{entry.body}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-3 space-y-2">
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Note or help</span>
+              <textarea
+                rows={2}
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+              />
+            </label>
+            {noteError && <p className="text-sm text-red-700">{noteError}</p>}
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={savingNote}
+                onClick={() => saveNote('NOTE')}
+                className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
+              >
+                Add note
+              </button>
+              <button
+                type="button"
+                disabled={savingNote}
+                onClick={() => saveNote('HELP')}
+                className="px-3 py-2 min-h-[44px] rounded-md border border-amber-300 text-sm font-medium text-amber-900 disabled:opacity-60"
+              >
+                Ask for help
+              </button>
+            </div>
+          </div>
         </div>
         <div className="flex shrink-0 gap-2">
           {canClaim && (

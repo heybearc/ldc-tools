@@ -58,6 +58,7 @@ export async function PATCH(
       select: {
         id: true,
         status: true,
+        completedAt: true,
         requestorName: true,
         requestorEmail: true,
       },
@@ -78,7 +79,12 @@ export async function PATCH(
       }
     }
 
-    return NextResponse.json({ ...updated, emailSent });
+    return NextResponse.json({
+      id: updated.id,
+      status: updated.status,
+      completedAt: updated.completedAt?.toISOString() || null,
+      emailSent,
+    });
   } catch (error) {
     console.error('Update work item error:', error);
     return NextResponse.json({ error: 'Failed to update work' }, { status: 500 });

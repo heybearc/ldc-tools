@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { canPostWork, projectInGroup } from '@/lib/work-item-access';
+import { createProcessRun } from '@/lib/process-runs';
 
 export async function POST(
   request: NextRequest,
@@ -43,25 +44,30 @@ export async function POST(
       }
     }
 
-    const items = await prisma.$transaction(
-      template.steps.map((step) => prisma.workItem.create({
-        data: {
-          constructionGroupId: scope.constructionGroupId as string,
+    const item = await createProcessRun({
+      constructionGroupId: scope.constructionGroupId,
+      createdById: session.user.id,
+      templateId: template.id,
+      name: template.name,
+      steps: template.steps,
+      projectId,
+      assigneeId: null,
+      claimable: true,
+    });
+
+    return NextResponse.json({
+      item: {
+        id: item.id,
+        title: item.title,
+        claimable: item.claimable,
+        steps: item.steps.map((step) => ({
+          id: step.id,
           title: step.title,
           detail: step.detail,
           explanation: step.explanation,
-          referenceUrl: step.referenceUrl,
-          timingKind: 'PROCESS',
-          projectId,
-          claimable: false,
-          status: 'OPEN',
-          createdById: session.user.id,
-        },
-        select: { id: true, title: true, explanation: true },
-      })),
-    );
-
-    return NextResponse.json({ items }, { status: 201 });
+        })),
+      },
+    }, { status: 201 });
   } catch (error) {
     console.error('Start process error:', error);
     return NextResponse.json({ error: 'Failed to start the process' }, { status: 500 });

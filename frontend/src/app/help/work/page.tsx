@@ -35,7 +35,8 @@ export default async function WorkHelpPage() {
           <h2>Add a task</h2>
           <p>
             Personnel Contact, Assistant, and Support can add work. Open Work, choose Add work, and enter a title and detail.
-            Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable. Select several open tasks, including with Shift, and assign them to one person.
+            Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable.
+            Select all, or select several open tasks including with Shift, then assign them or mark them done. Choose how many tasks to show on a page.
           </p>
 
           <h2>Claim a task</h2>
@@ -53,7 +54,9 @@ export default async function WorkHelpPage() {
 
           <h2>Finish a task</h2>
           <p>
-            The assignee, or Personnel, can mark the task Done. Done tasks stay on the list under Done.
+            The assignee, or Personnel, can mark the task Done. Done tasks stay in a collapsed Done section, with the date they were finished.
+            A process is listed as available. Claiming it keeps every step inside that process. Finishing the process marks that one work item done.
+            Anyone on the work list can add a note or ask for help on a task.
           </p>
         </div>
       </div>

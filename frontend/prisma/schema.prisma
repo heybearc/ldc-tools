@@ -82,6 +82,7 @@ model User {
   createdWorkItems    WorkItem[]          @relation("WorkItemCreator")
   projectPersonnel    ProjectPersonnel[]
   processTemplates    ProcessTemplate[]   @relation("ProcessTemplateCreator")
+  workNotes           WorkNote[]
 }
 
 model VerificationToken {
@@ -1004,6 +1005,11 @@ enum WorkStatus {
   DONE
 }
 
+enum WorkNoteKind {
+  NOTE
+  HELP
+}
+
 // One work item for the construction group. Processes, project dates, and crew requests feed this list.
 model WorkItem {
   id                  String         @id @default(cuid())
@@ -1022,6 +1028,7 @@ model WorkItem {
   requestorEmail      String?
   importKey           String?
   createdById         String
+  processTemplateId   String?
   claimedAt           DateTime?
   completedAt         DateTime?
   createdAt           DateTime       @default(now())
@@ -1031,12 +1038,47 @@ model WorkItem {
   project             Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
   assignee            User?             @relation("WorkItemAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   createdBy           User              @relation("WorkItemCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  processTemplate     ProcessTemplate?  @relation(fields: [processTemplateId], references: [id], onDelete: SetNull)
+  steps               WorkItemStep[]
+  notes               WorkNote[]
 
   @@unique([constructionGroupId, importKey])
   @@index([constructionGroupId])
   @@index([status])
   @@index([assigneeId])
+  @@index([processTemplateId])
   @@map("work_items")
+}
+
+// Steps copied onto a process run. They stay on that work item and are not separate tasks.
+model WorkItemStep {
+  id           String  @id @default(cuid())
+  workItemId   String
+  position     Int
+  title        String
+  detail       String  @db.Text
+  explanation  String? @db.Text
+  referenceUrl String?
+
+  workItem     WorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+
+  @@index([workItemId])
+  @@map("work_item_steps")
+}
+
+model WorkNote {
+  id         String       @id @default(cuid())
+  workItemId String
+  authorId   String
+  kind       WorkNoteKind
+  body       String       @db.Text
+  createdAt  DateTime     @default(now())
+
+  workItem   WorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([workItemId])
+  @@map("work_notes")
 }
 
 model ProcessTemplate {
@@ -1051,6 +1093,7 @@ model ProcessTemplate {
   constructionGroup   ConstructionGroup @relation(fields: [constructionGroupId], references: [id], onDelete: Cascade)
   createdBy           User              @relation("ProcessTemplateCreator", fields: [createdById], references: [id], onDelete: Restrict)
   steps               ProcessStep[]
+  runs                WorkItem[]
 
   @@index([constructionGroupId])
   @@map("process_templates")

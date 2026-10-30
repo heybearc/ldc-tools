@@ -13,7 +13,7 @@ async function signIn(page: Page) {
   await page.waitForURL((url) => !url.pathname.startsWith('/auth/signin'), { timeout: 15000 });
 }
 
-test('starting a process puts its steps on the work list', async ({ page }) => {
+test('starting a process lists one claimable process, not its steps', async ({ page }) => {
   await signIn(page);
 
   let list = await page.request.get('/api/v1/processes');
@@ -69,17 +69,25 @@ test('starting a process puts its steps on the work list', async ({ page }) => {
   });
   expect(started.status()).toBe(201);
   const run = await started.json();
-  expect(run.items).toHaveLength(2);
+  expect(run.item.title).toBe(name);
+  expect(run.item.steps).toHaveLength(2);
+  expect(run.item.claimable).toBe(true);
 
   await page.goto('/work');
-  const firstRow = page.locator('article').filter({ hasText: first });
-  const secondRow = page.locator('article').filter({ hasText: second });
-  await expect(firstRow.getByRole('heading', { name: first })).toBeVisible();
-  await expect(firstRow.getByText('Use the current drawing.')).toBeVisible();
-  await expect(secondRow.getByText('Copy the requestor.')).toBeVisible();
+  const processRow = page.locator(`article[data-work-id="${run.item.id}"]`);
+  await expect(processRow.getByRole('heading', { name })).toBeVisible();
+  await expect(page.getByRole('heading', { name: first })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: second })).toHaveCount(0);
+  await processRow.locator('summary', { hasText: 'Steps' }).click();
+  await expect(processRow.getByText(first)).toBeVisible();
+  await expect(processRow.getByText('Use the current drawing.')).toBeVisible();
+  await expect(processRow.getByText(second)).toBeVisible();
 
-  for (const item of run.items) {
-    const done = await page.request.patch(`/api/v1/work-items/${item.id}`, { data: { status: 'DONE' } });
-    expect(done.ok()).toBeTruthy();
-  }
+  const claim = await page.request.post(`/api/v1/work-items/${run.item.id}/claim`);
+  expect(claim.ok()).toBeTruthy();
+  const done = await page.request.patch(`/api/v1/work-items/${run.item.id}`, { data: { status: 'DONE' } });
+  expect(done.ok()).toBeTruthy();
+  const finished = await done.json();
+  expect(finished.status).toBe('DONE');
+  expect(finished.completedAt).toBeTruthy();
 });

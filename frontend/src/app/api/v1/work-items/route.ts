@@ -9,6 +9,11 @@ import { dueOnDate, timingLabel, validateWorkItemInput } from '@/lib/work-items'
 const itemInclude = {
   assignee: { select: { id: true, name: true, email: true } },
   project: { select: { id: true, name: true } },
+  steps: { orderBy: { position: 'asc' as const } },
+  notes: {
+    orderBy: { createdAt: 'asc' as const },
+    include: { author: { select: { id: true, name: true, email: true } } },
+  },
 } as const;
 
 function serialize(item: {
@@ -28,6 +33,20 @@ function serialize(item: {
   createdAt: Date;
   assignee: { id: string; name: string | null; email: string } | null;
   project: { id: string; name: string } | null;
+  steps?: Array<{
+    id: string;
+    title: string;
+    detail: string;
+    explanation: string | null;
+    referenceUrl: string | null;
+  }>;
+  notes?: Array<{
+    id: string;
+    kind: 'NOTE' | 'HELP';
+    body: string;
+    createdAt: Date;
+    author: { id: string; name: string | null; email: string };
+  }>;
 }) {
   const dueOn = item.dueOn ? item.dueOn.toISOString().slice(0, 10) : null;
   return {
@@ -48,6 +67,20 @@ function serialize(item: {
     claimedAt: item.claimedAt?.toISOString() || null,
     completedAt: item.completedAt?.toISOString() || null,
     createdAt: item.createdAt.toISOString(),
+    steps: (item.steps || []).map((step) => ({
+      id: step.id,
+      title: step.title,
+      detail: step.detail,
+      explanation: step.explanation,
+      referenceUrl: step.referenceUrl,
+    })),
+    notes: (item.notes || []).map((note) => ({
+      id: note.id,
+      kind: note.kind,
+      body: note.body,
+      createdAt: note.createdAt.toISOString(),
+      author: note.author,
+    })),
   };
 }
 
@@ -64,9 +97,19 @@ export async function GET() {
     }
 
     const canAssign = await canPostWork(session.user.id, scope);
-    const [items, teammates, projects] = await Promise.all([
+    const [items, teammates, projects, processes] = await Promise.all([
       prisma.workItem.findMany({
-        where: withCGFilter(scope),
+        where: {
+          AND: [
+            withCGFilter(scope),
+            {
+              OR: [
+                { timingKind: { not: 'PROCESS' } },
+                { processTemplateId: { not: null } },
+              ],
+            },
+          ],
+        },
         include: itemInclude,
         orderBy: [{ status: 'asc' }, { dueOn: 'asc' }, { createdAt: 'desc' }],
       }),
@@ -84,6 +127,11 @@ export async function GET() {
             orderBy: { name: 'asc' },
           })
         : Promise.resolve([]),
+      prisma.processTemplate.findMany({
+        where: { ...withCGFilter(scope), isActive: true },
+        include: { steps: { orderBy: { position: 'asc' } } },
+        orderBy: { name: 'asc' },
+      }),
     ]);
 
     return NextResponse.json({
@@ -92,6 +140,17 @@ export async function GET() {
       items: items.map(serialize),
       teammates,
       projects,
+      processes: processes.map((process) => ({
+        id: process.id,
+        name: process.name,
+        steps: process.steps.map((step) => ({
+          id: step.id,
+          title: step.title,
+          detail: step.detail,
+          explanation: step.explanation,
+          referenceUrl: step.referenceUrl,
+        })),
+      })),
     });
   } catch (error) {
     console.error('List work items error:', error);
