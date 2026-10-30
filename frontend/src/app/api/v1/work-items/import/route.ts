@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     const form = await request.formData();
     const file = form.get('file');
-    if (!(file instanceof File)) {
+    if (!file || typeof file === 'string' || typeof file.arrayBuffer !== 'function') {
       return NextResponse.json({ error: 'Choose a spreadsheet' }, { status: 400 });
     }
     if (file.size > MAX_BYTES) {
