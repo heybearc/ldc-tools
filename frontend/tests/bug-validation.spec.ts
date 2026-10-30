@@ -207,22 +207,14 @@ test.describe('Bug Validation Suite', () => {
     await page.goto(`${BASE_URL}/admin/users`);
     await page.waitForLoadState('networkidle');
 
-    // Try to click column header to sort
-    const nameHeader = page.locator('th:has-text("Name")').or(page.locator('text=Name').first());
-    
-    if (await nameHeader.isVisible()) {
-      await nameHeader.click();
-      await page.waitForTimeout(1000);
-      
-      // Check if table sorted (hard to verify without knowing data)
-      const firstUserName = await page.locator('tbody tr').first().locator('td').first().textContent();
-      console.log(`BUG-008: First user after sort: ${firstUserName}`);
-      
-      // Just verify no errors occurred
-      const errorMessages = page.locator('.text-red-600, [role="alert"]');
-      const hasErrors = await errorMessages.count() > 0;
-      expect(hasErrors).toBe(false);
-    }
+    const nameHeader = page.locator('th').filter({ hasText: /^User$/ });
+    await expect(nameHeader).toBeVisible();
+    await nameHeader.click();
+    await page.waitForTimeout(1000);
+
+    const firstUserName = await page.locator('tbody tr').first().locator('td').first().textContent();
+    console.log(`BUG-008: First user after sort: ${firstUserName}`);
+    await expect(page.locator('[role="alert"]')).toHaveCount(0);
   });
 
   test('BUG-009: Admin navigation menu overlap on small screens', async ({ page }) => {

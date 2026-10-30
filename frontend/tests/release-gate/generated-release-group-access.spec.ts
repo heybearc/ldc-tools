@@ -39,5 +39,12 @@ test('a super admin stays in a construction group and can add work or a project'
 
   await page.goto('/admin/users');
   await expect(page.getByText('Personnel team for this region')).toBeVisible();
-  await expect(page.getByRole('columnheader', { name: 'Actions' })).toBeInViewport();
+  const actions = page.getByRole('columnheader', { name: 'Actions' });
+  await expect(actions).toBeVisible();
+  const box = await actions.boundingBox();
+  const viewport = page.viewportSize();
+  expect(box).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(box!.x).toBeGreaterThanOrEqual(0);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(viewport!.width + 1);
 });

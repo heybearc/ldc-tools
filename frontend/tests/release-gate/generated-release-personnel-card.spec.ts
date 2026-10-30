@@ -21,11 +21,10 @@ test('sign-in opens the dashboard and Personnel is not on the construction group
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
 
-  const overviewResponse = page.waitForResponse(
-    (response) => response.url().includes('/api/v1/trade-teams/overview') && response.ok()
-  );
   await page.goto('/trade-teams/overview');
-  const payload = await (await overviewResponse).json();
+  const overview = await page.request.get('/api/v1/trade-teams/overview');
+  expect(overview.ok()).toBeTruthy();
+  const payload = await overview.json();
   const groups = payload.directoryGroups;
   const roles = (columns: { contact?: { role: string }[]; assistant?: { role: string }[]; support?: { role: string }[] }) =>
     [...(columns?.contact || []), ...(columns?.assistant || []), ...(columns?.support || [])].map((person) => person.role);
