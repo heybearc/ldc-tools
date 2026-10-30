@@ -84,6 +84,9 @@ model User {
   processTemplates    ProcessTemplate[]   @relation("ProcessTemplateCreator")
   workNotes           WorkNote[]
   workHelpReads       WorkHelpRead[]
+  chatMessages        ChatMessage[]
+  chatReads           ChatRead[]
+  chatPushSubscriptions ChatPushSubscription[]
 }
 
 model VerificationToken {
@@ -436,6 +439,7 @@ model ConstructionGroup {
   crewChangeRequests CrewChangeRequest[]
   workItems       WorkItem[]
   processTemplates ProcessTemplate[]
+  chatChannels    ChatChannel[]
   auditLogsFrom   AuditLog[]  @relation("AuditLogFromCG")
   auditLogsTo     AuditLog[]  @relation("AuditLogToCG")
 
@@ -962,6 +966,7 @@ model CrewChangeRequest {
   requestType           String    // ADD_TO_CREW, REMOVE_FROM_CREW, ADD_TO_PROJECT_ROSTER, ADD_TO_CREW_AND_PROJECT
   requestorName         String
   requestorEmail        String
+  notifyRequestor       Boolean   @default(true)
   volunteerName         String
   volunteerBaId         String?
   tradeTeamId           String?
@@ -1023,6 +1028,7 @@ model WorkItem {
   dueOn               DateTime?
   projectId           String?
   claimable           Boolean        @default(false)
+  notifyRequestor     Boolean        @default(true)
   assigneeId          String?
   status              WorkStatus     @default(OPEN)
   requestorName       String?
@@ -1133,6 +1139,77 @@ model ProcessStep {
 
   @@index([templateId])
   @@map("process_steps")
+}
+
+enum ChatChannelKind {
+  TEAM
+  DIRECT
+}
+
+model ChatChannel {
+  id                  String          @id @default(cuid())
+  constructionGroupId String
+  kind                ChatChannelKind
+  directKey           String
+  createdAt           DateTime        @default(now())
+
+  constructionGroup   ConstructionGroup @relation(fields: [constructionGroupId], references: [id], onDelete: Cascade)
+  messages            ChatMessage[]
+  reads               ChatRead[]
+
+  @@unique([constructionGroupId, directKey])
+  @@index([constructionGroupId])
+  @@map("chat_channels")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  channelId String
+  authorId  String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+
+  channel   ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author    User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([channelId, createdAt])
+  @@map("chat_messages")
+}
+
+model ChatRead {
+  id        String   @id @default(cuid())
+  channelId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  channel   ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@map("chat_reads")
+}
+
+model ChatPushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("chat_push_subscriptions")
+}
+
+model ChatPushConfig {
+  id         Int    @id @default(1)
+  publicKey  String
+  privateKey String
+  subject    String
+
+  @@map("chat_push_config")
 }
 
 model ProjectPersonnel {

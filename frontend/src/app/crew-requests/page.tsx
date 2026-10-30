@@ -9,12 +9,14 @@ import {
   Plus, Save, Trash2
 } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
+import { isAirgappedEmail } from '@/lib/reachable-email';
 
 interface CrewRequest {
   id: string;
   request_type: string;
   requestor_name: string;
   requestor_email: string;
+  notify_requestor?: boolean;
   volunteer_name: string;
   volunteer_ba_id: string | null;
   trade_team_id: string | null;
@@ -91,6 +93,7 @@ export default function CrewRequestsPage() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<CrewRequest | null>(null);
+  const [emailIds, setEmailIds] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [showAddVolunteer, setShowAddVolunteer] = useState(false);
@@ -170,6 +173,17 @@ export default function CrewRequestsPage() {
     fetchTradeTeams();
     fetchCGSettings();
   }, [statusFilter]);
+
+  const setCrewEmail = async (notifyRequestor: boolean) => {
+    if (emailIds.length === 0) return;
+    await fetch('/api/v1/crew-requests/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: emailIds, notifyRequestor }),
+    });
+    setEmailIds([]);
+    fetchRequests();
+  };
 
   const handleStatusChange = async (requestId: string, newStatus: string, resolutionNotes?: string, sendEmail?: boolean) => {
     setIsUpdating(true);
@@ -567,6 +581,26 @@ export default function CrewRequestsPage() {
           </div>
         </div>
 
+        {emailIds.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4 flex flex-wrap gap-2 items-center">
+            <p className="text-sm font-medium text-gray-800">{emailIds.length} selected</p>
+            <button
+              type="button"
+              className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm"
+              onClick={() => setCrewEmail(false)}
+            >
+              Email off
+            </button>
+            <button
+              type="button"
+              className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm"
+              onClick={() => setCrewEmail(true)}
+            >
+              Email on
+            </button>
+          </div>
+        )}
+
         {/* Requests List */}
         <div className="space-y-4">
           {filteredRequests.length === 0 ? (
@@ -586,6 +620,17 @@ export default function CrewRequestsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={emailIds.includes(request.id)}
+                        aria-label={`Select ${request.volunteer_name}`}
+                        onClick={(event) => event.stopPropagation()}
+                        onChange={(event) => {
+                          setEmailIds((current) => event.target.checked
+                            ? [...current, request.id]
+                            : current.filter((id) => id !== request.id));
+                        }}
+                      />
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${REQUEST_TYPE_LABELS[request.request_type]?.color || 'bg-gray-100 text-gray-700'}`}>
                         {REQUEST_TYPE_LABELS[request.request_type]?.icon}
                         {REQUEST_TYPE_LABELS[request.request_type]?.label || request.request_type}
@@ -593,6 +638,22 @@ export default function CrewRequestsPage() {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[request.status]?.bgColor} ${STATUS_CONFIG[request.status]?.color}`}>
                         {STATUS_CONFIG[request.status]?.label || request.status}
                       </span>
+                      <label className="inline-flex items-center gap-1 text-xs text-gray-600" onClick={(event) => event.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={request.notify_requestor !== false && !isAirgappedEmail(request.requestor_email)}
+                          disabled={isAirgappedEmail(request.requestor_email)}
+                          onChange={async (event) => {
+                            await fetch(`/api/v1/crew-requests/${request.id}`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ notify_requestor: event.target.checked }),
+                            });
+                            fetchRequests();
+                          }}
+                        />
+                        {isAirgappedEmail(request.requestor_email) ? 'Cannot email' : 'Email'}
+                      </label>
                     </div>
                     
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -764,11 +825,16 @@ export default function CrewRequestsPage() {
                 <input
                   type="checkbox"
                   id="send-email"
-                  defaultChecked={true}
+                  defaultChecked={selectedRequest.notify_requestor !== false && !isAirgappedEmail(selectedRequest.requestor_email)}
+                  disabled={isAirgappedEmail(selectedRequest.requestor_email) || selectedRequest.notify_requestor === false}
                   className="h-4 w-4 text-blue-600 rounded"
                 />
                 <span className="ml-2 text-sm text-blue-800">
-                  Send completion notification email to {selectedRequest.requestor_email}
+                  {isAirgappedEmail(selectedRequest.requestor_email)
+                    ? `${selectedRequest.requestor_email} is on the Bethel network and cannot be emailed`
+                    : selectedRequest.notify_requestor === false
+                      ? 'Email notifications are off for this request'
+                      : `Send completion notification email to ${selectedRequest.requestor_email}`}
                 </span>
               </label>
             </div>

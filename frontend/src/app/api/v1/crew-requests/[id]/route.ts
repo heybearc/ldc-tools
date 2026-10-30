@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { decryptPassword } from '@/lib/email-crypto';
 import nodemailer from 'nodemailer';
+import { canEmailAddress } from '@/lib/reachable-email';
 
 // GET - Get single request
 export async function GET(
@@ -73,7 +74,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { status, assigned_to_id, resolution_notes, send_completion_email } = body;
+    const { status, assigned_to_id, resolution_notes, send_completion_email, notify_requestor } = body;
 
     // Get the current request for email notification
     const currentRequest = await prisma.crewChangeRequest.findUnique({
@@ -106,6 +107,10 @@ export async function PATCH(
       updateData.resolutionNotes = resolution_notes;
     }
 
+    if (typeof notify_requestor === 'boolean') {
+      updateData.notifyRequestor = notify_requestor;
+    }
+
     const updated = await prisma.crewChangeRequest.update({
       where: { id: params.id },
       data: updateData,
@@ -116,7 +121,7 @@ export async function PATCH(
     });
 
     // Send completion email if requested
-    if (status === 'COMPLETED' && send_completion_email) {
+    if (status === 'COMPLETED' && send_completion_email && currentRequest.notifyRequestor !== false) {
       try {
         await sendCompletionEmail(currentRequest, resolution_notes, user.name || 'Personnel Team');
       } catch (emailError) {
@@ -208,6 +213,9 @@ async function sendCompletionEmail(
   resolutionNotes: string | null,
   completedByName: string
 ) {
+  if (!canEmailAddress(request.requestorEmail, request.notifyRequestor !== false)) {
+    return;
+  }
   // Get email configuration
   const emailConfig = await prisma.emailConfiguration.findFirst({
     where: { isActive: true }

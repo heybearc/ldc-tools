@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { ClipboardList, Plus, Upload } from 'lucide-react';
+import { isAirgappedEmail } from '@/lib/reachable-email';
 
 interface Person {
   id: string;
@@ -40,6 +41,7 @@ export interface WorkItem {
   assignee: Person | null;
   requestorName: string | null;
   requestorEmail: string | null;
+  notifyRequestor?: boolean;
   completedAt: string | null;
   steps: Step[];
   notes: WorkNote[];
@@ -280,6 +282,29 @@ export default function WorkPage() {
       await load();
     } finally {
       setBusyId(null);
+    }
+  }
+
+  async function setNotifySelected(notifyRequestor: boolean) {
+    if (selectedIds.length === 0) return;
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch('/api/v1/work-items/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds, notifyRequestor }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error || 'Failed to update email');
+        return;
+      }
+      setNotice(notifyRequestor ? 'Completion email is on for the selection.' : 'Completion email is off for the selection.');
+      setSelectedIds([]);
+      await load();
+    } catch {
+      setError('Failed to update email');
     }
   }
 
@@ -641,6 +666,22 @@ export default function WorkPage() {
                   >
                     {completing ? 'Marking done…' : 'Mark selected done'}
                   </button>
+                  <button
+                    type="button"
+                    disabled={selectedIds.length === 0}
+                    onClick={() => setNotifySelected(false)}
+                    className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
+                  >
+                    Email off
+                  </button>
+                  <button
+                    type="button"
+                    disabled={selectedIds.length === 0}
+                    onClick={() => setNotifySelected(true)}
+                    className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
+                  >
+                    Email on
+                  </button>
                 </div>
                 {canAssign && (
                   <div className="flex flex-col sm:flex-row sm:items-end gap-3">
@@ -940,7 +981,7 @@ export function NoteList({
   );
 }
 
-function WorkRow({
+export function WorkRow({
   item,
   currentUserId,
   canAssign,
@@ -1043,6 +1084,26 @@ function WorkRow({
           <p className="mt-2 text-gray-700 whitespace-pre-wrap">{item.detail}</p>
           {item.explanation && (
             <p className="mt-2 text-sm text-gray-600 whitespace-pre-wrap">{item.explanation}</p>
+          )}
+          {(item.timingKind === 'CREW_REQUEST' || item.requestorEmail) && (
+            <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={item.notifyRequestor !== false && !isAirgappedEmail(item.requestorEmail)}
+                disabled={isAirgappedEmail(item.requestorEmail)}
+                onChange={async (event) => {
+                  await fetch(`/api/v1/work-items/${item.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notifyRequestor: event.target.checked }),
+                  });
+                  await onChanged();
+                }}
+              />
+              {isAirgappedEmail(item.requestorEmail)
+                ? 'This address is on the Bethel network and cannot be emailed'
+                : 'Email the requestor when this is done'}
+            </label>
           )}
           <p className="mt-3 text-sm text-gray-500">
             {personName(item.assignee)}

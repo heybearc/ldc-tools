@@ -1,3 +1,5 @@
+import { canEmailAddress } from '@/lib/reachable-email';
+
 export const WORK_TIMING_KINDS = ['DEADLINE', 'PROJECT_DATE', 'MONTHLY', 'YEARLY', 'PROCESS', 'CREW_REQUEST', 'NONE'] as const;
 export type WorkTimingKind = (typeof WORK_TIMING_KINDS)[number];
 
@@ -102,6 +104,9 @@ export function validateWorkItemInput(body: Record<string, unknown>): { ok: true
   const requestorEmail = optionalText(body.requestorEmail);
   if (requestorEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(requestorEmail)) {
     return { ok: false, error: 'Requestor email is not valid' };
+  }
+  if (requestorEmail && !canEmailAddress(requestorEmail)) {
+    return { ok: false, error: 'That email address cannot receive mail from here' };
   }
 
   return {

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
 import { sendWorkCompletionEmail } from '@/lib/work-completion-email';
+import { canEmailAddress } from '@/lib/reachable-email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
         id: true,
         title: true,
         detail: true,
+        notifyRequestor: true,
         requestorName: true,
         requestorEmail: true,
       },
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     let emailed = 0;
     for (const item of openItems) {
-      if (!item.requestorEmail) continue;
+      if (!item.requestorEmail || !canEmailAddress(item.requestorEmail, item.notifyRequestor)) continue;
       try {
         const sent = await sendWorkCompletionEmail({
           requestorName: item.requestorName,

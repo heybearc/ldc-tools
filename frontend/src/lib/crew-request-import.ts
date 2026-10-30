@@ -1,3 +1,5 @@
+import { canEmailAddress } from '@/lib/reachable-email';
+
 export interface CrewRequestRow {
   importKey: string | null;
   title: string;
@@ -13,6 +15,7 @@ export interface CrewRequestParseResult {
 }
 
 const REQUIRED_HEADERS = ['choose an action', 'volunteer name', 'your name', 'your email'];
+
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function cell(row: Record<string, unknown>, header: string): string {
@@ -62,7 +65,7 @@ export function parseCrewRequestRows(rows: Record<string, unknown>[]): CrewReque
 
     const requestorName = cell(row, 'your name') || null;
     const rawEmail = cell(row, 'your email');
-    const requestorEmail = EMAIL.test(rawEmail) ? rawEmail : null;
+    const requestorEmail = EMAIL.test(rawEmail) && canEmailAddress(rawEmail) ? rawEmail : null;
     const baId = cell(row, 'volunteer ba id (if known)');
     const crew = cell(row, 'crew name');
     const project = cell(row, 'project roster name');

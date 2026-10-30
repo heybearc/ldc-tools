@@ -105,6 +105,9 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                 <Link href="/work" className={navClass(pathname === '/work')}>
                   Work
                 </Link>
+                <Link href="/chat" className={navClass(pathname === '/chat')}>
+                  Chat
+                </Link>
                 <Link href="/projects" className={navClass(pathname === '/projects')}>
                   Projects
                 </Link>
@@ -211,6 +214,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Work
+              </Link>
+              <Link
+                href="/chat"
+                className="block px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Chat
               </Link>
               <Link
                 href="/projects"

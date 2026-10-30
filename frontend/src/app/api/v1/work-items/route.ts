@@ -28,6 +28,7 @@ function serialize(item: {
   status: 'OPEN' | 'DONE';
   requestorName: string | null;
   requestorEmail: string | null;
+  notifyRequestor?: boolean;
   claimedAt: Date | null;
   completedAt: Date | null;
   createdAt: Date;
@@ -65,6 +66,7 @@ function serialize(item: {
     assignee: item.assignee,
     requestorName: item.requestorName,
     requestorEmail: item.requestorEmail,
+    notifyRequestor: item.notifyRequestor !== false,
     claimedAt: item.claimedAt?.toISOString() || null,
     completedAt: item.completedAt?.toISOString() || null,
     createdAt: item.createdAt.toISOString(),

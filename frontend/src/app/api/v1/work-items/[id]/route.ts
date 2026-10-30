@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
 import { sendWorkCompletionEmail } from '@/lib/work-completion-email';
+import { canEmailAddress } from '@/lib/reachable-email';
 
 export async function PATCH(
   request: NextRequest,
@@ -22,8 +23,16 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    if (body.status !== 'DONE' && body.status !== 'OPEN') {
+    const hasStatus = body.status !== undefined;
+    const hasNotify = body.notifyRequestor !== undefined;
+    if (!hasStatus && !hasNotify) {
+      return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
+    }
+    if (hasStatus && body.status !== 'DONE' && body.status !== 'OPEN') {
       return NextResponse.json({ error: 'Status must be open or done' }, { status: 400 });
+    }
+    if (hasNotify && typeof body.notifyRequestor !== 'boolean') {
+      return NextResponse.json({ error: 'Email notification must be on or off' }, { status: 400 });
     }
 
     const item = await prisma.workItem.findUnique({
@@ -35,6 +44,7 @@ export async function PATCH(
         status: true,
         title: true,
         detail: true,
+        notifyRequestor: true,
         requestorName: true,
         requestorEmail: true,
       },
@@ -52,8 +62,11 @@ export async function PATCH(
     const updated = await prisma.workItem.update({
       where: { id: item.id },
       data: {
-        status: body.status,
-        completedAt: body.status === 'DONE' ? new Date() : null,
+        ...(hasStatus ? {
+          status: body.status,
+          completedAt: body.status === 'DONE' ? new Date() : null,
+        } : {}),
+        ...(hasNotify ? { notifyRequestor: body.notifyRequestor } : {}),
       },
       select: {
         id: true,
@@ -65,7 +78,7 @@ export async function PATCH(
     });
 
     let emailSent = false;
-    if (body.status === 'DONE' && item.status !== 'DONE' && item.requestorEmail) {
+    if (hasStatus && body.status === 'DONE' && item.status !== 'DONE' && item.requestorEmail && canEmailAddress(item.requestorEmail, item.notifyRequestor)) {
       try {
         emailSent = await sendWorkCompletionEmail({
           requestorName: item.requestorName,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { canEmailAddress } from '@/lib/reachable-email';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
@@ -65,6 +66,7 @@ export async function GET(request: NextRequest) {
       request_type: r.requestType,
       requestor_name: r.requestorName,
       requestor_email: r.requestorEmail,
+      notify_requestor: r.notifyRequestor,
       volunteer_name: r.volunteerName,
       volunteer_ba_id: r.volunteerBaId,
       trade_team_id: r.tradeTeamId,
@@ -182,6 +184,7 @@ export async function POST(request: NextRequest) {
         requestType: request_type,
         requestorName,
         requestorEmail,
+        notifyRequestor: canEmailAddress(requestorEmail),
         volunteerName: volunteer_name,
         volunteerBaId: volunteer_ba_id || null,
         tradeTeamId: trade_team_id || null,

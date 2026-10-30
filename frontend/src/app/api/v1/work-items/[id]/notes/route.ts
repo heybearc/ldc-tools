@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { sendWorkHelpEmail } from '@/lib/work-completion-email';
+import { canEmailAddress } from '@/lib/reachable-email';
 
 export async function POST(
   request: NextRequest,
@@ -96,7 +97,7 @@ export async function POST(
         ]);
         const emails = new Set<string>();
         const addEmail = (email: string | null | undefined) => {
-          if (email && email.includes('@')) emails.add(email);
+          if (canEmailAddress(email)) emails.add(email as string);
         };
         for (const contact of contacts) addEmail(contact.user.email);
         for (const role of volunteers) {

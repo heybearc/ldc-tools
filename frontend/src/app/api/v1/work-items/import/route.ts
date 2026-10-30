@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
           status: 'OPEN',
           requestorName: row.requestorName,
           requestorEmail: row.requestorEmail,
+          notifyRequestor: Boolean(row.requestorEmail),
           importKey: row.importKey,
           createdById: session.user.id,
         })),
