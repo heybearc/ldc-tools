@@ -1,5 +1,13 @@
 # LDC Tools Release Notes
 
+## v1.39.0 - Import crew requests
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- Import the crew-update spreadsheet from Work. Each row becomes a claimable task, and the requestor stays on it when it is done
+
 ## v1.38.1 - Resend an invitation
 
 **Release Date:** October 30, 2026
