@@ -6,7 +6,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
-- v1.36.0 (`7537896`) is LIVE on green (CT135). STANDBY blue (CT133) is `12d9e2b` plus the user-management save fix. Crew-request import still waits on the spreadsheet.
+- v1.38.1 (`e384d04`) is LIVE on blue (CT133). STANDBY green (CT135) matches. Crew-request import still waits on the spreadsheet.
+
+### Mid-day
+- Shipped v1.37.0 (`756ef8b`): directory profile from a name; admin name, email, and cancel invitation. Then v1.38.0 (`9f56415`): invite form on User Management and toast confirmations.
+- Shipped v1.38.1 (`e384d04`): Resend Invitation failed because it wrote `regionId` and `zoneId` onto `UserInvitation`. qa-01 admin gate passed. Both nodes synced.
+- An invited person only gets email from Send invitation email or Resend Invitation, and only when Email Configuration is active. The Invited label also means they have not finished setup.
+- The v1.31.0 announcement was still active through 2026-11-12. Dismiss did not stick. Set `isActive` false.
+- Open urgent feedback: 0.
+- The Excel import template and `frontend/tsconfig.tsbuildinfo` are still uncommitted.
 
 ### Discoveries / Notes
 - Shipped v1.36.0 (`7537896`). Admin is a direct link. User management lists this region's Personnel. Super admin and Personnel keep a construction group, so Work and Projects can add items. LIVE green CT135, STANDBY was synced to the same commit.

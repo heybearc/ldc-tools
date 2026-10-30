@@ -2,17 +2,21 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** User management save and cancel-invitation, then slice 6 when the spreadsheet arrives
+**Working on:** Slice 6 when the spreadsheet arrives
 
 ---
 
 ## Current Task
-**User management** — name and email save, and cancel an invitation. Crew-request import (slice 6) still waits on the spreadsheet.
+Crew-request import (slice 6) still waits on the spreadsheet.
 
 ### What I'm doing right now
-v1.36.0 (`7537896`) is LIVE on green (CT135). STANDBY blue (CT133) has the Personnel profile links (`12d9e2b`).
+v1.38.1 (`e384d04`) is LIVE on blue (CT133). STANDBY green (CT135) is the same commit.
 
 ### Recent completions
+- ✅ Shipped v1.38.1 (`e384d04`). Resend Invitation no longer writes region fields. qa-01 admin gate passed. LIVE blue CT133, STANDBY green CT135.
+- ✅ Shipped v1.38.0 (`9f56415`). Invite form on User Management. Confirmations are toasts.
+- ✅ Shipped v1.37.0 (`756ef8b`). Directory names open a profile. Admin can save name and email and cancel an invitation.
+- ✅ Turned off the v1.31.0 announcement (it was active through 2026-11-12).
 - ✅ Personnel directory names open a profile (`12d9e2b`) on STANDBY
 - ✅ Shipped v1.36.0 (`7537896`); qa-01 admin gate plus construction-group access test passed
 - ✅ Loaded the CG 01.12 Personnel roster into the shared database

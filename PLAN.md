@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.36.0 is LIVE on green (CT135) at `7537896`. STANDBY blue (CT133) has Personnel profile links (`12d9e2b`). Next is slice 6, waiting on the crew-request spreadsheet. Hub dates are paused.
+**Status:** v1.38.1 is LIVE on blue (CT133) at `e384d04`. STANDBY green (CT135) matches. Next is slice 6, waiting on the crew-request spreadsheet. Hub dates are paused.
 
 ---
 
@@ -28,6 +28,8 @@
 - [x] Slice 5 — process templates; `/ship` v1.35.0
 - [x] Admin link, Personnel user list, construction-group access; `/ship` v1.36.0
 - [x] CG 01.12 Personnel roster loaded; profile links on STANDBY (`12d9e2b`)
+- [x] Directory profiles, invite form, toasts; `/ship` v1.37.0 and v1.38.0
+- [x] Resend Invitation; `/ship` v1.38.1
 - [ ] Slice 6 below — blocked until the Microsoft Form spreadsheet is in hand
 
 ### Completed This Phase
