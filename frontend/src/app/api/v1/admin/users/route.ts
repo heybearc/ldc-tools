@@ -115,10 +115,10 @@ export async function GET(request: NextRequest) {
       // Determine status: if emailVerified is null, user is "INVITED"
       // Otherwise use the database status or default to ACTIVE
       let displayStatus: 'ACTIVE' | 'INVITED' | 'INACTIVE' = 'ACTIVE';
-      if (!user.emailVerified) {
-        displayStatus = 'INVITED';
-      } else if (user.status === 'INACTIVE') {
+      if (user.status === 'INACTIVE' || user.status === 'SUSPENDED') {
         displayStatus = 'INACTIVE';
+      } else if (!user.emailVerified || user.status === 'INVITED') {
+        displayStatus = 'INVITED';
       }
       
       // Derive CG from volunteer or direct assignment

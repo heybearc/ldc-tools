@@ -229,13 +229,40 @@ export default function UserManagementPage() {
         loadUsers();
         loadUserStats();
       } else {
-        alert('Failed to update user. Please try again.');
+        const data = await response.json().catch(() => ({}));
+        alert(data.message || data.error || 'Failed to update user. Please try again.');
       }
     } catch (error) {
       console.error('Failed to update user:', error);
       alert('Failed to update user. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelInvitation = async (userId: string) => {
+    if (!confirm('Cancel this invitation? They will stay on the personnel list as inactive and cannot accept the invite.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/v1/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'INACTIVE' }),
+      });
+
+      if (response.ok) {
+        alert('Invitation cancelled.');
+        loadUsers();
+        loadUserStats();
+      } else {
+        const data = await response.json().catch(() => ({}));
+        alert(data.message || data.error || 'Failed to cancel invitation.');
+      }
+    } catch (error) {
+      console.error('Failed to cancel invitation:', error);
+      alert('Failed to cancel invitation.');
     }
   };
 
@@ -637,16 +664,28 @@ export default function UserManagementPage() {
                                   Edit User
                                 </button>
                                 {user.status === 'INVITED' && (
-                                  <button
-                                    onClick={() => {
-                                      handleResendInvitation(user.id);
-                                      setOpenDropdownId(null);
-                                    }}
-                                    className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center"
-                                  >
-                                    <Mail className="mr-2 h-4 w-4" />
-                                    Resend Invitation
-                                  </button>
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        handleResendInvitation(user.id);
+                                        setOpenDropdownId(null);
+                                      }}
+                                      className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center"
+                                    >
+                                      <Mail className="mr-2 h-4 w-4" />
+                                      Resend Invitation
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        handleCancelInvitation(user.id);
+                                        setOpenDropdownId(null);
+                                      }}
+                                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                                    >
+                                      <X className="mr-2 h-4 w-4" />
+                                      Cancel Invitation
+                                    </button>
+                                  </>
                                 )}
                                 <button
                                   onClick={() => {
@@ -1038,7 +1077,8 @@ Alice Williams,alice.williams@example.com,READ_ONLY,,01.12,01,INVITED
                   </label>
                   <input
                     type="text"
-                    defaultValue={selectedUser.name}
+                    value={selectedUser.name}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -1049,7 +1089,8 @@ Alice Williams,alice.williams@example.com,READ_ONLY,,01.12,01,INVITED
                   </label>
                   <input
                     type="email"
-                    defaultValue={selectedUser.email}
+                    value={selectedUser.email}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

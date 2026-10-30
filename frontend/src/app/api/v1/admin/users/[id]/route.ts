@@ -27,18 +27,36 @@ export async function PATCH(
     // Get current user data for audit log
     const currentUser = await prisma.user.findUnique({
       where: { id: params.id },
-      select: { name: true, email: true, role: true, constructionGroupId: true, adminLevel: true, status: true, emailVerified: true }
+      select: { name: true, email: true, role: true, constructionGroupId: true, adminLevel: true, status: true, emailVerified: true, volunteerId: true }
     });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
     
-    // Build update data
-    const updateData: any = {
-      name,
-      email,
-      role,
-      constructionGroupId: constructionGroupId === '' ? null : constructionGroupId,
-      adminLevel: adminLevel === '' ? null : adminLevel,
-      status,
-    };
+    // Build update data from the fields that were sent
+    const updateData: any = {};
+    let nextFirst = '';
+    let nextLast = '';
+    if (typeof name === 'string') {
+      const parts = name.trim().split(/\s+/).filter(Boolean);
+      nextFirst = parts[0] || '';
+      nextLast = parts.slice(1).join(' ');
+      updateData.name = `${nextFirst} ${nextLast}`.trim();
+      updateData.firstName = nextFirst;
+      updateData.lastName = nextLast;
+    }
+    if (typeof email === 'string' && email.trim()) {
+      updateData.email = email.trim().toLowerCase();
+    }
+    if (role) updateData.role = role;
+    if (constructionGroupId !== undefined) {
+      updateData.constructionGroupId = constructionGroupId === '' ? null : constructionGroupId;
+    }
+    if (adminLevel !== undefined) {
+      updateData.adminLevel = adminLevel === '' ? null : adminLevel;
+    }
+    if (status) updateData.status = status;
 
     // Handle password change if provided
     if (password) {
@@ -57,31 +75,42 @@ export async function PATCH(
       updateData.emailVerified = null;
     }
     
-    // Update user
-    const updatedUser = await prisma.user.update({
-      where: { id: params.id },
-      data: updateData,
-    });
+    let updatedUser;
+    try {
+      updatedUser = await prisma.user.update({
+        where: { id: params.id },
+        data: updateData,
+      });
+    } catch (error) {
+      if (error instanceof Error && 'code' in error && (error as { code?: string }).code === 'P2002') {
+        return NextResponse.json({ error: 'That email belongs to someone else' }, { status: 409 });
+      }
+      throw error;
+    }
+
+    if (status === 'INACTIVE') {
+      await prisma.userInvitation.updateMany({
+        where: {
+          email: { equals: currentUser.email, mode: 'insensitive' },
+          status: { in: ['PENDING', 'SENT'] },
+        },
+        data: { status: 'CANCELLED', expiresAt: new Date() },
+      });
+    }
     
     // Sync volunteer data if user is linked to a volunteer
     try {
       if (updatedUser.volunteerId) {
         const volunteerData: any = {};
         
-        // Sync name changes
-        if (name) {
-          const nameParts = name.split(' ');
-          volunteerData.firstName = nameParts[0] || '';
-          volunteerData.lastName = nameParts.slice(1).join(' ') || '';
+        if (typeof name === 'string') {
+          volunteerData.firstName = nextFirst;
+          volunteerData.lastName = nextLast;
         }
         
-        // Sync email changes (volunteer email is source of truth)
-        if (email && email !== currentUser?.email) {
-          volunteerData.emailPersonal = email;
+        if (typeof email === 'string' && email.trim() && email.trim().toLowerCase() !== currentUser.email) {
+          volunteerData.emailPersonal = email.trim().toLowerCase();
         }
-        
-        // Sync status
-        volunteerData.isActive = status === 'ACTIVE';
         
         // Update volunteer if we have changes
         if (Object.keys(volunteerData).length > 0) {

@@ -24,18 +24,22 @@ export async function GET(request: NextRequest) {
     const totalUsers = await prisma.user.count({ where: personnel });
 
     const activeUsers = await prisma.user.count({
-      where: { AND: [personnel, { emailVerified: { not: null } }] },
+      where: { AND: [personnel, { emailVerified: { not: null }, status: { not: 'INACTIVE' } }] },
     });
 
     const invitedUsers = await prisma.user.count({
-      where: { AND: [personnel, { emailVerified: null }] },
+      where: { AND: [personnel, { emailVerified: null, status: { notIn: ['INACTIVE', 'SUSPENDED'] } }] },
+    });
+
+    const inactiveUsers = await prisma.user.count({
+      where: { AND: [personnel, { status: { in: ['INACTIVE', 'SUSPENDED'] } }] },
     });
     
     const stats = {
       total: totalUsers,
       active: activeUsers,
       invited: invitedUsers,
-      inactive: 0 // We don't have an inactive status in the schema
+      inactive: inactiveUsers,
     };
     
     return NextResponse.json({
