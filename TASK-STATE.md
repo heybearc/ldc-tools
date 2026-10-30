@@ -2,12 +2,12 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Hub dates stay paused. v1.41.0 is shipped.
+**Working on:** Hub assignments from the persons list. Dates are still missing, so nothing is ended.
 
 ---
 
 ## Current Task
-v1.41.0 is shipped. Hub start and end dates stay paused until the Persons export is back.
+v1.41.0 is shipped. The persons list is committed. It has no start or end dates, so older assignments are not ended yet.
 
 ### What I'm doing right now
 v1.41.0 (`16ffef1`) is LIVE on green (CT135) and synced to blue (CT133).

@@ -15,7 +15,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - Help emails only the Personnel Contact and Assistant. Replies and an unread mark stay on the work item. Chat is separate: one team room and direct messages, with browser notifications after Turn on notifications.
 - `bethel.jw.org` and `jwpub.org` are never mailed, on crew requests and on help. Crew-request completion email can be turned off on one request or in bulk.
 - Open urgent feedback: 0. Chat and the email toggles were not retested in the browser after `8b8291c`.
-- The Excel import template and `frontend/tsconfig.tsbuildinfo` are still uncommitted.
+- The persons list is in the trade leadership workbook. It has current roles and no start or end dates. Incomplete crew roles are left unchanged.
 
 ### Mid-day
 - Shipped v1.37.0 (`756ef8b`): directory profile from a name; admin name, email, and cancel invitation. Then v1.38.0 (`9f56415`): invite form on User Management and toast confirmations.
@@ -23,7 +23,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - An invited person only gets email from Send invitation email or Resend Invitation, and only when Email Configuration is active. The Invited label also means they have not finished setup.
 - The v1.31.0 announcement was still active through 2026-11-12. Dismiss did not stick. Set `isActive` false.
 - Open urgent feedback: 0.
-- The Excel import template and `frontend/tsconfig.tsbuildinfo` are still uncommitted.
+- The persons list is in the trade leadership workbook. It has current roles and no start or end dates. Incomplete crew roles are left unchanged.
 
 ### Discoveries / Notes
 - The form export is `Construction Group 01.12 LDC Crew Update Request(1-212).xlsx` (212 rows). Mapped columns: ID, Your Email, Choose an Action, Your Name, Volunteer Name, Volunteer BA ID, Crew Name, Project Roster Name, Questions or Comments. Four rows have a name and no email. The same form ID is skipped on a later import.
@@ -40,7 +40,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - Processes (`163f0a3`) are on STANDBY blue CT133. Starting a template creates a work item per step, with its explanation. The standby check passed. Not shipped.
 - `/help/projects` is no longer a retired route, so the projects help page loads.
 - Local `git push` over SSH was denied. The release and process commits went out with `gh` credentials.
-- The Excel import template and `frontend/tsconfig.tsbuildinfo` are still uncommitted.
+- The persons list is in the trade leadership workbook. It has current roles and no start or end dates. Incomplete crew roles are left unchanged.
 - Removed 167 volunteer records that were not in the directory and had no login. Removed Dathan Sours and Tobias Torres. Kept the other asked-about accounts.
 - Construction group section on CG 01.12: Cory Allen (Contact), Matt Hirsch (Assistant), Amber Allen, Cory L Test, Ruth Hirsch, Kennedy Allen, Amber Williams (Support). Ancillary is empty.
 - Support for those five is a volunteer role, not a PersonnelContact row.

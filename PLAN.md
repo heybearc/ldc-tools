@@ -101,9 +101,13 @@ Import the Microsoft Form spreadsheet `Construction Group 01.12 LDC Crew Update 
 
 Done when a spreadsheet import creates claimable tasks, someone can finish one, and the requestor is still on that task.
 
-### Paused
+### 7. Hub assignments — in progress
 
-Hub start and end dates. Waiting on the Persons export. If a person has an older assignment and a newer one, keep the current assignment.
+The persons list is in `docs/templates/LDC-Trade-Leadership-Import-Template.xlsx` (the sheet with Mobile Phone and Email Address). It has current roles and no start or end dates.
+
+A fully listed role names the trade and, for a crew role, the crew. Those are the current assignments. Any other assignment for that person is older. A role with no crew is incomplete, and that person is left unchanged. Nothing is written until the dates are in the list.
+
+Done when an older assignment gets an end date and the directory shows the current one.
 
 ### Do not build
 
