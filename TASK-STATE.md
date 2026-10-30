@@ -2,15 +2,15 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Region work queue, slice 4 (project schedule) on standby
+**Working on:** Release v1.34.0, then processes (slice 5)
 
 ---
 
 ## Current Task
-**Project schedule** — built (slice 4). Next is processes (slice 5) after this is on standby.
+**Processes** — next (slice 5), after v1.34.0 is live
 
 ### What I'm doing right now
-v1.33.0 is LIVE on blue (CT133). A project date is a work item: Personnel add it on the project, and it shows on the work list. Not shipped.
+v1.34.0 puts a project date on the project and on the work list. Next is a process template whose steps become work items.
 
 ### Recent completions
 - ✅ Shipped v1.33.0 (`9db88f9`); qa-01 full suite 61/61 plus the projects tests passed
@@ -23,7 +23,7 @@ v1.33.0 is LIVE on blue (CT133). A project date is a work item: Personnel add it
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Processes (slice 5), after slice 4 is on standby
+Build processes (slice 5)
 
 ---
 
@@ -35,4 +35,4 @@ Processes (slice 5), after slice 4 is on standby
 ---
 
 ## Exact Next Command
-Processes (slice 5), after slice 4 is on standby
+Build processes (slice 5)

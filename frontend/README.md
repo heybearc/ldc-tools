@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.33.0**
+Current: **1.34.0**
 
 ## Version History
+- **v1.34.0** (2026-10-30) - Dated work on a project also shows on the work list
 - **v1.33.0** (2026-10-29) - Projects list for the construction group, with Personnel assigned by oversight
 - **v1.32.0** (2026-10-29) - Work list for the construction group
 - **v1.31.0** (2026-10-29) - Construction group contacts and ancillary people on the directory
@@ -36,6 +37,7 @@ Current: **1.33.0**
 ### Projects
 - Projects for the signed-in construction group
 - Oversight assigns Personnel to a project
+- Personnel add a date on a project, and that date shows on the work list
 - Crews, budget, and congregations stay off this list
 
 ### Trade Team Management

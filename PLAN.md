@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.33.0 is LIVE on blue (CT133). Slice 4 (project dates) is the unreleased work. Hub dates are paused.
+**Status:** v1.34.0 is the project-date release. Next is processes (slice 5). Hub dates are paused.
 
 ---
 

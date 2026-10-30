@@ -1,5 +1,14 @@
 # LDC Tools Release Notes
 
+## v1.34.0 - Project dates
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- Personnel can add dated work on a project
+- That date stays on the project and also shows on the work list
+
 ## v1.33.0 - Projects
 
 **Release Date:** October 29, 2026
