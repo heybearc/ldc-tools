@@ -110,6 +110,7 @@ credentials/
 # Temporary files
 tmp/
 temp/
+*.tsbuildinfo
 *.tmp
 *.temp
 
