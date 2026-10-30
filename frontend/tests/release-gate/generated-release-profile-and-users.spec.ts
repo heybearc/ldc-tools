@@ -82,8 +82,10 @@ test('an admin can type a user name and email, and can cancel an invitation', as
   expect(users.length).toBeGreaterThan(0);
   expect(typeof inactive).toBe('number');
 
-  const inactiveCard = page.locator('div').filter({ has: page.getByText('Inactive', { exact: true }) }).last();
-  await expect(inactiveCard.getByText(String(inactive), { exact: true })).toBeVisible();
+  const inactiveCount = page.locator('dl').filter({
+    has: page.getByRole('term', { name: 'Inactive', exact: true }),
+  }).getByRole('definition');
+  await expect(inactiveCount).toHaveText(String(inactive));
 
   const person = users.find((user) => user.name && user.email) || users[0];
   const row = page.locator('tr').filter({ hasText: person.email });
