@@ -1,0 +1,1 @@
+ALTER TYPE "WorkTimingKind" ADD VALUE 'NONE';

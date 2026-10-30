@@ -996,6 +996,7 @@ enum WorkTimingKind {
   YEARLY
   PROCESS
   CREW_REQUEST
+  NONE
 }
 
 enum WorkStatus {

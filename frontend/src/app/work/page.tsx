@@ -15,7 +15,7 @@ interface WorkItem {
   detail: string;
   explanation: string | null;
   referenceUrl: string | null;
-  timingKind: 'DEADLINE' | 'PROJECT_DATE' | 'MONTHLY' | 'YEARLY' | 'PROCESS' | 'CREW_REQUEST';
+  timingKind: 'DEADLINE' | 'PROJECT_DATE' | 'MONTHLY' | 'YEARLY' | 'PROCESS' | 'CREW_REQUEST' | 'NONE';
   timingLabel: string;
   project: { id: string; name: string } | null;
   claimable: boolean;
@@ -62,6 +62,10 @@ export default function WorkPage() {
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+  const [bulkAssigneeId, setBulkAssigneeId] = useState('');
+  const [assigning, setAssigning] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -153,6 +157,53 @@ export default function WorkPage() {
     } finally {
       setImporting(false);
       if (fileInput.current) fileInput.current.value = '';
+    }
+  }
+
+  function toggleSelected(id: string, index: number, shiftKey: boolean) {
+    setSelectedIds((current) => {
+      const selected = new Set(current);
+      if (shiftKey && lastSelectedIndex !== null) {
+        const start = Math.min(lastSelectedIndex, index);
+        const end = Math.max(lastSelectedIndex, index);
+        const range = openItems.slice(start, end + 1).map((item) => item.id);
+        const turningOn = !selected.has(id);
+        range.forEach((itemId) => {
+          if (turningOn) selected.add(itemId);
+          else selected.delete(itemId);
+        });
+      } else if (selected.has(id)) {
+        selected.delete(id);
+      } else {
+        selected.add(id);
+      }
+      return Array.from(selected);
+    });
+    setLastSelectedIndex(index);
+  }
+
+  async function assignSelected() {
+    if (!bulkAssigneeId || selectedIds.length === 0) return;
+    setAssigning(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch('/api/v1/work-items/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds, assigneeId: bulkAssigneeId }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error || 'Failed to assign work');
+        return;
+      }
+      setNotice(`Assigned ${body.assigned} task${body.assigned === 1 ? '' : 's'}.`);
+      setSelectedIds([]);
+      setLastSelectedIndex(null);
+      await load();
+    } finally {
+      setAssigning(false);
     }
   }
 
@@ -278,6 +329,7 @@ export default function WorkPage() {
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
               >
                 <option value="DEADLINE">Deadline</option>
+                <option value="NONE">No deadline</option>
                 <option value="PROJECT_DATE">Date on a project</option>
                 <option value="MONTHLY">Monthly</option>
                 <option value="YEARLY">Yearly</option>
@@ -378,13 +430,41 @@ export default function WorkPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {openItems.map((item) => (
+          {data?.canAssign && selectedIds.length > 0 && (
+            <div className="bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row sm:items-end gap-3">
+              <p className="text-sm font-medium text-gray-800 sm:mb-2">{selectedIds.length} selected</p>
+              <label className="block flex-1">
+                <span className="text-sm font-medium text-gray-700">Assign to</span>
+                <select
+                  value={bulkAssigneeId}
+                  onChange={(event) => setBulkAssigneeId(event.target.value)}
+                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
+                >
+                  <option value="">Choose a person</option>
+                  {data.teammates.map((person) => (
+                    <option key={person.id} value={person.id}>{personName(person)}</option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                disabled={assigning || !bulkAssigneeId}
+                onClick={assignSelected}
+                className="px-4 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
+              >
+                {assigning ? 'Assigning…' : 'Assign selected'}
+              </button>
+            </div>
+          )}
+          {openItems.map((item, index) => (
             <WorkRow
               key={item.id}
               item={item}
               currentUserId={data?.currentUserId || ''}
               canAssign={Boolean(data?.canAssign)}
               busy={busyId === item.id}
+              selected={selectedIds.includes(item.id)}
+              onToggle={(shiftKey) => toggleSelected(item.id, index, shiftKey)}
               onClaim={() => claim(item.id)}
               onDone={() => setStatus(item.id, 'DONE')}
             />
@@ -414,6 +494,8 @@ function WorkRow({
   currentUserId,
   canAssign,
   busy,
+  selected,
+  onToggle,
   onClaim,
   onDone,
 }: {
@@ -421,6 +503,8 @@ function WorkRow({
   currentUserId: string;
   canAssign: boolean;
   busy: boolean;
+  selected?: boolean;
+  onToggle?: (shiftKey: boolean) => void;
   onClaim: () => void;
   onDone: () => void;
 }) {
@@ -431,7 +515,17 @@ function WorkRow({
   return (
     <article className="bg-white rounded-lg shadow p-5">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-        <div className="min-w-0">
+        {onToggle && (
+          <input
+            type="checkbox"
+            checked={Boolean(selected)}
+            aria-label={`Select ${item.title}`}
+            onClick={(event) => onToggle(event.shiftKey)}
+            onChange={() => undefined}
+            className="mt-1 h-5 w-5"
+          />
+        )}
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
             <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">

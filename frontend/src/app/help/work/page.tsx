@@ -35,7 +35,7 @@ export default async function WorkHelpPage() {
           <h2>Add a task</h2>
           <p>
             Personnel Contact, Assistant, and Support can add work. Open Work, choose Add work, and enter a title and detail.
-            Timing is a deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable.
+            Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable. Select several open tasks, including with Shift, and assign them to one person.
           </p>
 
           <h2>Claim a task</h2>

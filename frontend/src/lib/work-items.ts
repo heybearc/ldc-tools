@@ -1,4 +1,4 @@
-export const WORK_TIMING_KINDS = ['DEADLINE', 'PROJECT_DATE', 'MONTHLY', 'YEARLY', 'PROCESS', 'CREW_REQUEST'] as const;
+export const WORK_TIMING_KINDS = ['DEADLINE', 'PROJECT_DATE', 'MONTHLY', 'YEARLY', 'PROCESS', 'CREW_REQUEST', 'NONE'] as const;
 export type WorkTimingKind = (typeof WORK_TIMING_KINDS)[number];
 
 export const PERSONNEL_ROLE_CODES = ['PC', 'PCA', 'PC-Support', 'PC_SUPPORT'] as const;
@@ -39,6 +39,7 @@ export function timingLabel(
   if (kind === 'YEARLY') return 'Yearly';
   if (kind === 'PROCESS') return projectName ? `Process · ${projectName}` : 'Process';
   if (kind === 'CREW_REQUEST') return 'Crew request';
+  if (kind === 'NONE') return 'No deadline';
   const date = formatCalendarDate(dueOn);
   if (kind === 'PROJECT_DATE') {
     return [date, projectName].filter(Boolean).join(' · ');
@@ -64,7 +65,7 @@ export function validateWorkItemInput(body: Record<string, unknown>): { ok: true
 
   const timingKind = body.timingKind;
   if (typeof timingKind !== 'string' || !(WORK_TIMING_KINDS as readonly string[]).includes(timingKind)) {
-    return { ok: false, error: 'Choose a deadline, a project date, or a monthly or yearly repeat' };
+    return { ok: false, error: 'Choose a deadline, no deadline, a project date, or a monthly or yearly repeat' };
   }
 
   const dueOn = optionalText(body.dueOn);
@@ -111,7 +112,7 @@ export function validateWorkItemInput(body: Record<string, unknown>): { ok: true
       explanation: optionalText(body.explanation),
       referenceUrl,
       timingKind: timingKind as WorkTimingKind,
-      dueOn: timingKind === 'MONTHLY' || timingKind === 'YEARLY' || timingKind === 'PROCESS' || timingKind === 'CREW_REQUEST' ? null : dueOn,
+      dueOn: timingKind === 'MONTHLY' || timingKind === 'YEARLY' || timingKind === 'PROCESS' || timingKind === 'CREW_REQUEST' || timingKind === 'NONE' ? null : dueOn,
       projectId,
       claimable: body.claimable === true,
       assigneeId: optionalText(body.assigneeId),

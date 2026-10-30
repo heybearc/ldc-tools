@@ -38,12 +38,15 @@ export default function CGSelector() {
         const storedCG = localStorage.getItem('selectedCG');
         if (storedCG && storedCG !== filter.constructionGroupId) {
           setSelectedCG(storedCG);
-          await fetch('/api/v1/user/set-cg-filter', {
+          const saved = await fetch('/api/v1/user/set-cg-filter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ constructionGroupId: storedCG }),
           });
-          window.dispatchEvent(new CustomEvent('cg-filter-changed'));
+          if (saved.ok) {
+            window.location.replace(window.location.pathname + window.location.search);
+            return;
+          }
         } else if (filter.viewingAll) {
           setSelectedCG(null);
         } else if (filter.constructionGroupId || data.effectiveConstructionGroupId) {

@@ -17,7 +17,7 @@ function serialize(item: {
   detail: string;
   explanation: string | null;
   referenceUrl: string | null;
-  timingKind: 'DEADLINE' | 'PROJECT_DATE' | 'MONTHLY' | 'YEARLY' | 'PROCESS' | 'CREW_REQUEST';
+  timingKind: 'DEADLINE' | 'PROJECT_DATE' | 'MONTHLY' | 'YEARLY' | 'PROCESS' | 'CREW_REQUEST' | 'NONE';
   dueOn: Date | null;
   claimable: boolean;
   status: 'OPEN' | 'DONE';
