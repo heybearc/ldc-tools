@@ -76,8 +76,6 @@ export async function POST(
           firstName: user.name?.split(' ')[0] || '',
           lastName: user.name?.split(' ').slice(1).join(' ') || '',
           role: user.role,
-          regionId: '',
-          zoneId: '',
           invitedBy: session.user?.id || '',
           invitationToken: inviteToken,
           expiresAt: inviteExpires,
