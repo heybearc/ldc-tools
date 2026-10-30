@@ -7,12 +7,13 @@
 ---
 
 ## Current Task
-v1.39.0 is shipped. Hub start and end dates stay paused until the Persons export is back.
+v1.40.0 is shipped. Hub start and end dates stay paused until the Persons export is back.
 
 ### What I'm doing right now
-v1.39.0 (`6ab0f34`) is LIVE on green (CT135) and STANDBY on blue (CT133). qa-01 full suite 69/69 plus the crew-import test passed.
+v1.40.0 (`9f368a3`) is LIVE on blue (CT133) and STANDBY on green (CT135). qa-01 full suite 71/71 plus the work-assign tests passed.
 
 ### Recent completions
+- ✅ Shipped v1.40.0 (`9f368a3`). Work opens on the group already chosen. A task can have no deadline. Several open tasks can be assigned to one person. qa-01 full suite 71/71. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.39.0 (`6ab0f34`). Crew-update import creates claimable work and keeps the requestor. qa-01 full suite 69/69. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.38.1 (`e384d04`). Resend Invitation no longer writes region fields. qa-01 admin gate passed. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.38.0 (`9f56415`). Invite form on User Management. Confirmations are toasts.

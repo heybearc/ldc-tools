@@ -6,7 +6,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
-- Shipped v1.39.0 (`6ab0f34`). LIVE green CT135, STANDBY blue CT133. qa-01 full suite 69/69 plus the crew-import test. Hub dates stay paused.
+- Shipped v1.40.0 (`9f368a3`). LIVE blue CT133, STANDBY green CT135. qa-01 full suite 71/71. Work uses the header group, a task can have no deadline, and several tasks can be assigned together. Bulk claim was left out. Hub dates stay paused.
 
 ### Mid-day
 - Shipped v1.37.0 (`756ef8b`): directory profile from a name; admin name, email, and cancel invitation. Then v1.38.0 (`9f56415`): invite form on User Management and toast confirmations.
