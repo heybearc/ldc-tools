@@ -78,11 +78,12 @@ test('an admin can type a user name and email, and can cancel an invitation', as
   const usersPayload = await (await usersResponse).json();
   const statsPayload = await (await statsResponse).json();
   const users = (usersPayload.users || []) as { name: string; email: string; status: string }[];
+  const inactive = statsPayload.stats?.inactive;
   expect(users.length).toBeGreaterThan(0);
-  expect(typeof statsPayload.inactive).toBe('number');
+  expect(typeof inactive).toBe('number');
 
   const inactiveCard = page.locator('div').filter({ has: page.getByText('Inactive', { exact: true }) }).last();
-  await expect(inactiveCard.getByText(String(statsPayload.inactive), { exact: true })).toBeVisible();
+  await expect(inactiveCard.getByText(String(inactive), { exact: true })).toBeVisible();
 
   const person = users.find((user) => user.name && user.email) || users[0];
   const row = page.locator('tr').filter({ hasText: person.email });
