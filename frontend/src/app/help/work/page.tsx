@@ -43,6 +43,14 @@ export default async function WorkHelpPage() {
             When a claimable task has no assignee, anyone signed in to this construction group can choose Claim. That assigns the task to you.
           </p>
 
+          <h2>Import crew requests</h2>
+          <p>
+            Personnel can import the Microsoft Form spreadsheet from Work. Each row becomes a claimable task
+            with the requestor, volunteer, crew, project roster, and comments. Importing the same spreadsheet again
+            does not add those rows a second time. Marking the task Done keeps the requestor on it. If email is
+            already configured, the requestor is told.
+          </p>
+
           <h2>Finish a task</h2>
           <p>
             The assignee, or Personnel, can mark the task Done. Done tasks stay on the list under Done.

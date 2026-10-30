@@ -995,6 +995,7 @@ enum WorkTimingKind {
   MONTHLY
   YEARLY
   PROCESS
+  CREW_REQUEST
 }
 
 enum WorkStatus {
@@ -1018,6 +1019,7 @@ model WorkItem {
   status              WorkStatus     @default(OPEN)
   requestorName       String?
   requestorEmail      String?
+  importKey           String?
   createdById         String
   claimedAt           DateTime?
   completedAt         DateTime?
@@ -1029,6 +1031,7 @@ model WorkItem {
   assignee            User?             @relation("WorkItemAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   createdBy           User              @relation("WorkItemCreator", fields: [createdById], references: [id], onDelete: Restrict)
 
+  @@unique([constructionGroupId, importKey])
   @@index([constructionGroupId])
   @@index([status])
   @@index([assigneeId])

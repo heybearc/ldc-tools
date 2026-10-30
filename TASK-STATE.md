@@ -2,15 +2,15 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Slice 6 when the spreadsheet arrives
+**Working on:** Slice 6 crew-request import on STANDBY
 
 ---
 
 ## Current Task
-Crew-request import (slice 6) still waits on the spreadsheet.
+Crew-request import (slice 6) reads the Construction Group 01.12 form export and creates claimable work.
 
 ### What I'm doing right now
-v1.38.1 (`e384d04`) is LIVE on blue (CT133). STANDBY green (CT135) is the same commit.
+v1.38.1 (`e384d04`) is LIVE on blue (CT133). Crew-request import is deploying to STANDBY green (CT135).
 
 ### Recent completions
 - ✅ Shipped v1.38.1 (`e384d04`). Resend Invitation no longer writes region fields. qa-01 admin gate passed. LIVE blue CT133, STANDBY green CT135.
@@ -32,7 +32,7 @@ v1.38.1 (`e384d04`) is LIVE on blue (CT133). STANDBY green (CT135) is the same c
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Crew-request import (slice 6) once the spreadsheet is here
+Import the crew-update spreadsheet on Work, then finish one task and confirm the requestor stays on it.
 
 ---
 
@@ -44,4 +44,4 @@ Crew-request import (slice 6) once the spreadsheet is here
 ---
 
 ## Exact Next Command
-Crew-request import (slice 6) once the spreadsheet is here
+Import the crew-update spreadsheet on Work, then finish one task and confirm the requestor stays on it.

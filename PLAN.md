@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.38.1 is LIVE on blue (CT133) at `e384d04`. STANDBY green (CT135) matches. Next is slice 6, waiting on the crew-request spreadsheet. Hub dates are paused.
+**Status:** v1.38.1 is LIVE on blue (CT133) at `e384d04`. Slice 6 imports the crew-update form onto the work list. Hub dates are paused.
 
 ---
 
@@ -30,7 +30,7 @@
 - [x] CG 01.12 Personnel roster loaded; profile links on STANDBY (`12d9e2b`)
 - [x] Directory profiles, invite form, toasts; `/ship` v1.37.0 and v1.38.0
 - [x] Resend Invitation; `/ship` v1.38.1
-- [ ] Slice 6 below — blocked until the Microsoft Form spreadsheet is in hand
+- [x] Slice 6 — crew-request spreadsheet import onto the work list
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
@@ -95,9 +95,9 @@ A process template belongs to the construction group. Each step has an explanati
 
 Done when a template can be started and its steps show on the work list with their explanations.
 
-### 6. Crew-request import
+### 6. Crew-request import — done
 
-Import the Microsoft Form spreadsheet. Each row becomes a work item. There is no form to fill out. Use the detail already stored on a crew-change request: requestor, volunteer, crew, project, comments. Map the sheet’s columns once, when the file is in hand. Completing the item records that it is done and keeps the requestor on the row so they can be told. Send email when mail is already configured. Do not block this slice on new email setup.
+Import the Microsoft Form spreadsheet `Construction Group 01.12 LDC Crew Update Request`. Each row becomes a claimable work item. Columns: ID, Your Email, Choose an Action, Your Name, Volunteer Name, Volunteer BA ID, Crew Name, Project Roster Name, Questions or Comments. Completing the item keeps the requestor and sends email when mail is already configured. Importing the same form ID again does not add a second task.
 
 Done when a spreadsheet import creates claimable tasks, someone can finish one, and the requestor is still on that task.
 
@@ -114,7 +114,7 @@ Mobile and PWA wait until the work list is in use.
 ## Prioritized Backlog
 
 ### High Priority
-- [ ] Slices 1–6 above
+- [x] Slices 1–6 above
 
 ### Do not archive
 Projects and crew-change requests stay. The schedule is dated work on the work list, not the old crew calendar. Archive the volunteer roster, congregations, budget, and crew-to-project assignment.

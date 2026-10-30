@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
+import { sendWorkCompletionEmail } from '@/lib/work-completion-email';
 
 export async function PATCH(
   request: NextRequest,
@@ -27,7 +28,16 @@ export async function PATCH(
 
     const item = await prisma.workItem.findUnique({
       where: { id: params.id },
-      select: { id: true, constructionGroupId: true, assigneeId: true },
+      select: {
+        id: true,
+        constructionGroupId: true,
+        assigneeId: true,
+        status: true,
+        title: true,
+        detail: true,
+        requestorName: true,
+        requestorEmail: true,
+      },
     });
     if (!item || !canAccessCG(scope, item.constructionGroupId)) {
       return NextResponse.json({ error: 'Work item not found' }, { status: 404 });
@@ -45,10 +55,30 @@ export async function PATCH(
         status: body.status,
         completedAt: body.status === 'DONE' ? new Date() : null,
       },
-      select: { id: true, status: true },
+      select: {
+        id: true,
+        status: true,
+        requestorName: true,
+        requestorEmail: true,
+      },
     });
 
-    return NextResponse.json(updated);
+    let emailSent = false;
+    if (body.status === 'DONE' && item.status !== 'DONE' && item.requestorEmail) {
+      try {
+        emailSent = await sendWorkCompletionEmail({
+          requestorName: item.requestorName,
+          requestorEmail: item.requestorEmail,
+          title: item.title,
+          detail: item.detail,
+          completedByName: session.user.name || 'Personnel',
+        });
+      } catch (emailError) {
+        console.error('Work completion email failed:', emailError);
+      }
+    }
+
+    return NextResponse.json({ ...updated, emailSent });
   } catch (error) {
     console.error('Update work item error:', error);
     return NextResponse.json({ error: 'Failed to update work' }, { status: 500 });

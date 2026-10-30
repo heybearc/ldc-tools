@@ -6,7 +6,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
-- v1.38.1 (`e384d04`) is LIVE on blue (CT133). STANDBY green (CT135) matches. Crew-request import still waits on the spreadsheet.
+- Slice 6 imports the Construction Group 01.12 crew-update form onto the work list. v1.38.1 (`e384d04`) is still LIVE on blue (CT133).
 
 ### Mid-day
 - Shipped v1.37.0 (`756ef8b`): directory profile from a name; admin name, email, and cancel invitation. Then v1.38.0 (`9f56415`): invite form on User Management and toast confirmations.
@@ -17,6 +17,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - The Excel import template and `frontend/tsconfig.tsbuildinfo` are still uncommitted.
 
 ### Discoveries / Notes
+- The form export is `Construction Group 01.12 LDC Crew Update Request(1-212).xlsx` (212 rows). Mapped columns: ID, Your Email, Choose an Action, Your Name, Volunteer Name, Volunteer BA ID, Crew Name, Project Roster Name, Questions or Comments. Four rows have a name and no email. The same form ID is skipped on a later import.
 - Shipped v1.36.0 (`7537896`). Admin is a direct link. User management lists this region's Personnel. Super admin and Personnel keep a construction group, so Work and Projects can add items. LIVE green CT135, STANDBY was synced to the same commit.
 - CG 01.12 Personnel roster from the hub screenshot is in the shared database, including invited user accounts. New accounts have no password until an admin sets one.
 - Personnel, Construction group, and Ancillary names open a profile on STANDBY (`12d9e2b`). Live does not have that until the next ship.

@@ -1,7 +1,7 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { ClipboardList, Plus } from 'lucide-react';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ClipboardList, Plus, Upload } from 'lucide-react';
 
 interface Person {
   id: string;
@@ -15,7 +15,7 @@ interface WorkItem {
   detail: string;
   explanation: string | null;
   referenceUrl: string | null;
-  timingKind: 'DEADLINE' | 'PROJECT_DATE' | 'MONTHLY' | 'YEARLY';
+  timingKind: 'DEADLINE' | 'PROJECT_DATE' | 'MONTHLY' | 'YEARLY' | 'PROCESS' | 'CREW_REQUEST';
   timingLabel: string;
   project: { id: string; name: string } | null;
   claimable: boolean;
@@ -59,7 +59,10 @@ export default function WorkPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [notice, setNotice] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     setError('');
@@ -131,6 +134,28 @@ export default function WorkPage() {
     }
   }
 
+  async function onImport(file: File) {
+    setImporting(true);
+    setError('');
+    setNotice('');
+    try {
+      const body = new FormData();
+      body.set('file', file);
+      const response = await fetch('/api/v1/work-items/import', { method: 'POST', body });
+      const result = await response.json();
+      if (!response.ok) {
+        setError(result.error || 'Failed to import crew requests');
+        return;
+      }
+      const skipped = result.skipped ? ` ${result.skipped} already on the list or blank.` : '';
+      setNotice(`Imported ${result.created} crew request${result.created === 1 ? '' : 's'}.${skipped}`);
+      await load();
+    } finally {
+      setImporting(false);
+      if (fileInput.current) fileInput.current.value = '';
+    }
+  }
+
   async function setStatus(id: string, status: 'OPEN' | 'DONE') {
     setBusyId(id);
     setError('');
@@ -165,19 +190,43 @@ export default function WorkPage() {
           </p>
         </div>
         {data?.canAssign && (
-          <button
-            type="button"
-            onClick={() => setShowForm((open) => !open)}
-            className="inline-flex items-center justify-center px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add work
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <input
+              ref={fileInput}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              className="sr-only"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) onImport(file);
+              }}
+            />
+            <button
+              type="button"
+              disabled={importing}
+              onClick={() => fileInput.current?.click()}
+              className="inline-flex items-center justify-center px-4 py-2 min-h-[44px] rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              {importing ? 'Importing…' : 'Import crew requests'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowForm((open) => !open)}
+              className="inline-flex items-center justify-center px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add work
+            </button>
+          </div>
         )}
       </div>
 
       {error && (
         <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>
+      )}
+      {notice && (
+        <p className="rounded-md bg-green-50 text-green-800 px-4 py-3 text-sm">{notice}</p>
       )}
 
       {showForm && data?.canAssign && (
