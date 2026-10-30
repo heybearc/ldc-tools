@@ -40,7 +40,13 @@ export default function MyWorkPage() {
       load();
     };
     window.addEventListener('cg-filter-changed', onGroupChange);
-    return () => window.removeEventListener('cg-filter-changed', onGroupChange);
+    const refresh = window.setInterval(() => {
+      if (document.visibilityState === 'visible') load();
+    }, 20000);
+    return () => {
+      window.removeEventListener('cg-filter-changed', onGroupChange);
+      window.clearInterval(refresh);
+    };
   }, [load]);
 
   async function setStatus(id: string, status: 'OPEN' | 'DONE') {

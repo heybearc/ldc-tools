@@ -19,6 +19,7 @@ interface Step {
 
 interface WorkNote {
   id: string;
+  parentId?: string | null;
   kind: 'NOTE' | 'HELP';
   body: string;
   createdAt: string;
@@ -42,6 +43,7 @@ export interface WorkItem {
   completedAt: string | null;
   steps: Step[];
   notes: WorkNote[];
+  helpUnread?: boolean;
 }
 
 interface ProcessOffer {
@@ -138,7 +140,13 @@ export default function WorkPage() {
       load();
     };
     window.addEventListener('cg-filter-changed', onGroupChange);
-    return () => window.removeEventListener('cg-filter-changed', onGroupChange);
+    const refresh = window.setInterval(() => {
+      if (document.visibilityState === 'visible') load();
+    }, 20000);
+    return () => {
+      window.removeEventListener('cg-filter-changed', onGroupChange);
+      window.clearInterval(refresh);
+    };
   }, [load]);
 
   const needsDate = form.timingKind === 'DEADLINE' || form.timingKind === 'PROJECT_DATE';
@@ -816,7 +824,123 @@ function StepList({ steps }: { steps: Step[] }) {
   );
 }
 
-export function WorkRow({
+export function NoteList({
+  itemId,
+  notes,
+  onChanged,
+}: {
+  itemId: string;
+  notes: WorkNote[];
+  onChanged: () => Promise<void>;
+}) {
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [reply, setReply] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const marked = useRef(false);
+  const top = notes.filter((note) => !note.parentId);
+  if (top.length === 0) return null;
+
+  async function markRead() {
+    if (marked.current) return;
+    marked.current = true;
+    await fetch(`/api/v1/work-items/${itemId}/help-read`, { method: 'POST' });
+    await onChanged();
+  }
+
+  async function sendReply(parentId: string) {
+    const text = reply.trim();
+    if (!text) {
+      setError('Write a reply');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/v1/work-items/${itemId}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body: text, kind: 'NOTE', parentId }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error || 'Failed to reply');
+        return;
+      }
+      setReply('');
+      setReplyTo(null);
+      await markRead();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <ul className="mt-3 space-y-2">
+      {top.map((entry) => {
+        const replies = notes.filter((note) => note.parentId === entry.id);
+        return (
+          <li key={entry.id} className={`rounded-md px-3 py-2 text-sm ${entry.kind === 'HELP' ? 'bg-amber-50 text-amber-950' : 'bg-gray-50 text-gray-800'}`}>
+            <p className="font-medium">
+              {entry.kind === 'HELP' ? 'Asked for help' : 'Note'}
+              {' · '}
+              {personName(entry.author)}
+              {' · '}
+              {formatDone(entry.createdAt)}
+            </p>
+            <p className="mt-1 whitespace-pre-wrap">{entry.body}</p>
+            {replies.length > 0 && (
+              <ul className="mt-2 space-y-2 border-l-2 border-amber-200 pl-3">
+                {replies.map((child) => (
+                  <li key={child.id}>
+                    <p className="font-medium">
+                      Reply · {personName(child.author)} · {formatDone(child.createdAt)}
+                    </p>
+                    <p className="whitespace-pre-wrap">{child.body}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {entry.kind === 'HELP' && (
+              <div className="mt-2">
+                {replyTo === entry.id ? (
+                  <div className="space-y-2">
+                    <textarea
+                      rows={2}
+                      value={reply}
+                      onFocus={() => { markRead().catch(() => undefined); }}
+                      onChange={(event) => setReply(event.target.value)}
+                      className="w-full rounded-md border border-amber-300 px-3 py-2 text-gray-900"
+                    />
+                    {error && <p className="text-red-700">{error}</p>}
+                    <button
+                      type="button"
+                      disabled={saving}
+                      onClick={() => sendReply(entry.id)}
+                      className="px-3 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
+                    >
+                      {saving ? 'Sending…' : 'Reply'}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setReplyTo(entry.id)}
+                    className="text-sm font-medium text-amber-900 hover:underline"
+                  >
+                    Reply
+                  </button>
+                )}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function WorkRow({
   item,
   currentUserId,
   canAssign,
@@ -900,6 +1024,11 @@ export function WorkRow({
             <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
               {item.timingLabel}
             </span>
+            {item.helpUnread && (
+              <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-900">
+                Unread
+              </span>
+            )}
             {item.claimable && item.status === 'OPEN' && (
               <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
                 Claimable
@@ -928,22 +1057,7 @@ export function WorkRow({
             </a>
           )}
           <StepList steps={item.steps || []} />
-          {(item.notes || []).length > 0 && (
-            <ul className="mt-3 space-y-2">
-              {item.notes.map((entry) => (
-                <li key={entry.id} className={`rounded-md px-3 py-2 text-sm ${entry.kind === 'HELP' ? 'bg-amber-50 text-amber-950' : 'bg-gray-50 text-gray-800'}`}>
-                  <p className="font-medium">
-                    {entry.kind === 'HELP' ? 'Asked for help' : 'Note'}
-                    {' · '}
-                    {personName(entry.author)}
-                    {' · '}
-                    {formatDone(entry.createdAt)}
-                  </p>
-                  <p className="mt-1 whitespace-pre-wrap">{entry.body}</p>
-                </li>
-              ))}
-            </ul>
-          )}
+          <NoteList itemId={item.id} notes={item.notes || []} onChanged={onChanged} />
           <div className="mt-3 space-y-2">
             <label className="block">
               <span className="text-sm font-medium text-gray-700">Note or help</span>

@@ -12,6 +12,35 @@ function userInGroupWhere(constructionGroupId: string) {
   };
 }
 
+export async function isPersonnelLead(userId: string, constructionGroupId: string): Promise<boolean> {
+  const [contact, volunteerRole] = await Promise.all([
+    prisma.personnelContact.findFirst({
+      where: {
+        userId,
+        constructionGroupId,
+        isActive: true,
+        endDate: null,
+        role: { in: ['PC', 'PCA'] },
+      },
+      select: { id: true },
+    }),
+    prisma.volunteerRole.findFirst({
+      where: {
+        isActive: true,
+        endDate: null,
+        roleCode: { in: ['PC', 'PCA'] },
+        volunteer: {
+          isActive: true,
+          constructionGroupId,
+          user: { id: userId },
+        },
+      },
+      select: { id: true },
+    }),
+  ]);
+  return Boolean(contact || volunteerRole);
+}
+
 export async function canPostWork(userId: string, scope: CGScope): Promise<boolean> {
   if (!scope.constructionGroupId) return false;
   if (scope.userRole === 'SUPER_ADMIN' || scope.userRole === 'ADMIN') return true;

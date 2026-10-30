@@ -16,7 +16,7 @@ interface OverviewTeam {
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [groupName, setGroupName] = useState<string | null>(null);
-  const [stats, setStats] = useState({ teams: 0, crews: 0, people: 0, available: 0, mine: 0, help: 0 });
+  const [stats, setStats] = useState({ teams: 0, crews: 0, people: 0, available: 0, mine: 0, help: 0, unread: 0 });
   const [myTitles, setMyTitles] = useState<string[]>([]);
 
   useEffect(() => {
@@ -76,8 +76,9 @@ export default function HomePage() {
             status: string;
             claimable: boolean;
             assignee: { id: string } | null;
-            notes?: Array<{ kind: string }>;
-          }>;
+              notes?: Array<{ kind: string }>;
+              helpUnread?: boolean;
+            }>;
           const open = items.filter((item) => item.status === 'OPEN');
           const assigned = open.filter((item) => item.assignee?.id === userId);
           setMyTitles(assigned.slice(0, 5).map((item) => item.title));
@@ -86,6 +87,7 @@ export default function HomePage() {
             available: open.filter((item) => item.claimable && !item.assignee).length + (work.processes?.length || 0),
             mine: assigned.length,
             help: open.filter((item) => (item.notes || []).some((note) => note.kind === 'HELP')).length,
+            unread: open.filter((item) => item.helpUnread).length,
           }));
         }
       } catch (error) {
@@ -148,6 +150,7 @@ export default function HomePage() {
           <p className="mt-4 text-sm text-amber-900">
             <Link href="/work#help" className="font-medium hover:underline">
               {stats.help} open {stats.help === 1 ? 'item has' : 'items have'} a request for help
+              {stats.unread > 0 ? ` · ${stats.unread} unread` : ''}
             </Link>
           </p>
         )}

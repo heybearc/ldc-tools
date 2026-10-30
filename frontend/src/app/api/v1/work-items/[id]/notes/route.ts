@@ -41,18 +41,30 @@ export async function POST(
       return NextResponse.json({ error: 'Work item not found' }, { status: 404 });
     }
 
+    const parentId = typeof body.parentId === 'string' && body.parentId ? body.parentId : null;
+    if (parentId) {
+      const parent = await prisma.workNote.findFirst({
+        where: { id: parentId, workItemId: item.id, kind: 'HELP', parentId: null },
+        select: { id: true },
+      });
+      if (!parent) {
+        return NextResponse.json({ error: 'That help request was not found' }, { status: 400 });
+      }
+    }
+
     const note = await prisma.workNote.create({
       data: {
         workItemId: item.id,
         authorId: session.user.id,
-        kind,
+        parentId,
+        kind: parentId ? 'NOTE' : kind,
         body: text,
       },
       include: { author: { select: { id: true, name: true, email: true } } },
     });
 
     let notified = 0;
-    if (kind === 'HELP') {
+    if (!parentId && kind === 'HELP') {
       try {
         const [contacts, volunteers] = await Promise.all([
           prisma.personnelContact.findMany({

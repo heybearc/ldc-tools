@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope, withCGFilter } from '@/lib/cg-scope';
-import { activeUserInGroup, canPostWork, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
+import { activeUserInGroup, canPostWork, isPersonnelLead, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
 import { dueOnDate, timingLabel, validateWorkItemInput } from '@/lib/work-items';
 
 const itemInclude = {
@@ -42,12 +42,13 @@ function serialize(item: {
   }>;
   notes?: Array<{
     id: string;
+    parentId?: string | null;
     kind: 'NOTE' | 'HELP';
     body: string;
     createdAt: Date;
     author: { id: string; name: string | null; email: string };
   }>;
-}) {
+}, helpUnread = false) {
   const dueOn = item.dueOn ? item.dueOn.toISOString().slice(0, 10) : null;
   return {
     id: item.id,
@@ -76,12 +77,34 @@ function serialize(item: {
     })),
     notes: (item.notes || []).map((note) => ({
       id: note.id,
+      parentId: note.parentId || null,
       kind: note.kind,
       body: note.body,
       createdAt: note.createdAt.toISOString(),
       author: note.author,
     })),
+    helpUnread,
   };
+}
+
+function itemHelpUnread(
+  item: {
+    assigneeId?: string | null;
+    notes?: Array<{ id: string; parentId?: string | null; kind: string; authorId?: string; createdAt: Date; author: { id: string } }>;
+  },
+  userId: string,
+  isLead: boolean,
+  readAt: Date | null,
+) {
+  const notes = item.notes || [];
+  const help = notes.filter((note) => note.kind === 'HELP' && !note.parentId);
+  if (help.length === 0) return false;
+  const asked = help.some((note) => note.author.id === userId);
+  const assigned = item.assigneeId === userId;
+  if (!isLead && !asked && !assigned) return false;
+  const helpIds = new Set(help.map((note) => note.id));
+  const thread = notes.filter((note) => helpIds.has(note.id) || (note.parentId && helpIds.has(note.parentId)));
+  return thread.some((note) => note.author.id !== userId && (!readAt || note.createdAt > readAt));
 }
 
 export async function GET() {
@@ -134,10 +157,20 @@ export async function GET() {
       }),
     ]);
 
+    const lead = await isPersonnelLead(session.user.id, scope.constructionGroupId);
+    const reads = await prisma.workHelpRead.findMany({
+      where: { userId: session.user.id, workItemId: { in: items.map((item) => item.id) } },
+      select: { workItemId: true, readAt: true },
+    });
+    const readAtByItem = new Map(reads.map((read) => [read.workItemId, read.readAt]));
+
     return NextResponse.json({
       canAssign,
       currentUserId: session.user.id,
-      items: items.map(serialize),
+      items: items.map((item) => serialize(
+        item,
+        itemHelpUnread(item, session.user.id, lead, readAtByItem.get(item.id) || null),
+      )),
       teammates,
       projects,
       processes: processes.map((process) => ({

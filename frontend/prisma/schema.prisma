@@ -83,6 +83,7 @@ model User {
   projectPersonnel    ProjectPersonnel[]
   processTemplates    ProcessTemplate[]   @relation("ProcessTemplateCreator")
   workNotes           WorkNote[]
+  workHelpReads       WorkHelpRead[]
 }
 
 model VerificationToken {
@@ -1041,6 +1042,7 @@ model WorkItem {
   processTemplate     ProcessTemplate?  @relation(fields: [processTemplateId], references: [id], onDelete: SetNull)
   steps               WorkItemStep[]
   notes               WorkNote[]
+  helpReads           WorkHelpRead[]
 
   @@unique([constructionGroupId, importKey])
   @@index([constructionGroupId])
@@ -1070,15 +1072,34 @@ model WorkNote {
   id         String       @id @default(cuid())
   workItemId String
   authorId   String
+  parentId   String?
   kind       WorkNoteKind
   body       String       @db.Text
   createdAt  DateTime     @default(now())
 
   workItem   WorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
   author     User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  parent     WorkNote?  @relation("WorkNoteReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies    WorkNote[] @relation("WorkNoteReplies")
 
   @@index([workItemId])
+  @@index([parentId])
   @@map("work_notes")
+}
+
+// When the Personnel Contact or Assistant last opened a help thread.
+model WorkHelpRead {
+  id         String   @id @default(cuid())
+  workItemId String
+  userId     String
+  readAt     DateTime @default(now())
+
+  workItem   WorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workItemId, userId])
+  @@index([userId])
+  @@map("work_help_reads")
 }
 
 model ProcessTemplate {
