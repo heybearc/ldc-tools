@@ -23,6 +23,7 @@ type EntryUser = {
 
 export type DirectoryEditTarget = {
   id: string;
+  kind?: 'oversight' | 'group';
   role: string;
   startDate?: string | null;
   endDate?: string | null;
@@ -30,6 +31,30 @@ export type DirectoryEditTarget = {
   crewId: string | null;
   user: EntryUser;
 };
+
+const PERSONNEL_ROLES = [
+  { value: 'PC', label: 'Contact' },
+  { value: 'PCA', label: 'Assistant' },
+  { value: 'PC-Support', label: 'Support' },
+];
+const CONSTRUCTION_ROLES = [
+  { value: 'CGO', label: 'Contact' },
+  { value: 'ACGO', label: 'Assistant' },
+  { value: 'CG-Support', label: 'Support' },
+];
+
+function normalizeGroupRole(role: string) {
+  if (role === 'PC_SUPPORT') return 'PC-Support';
+  if (role === 'CGOA' || role === 'CG_SUPPORT') return role === 'CGOA' ? 'ACGO' : 'CG-Support';
+  return role;
+}
+
+function groupRoles(role: string) {
+  const code = normalizeGroupRole(role);
+  if (PERSONNEL_ROLES.some((item) => item.value === code)) return PERSONNEL_ROLES;
+  if (CONSTRUCTION_ROLES.some((item) => item.value === code)) return CONSTRUCTION_ROLES;
+  return [{ value: code, label: code }];
+}
 
 const TEAM_ROLES = [
   { value: 'TTO', label: 'TTO' },
@@ -96,9 +121,11 @@ export default function DirectoryEntryDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const isGroup = entry?.kind === 'group';
   const initialName = entry ? nameParts(entry.user) : { firstName: '', lastName: '' };
   const initialCrew = entry?.crewId || defaults?.crewId || '';
   const initialTeam = entry?.tradeTeamId || defaults?.tradeTeamId || teams[0]?.id || '';
+  const initialGroupRole = normalizeGroupRole(entry?.role || 'PC-Support');
   const [firstName, setFirstName] = useState(initialName.firstName);
   const [lastName, setLastName] = useState(initialName.lastName);
   const [email, setEmail] = useState(entry?.user.email || '');
@@ -111,7 +138,9 @@ export default function DirectoryEntryDialog({
   const [tradeTeamId, setTradeTeamId] = useState(initialTeam);
   const [crewId, setCrewId] = useState(initialCrew);
   const [role, setRole] = useState(
-    roleForScope(Boolean(initialCrew), entry?.user.isSister === true, entry?.role || (initialCrew ? 'TCO' : 'TTO'))
+    isGroup
+      ? initialGroupRole
+      : roleForScope(Boolean(initialCrew), entry?.user.isSister === true, entry?.role || (initialCrew ? 'TCO' : 'TTO'))
   );
   const [startDate, setStartDate] = useState(dateInputValue(entry?.startDate) || dateInputValue(new Date()));
   const [endDate, setEndDate] = useState(dateInputValue(entry?.endDate));
@@ -122,7 +151,11 @@ export default function DirectoryEntryDialog({
     () => teams.find((team) => team.id === tradeTeamId)?.crews || [],
     [teams, tradeTeamId]
   );
-  const roles = (crewId ? CREW_ROLES : TEAM_ROLES).filter((item) => !isSister || item.value === supportRole(Boolean(crewId)));
+  const groupFamily = PERSONNEL_ROLES.concat(CONSTRUCTION_ROLES).some((item) => item.value === initialGroupRole);
+  const groupChoices = groupRoles(initialGroupRole).filter((item) => !isSister || !groupFamily || item.label === 'Support' || item.value.endsWith('Support'));
+  const roles = isGroup
+    ? groupChoices
+    : (crewId ? CREW_ROLES : TEAM_ROLES).filter((item) => !isSister || item.value === supportRole(Boolean(crewId)));
 
   async function save() {
     setSaving(true);
@@ -142,22 +175,37 @@ export default function DirectoryEntryDialog({
         return;
       }
     }
-    const payload = {
-      id: entry?.id,
-      scope: crewId ? 'crew' : 'team',
-      firstName,
-      lastName,
-      email,
-      phone,
-      image: nextImage,
-      isSister,
-      role,
-      tradeTeamId,
-      crewId: crewId || null,
-      originScope: entry?.crewId ? 'crew' : 'team',
-      startDate,
-      endDate,
-    };
+    const payload = isGroup
+      ? {
+          scope: 'group',
+          userId: entry?.user.id,
+          originRole: normalizeGroupRole(entry?.role || role),
+          firstName,
+          lastName,
+          email,
+          phone,
+          image: nextImage,
+          isSister,
+          role,
+          startDate,
+          endDate,
+        }
+      : {
+          id: entry?.id,
+          scope: crewId ? 'crew' : 'team',
+          firstName,
+          lastName,
+          email,
+          phone,
+          image: nextImage,
+          isSister,
+          role,
+          tradeTeamId,
+          crewId: crewId || null,
+          originScope: entry?.crewId ? 'crew' : 'team',
+          startDate,
+          endDate,
+        };
     const response = await fetch('/api/v1/trade-teams/directory', {
       method: mode === 'add' ? 'POST' : 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -177,7 +225,7 @@ export default function DirectoryEntryDialog({
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-xl">
         <div className="border-b px-5 py-4">
           <h2 className="text-lg font-semibold text-gray-900">
-            {mode === 'add' ? 'Add person' : 'Edit entry'}
+            {mode === 'add' ? 'Add person' : isGroup ? 'Profile' : 'Edit entry'}
           </h2>
         </div>
         <div className="space-y-3 px-5 py-4">
@@ -248,45 +296,49 @@ export default function DirectoryEntryDialog({
               onChange={(event) => {
                 const sister = event.target.checked;
                 setIsSister(sister);
-                setRole(roleForScope(Boolean(crewId), sister, role));
+                setRole(isGroup ? (groupRoles(initialGroupRole).find((item) => item.label === 'Support')?.value || role) : roleForScope(Boolean(crewId), sister, role));
               }}
             />
             Sister
           </label>
           <p className="text-xs text-gray-500">Sisters can only be Support.</p>
-          <label className="block text-sm text-gray-700">
-            Trade
-            <select
-              className="mt-1 w-full rounded border px-2 py-2"
-              value={tradeTeamId}
-              onChange={(event) => {
-                setTradeTeamId(event.target.value);
-                setCrewId('');
-                setRole(roleForScope(false, isSister, role));
-              }}
-            >
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>{team.name}</option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm text-gray-700">
-            Crew
-            <select
-              className="mt-1 w-full rounded border px-2 py-2"
-              value={crewId}
-              onChange={(event) => {
-                const next = event.target.value;
-                setCrewId(next);
-                setRole(roleForScope(Boolean(next), isSister, role));
-              }}
-            >
-              <option value="">Team level</option>
-              {crews.map((crew) => (
-                <option key={crew.id} value={crew.id}>{crew.name}</option>
-              ))}
-            </select>
-          </label>
+          {!isGroup && (
+            <>
+              <label className="block text-sm text-gray-700">
+                Trade
+                <select
+                  className="mt-1 w-full rounded border px-2 py-2"
+                  value={tradeTeamId}
+                  onChange={(event) => {
+                    setTradeTeamId(event.target.value);
+                    setCrewId('');
+                    setRole(roleForScope(false, isSister, role));
+                  }}
+                >
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>{team.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-sm text-gray-700">
+                Crew
+                <select
+                  className="mt-1 w-full rounded border px-2 py-2"
+                  value={crewId}
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    setCrewId(next);
+                    setRole(roleForScope(Boolean(next), isSister, role));
+                  }}
+                >
+                  <option value="">Team level</option>
+                  {crews.map((crew) => (
+                    <option key={crew.id} value={crew.id}>{crew.name}</option>
+                  ))}
+                </select>
+              </label>
+            </>
+          )}
           <label className="block text-sm text-gray-700">
             Role
             <select className="mt-1 w-full rounded border px-2 py-2" value={role} onChange={(event) => setRole(event.target.value)}>

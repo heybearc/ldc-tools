@@ -290,12 +290,145 @@ export async function POST(request: NextRequest) {
   }
 }
 
+const GROUP_ROLE_NAMES: Record<string, string> = {
+  PC: 'Personnel Contact',
+  PCA: 'Personnel Contact Assistant',
+  'PC-Support': 'Personnel Contact Support',
+  CGO: 'Construction Group Overseer',
+  ACGO: 'Assistant Construction Group Overseer',
+  'CG-Support': 'Construction Group Support',
+};
+
+function contactRole(role: string): 'PC' | 'PCA' | 'PC_SUPPORT' | null {
+  if (role === 'PC') return 'PC';
+  if (role === 'PCA') return 'PCA';
+  if (role === 'PC-Support' || role === 'PC_SUPPORT') return 'PC_SUPPORT';
+  return null;
+}
+
+function roleAliases(role: string) {
+  if (role === 'PC-Support' || role === 'PC_SUPPORT') return ['PC-Support', 'PC_SUPPORT'];
+  if (role === 'ACGO' || role === 'CGOA') return ['ACGO', 'CGOA'];
+  if (role === 'CG-Support' || role === 'CG_SUPPORT') return ['CG-Support', 'CG_SUPPORT'];
+  return [role];
+}
+
+async function updateGroupProfile(body: Record<string, unknown>) {
+  const userId = String(body.userId || '');
+  const firstName = String(body.firstName || '').trim();
+  const lastName = String(body.lastName || '').trim();
+  const email = String(body.email || '').trim().toLowerCase();
+  const phone = String(body.phone || '').trim() || null;
+  const photo = profileImage(body.image);
+  const role = String(body.role || '');
+  const originRole = String(body.originRole || role);
+  const isSister = body.isSister === true;
+  const startDate = parseDirectoryDate(typeof body.startDate === 'string' ? body.startDate : null);
+  const endDate = typeof body.endDate === 'string' && body.endDate ? parseDirectoryDate(body.endDate) : null;
+
+  if (photo.error) return NextResponse.json({ error: photo.error }, { status: 400 });
+  if (!userId || !firstName || !email) {
+    return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
+  }
+  const managed = ['PC', 'PCA', 'PC-Support', 'PC_SUPPORT', 'CGO', 'ACGO', 'CGOA', 'CG-Support', 'CG_SUPPORT'];
+  if (isSister && managed.includes(role) && !role.includes('Support')) {
+    return NextResponse.json({ error: 'Sisters can only be Support' }, { status: 400 });
+  }
+
+  const emailOwner = await prisma.user.findUnique({ where: { email } });
+  if (emailOwner && emailOwner.id !== userId) {
+    return NextResponse.json({ error: 'That email belongs to someone else' }, { status: 409 });
+  }
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      email,
+      firstName,
+      lastName,
+      isSister,
+      image: photo.image,
+      name: `${firstName} ${lastName}`.trim(),
+    },
+    select: { id: true, volunteerId: true, constructionGroupId: true },
+  });
+  await ensureVolunteer(user.id, user.constructionGroupId, { firstName, lastName, email, phone });
+
+  const volunteer = await prisma.volunteer.findFirst({
+    where: { user: { id: user.id } },
+    select: { id: true, constructionGroupId: true },
+  });
+  if (volunteer) {
+    await prisma.volunteerRole.updateMany({
+      where: { volunteerId: volunteer.id, roleCode: { in: roleAliases(originRole) }, isActive: true, endDate: null },
+      data: {
+        roleCode: role,
+        roleName: GROUP_ROLE_NAMES[role] || role,
+        ...(startDate ? { startDate } : {}),
+        endDate,
+        isActive: endDate == null,
+      },
+    });
+  }
+
+  const previous = contactRole(originRole);
+  const next = contactRole(role);
+  if (previous) {
+    const contacts = await prisma.personnelContact.findMany({
+      where: { userId: user.id, role: previous, isActive: true, endDate: null },
+    });
+    for (const contact of contacts) {
+      if (!next || endDate) {
+        await prisma.personnelContact.update({
+          where: { id: contact.id },
+          data: { isActive: endDate == null, endDate },
+        });
+        continue;
+      }
+      if (next === previous) {
+        await prisma.personnelContact.update({
+          where: { id: contact.id },
+          data: { isActive: true, endDate: null },
+        });
+        continue;
+      }
+      const clash = await prisma.personnelContact.findUnique({
+        where: {
+          constructionGroupId_userId_role: {
+            constructionGroupId: contact.constructionGroupId,
+            userId: user.id,
+            role: next,
+          },
+        },
+      });
+      if (clash) {
+        await prisma.personnelContact.update({
+          where: { id: clash.id },
+          data: { isActive: true, endDate: null },
+        });
+        await prisma.personnelContact.update({
+          where: { id: contact.id },
+          data: { isActive: false, endDate: endDate || new Date() },
+        });
+      } else {
+        await prisma.personnelContact.update({
+          where: { id: contact.id },
+          data: { role: next },
+        });
+      }
+    }
+  }
+
+  return NextResponse.json({ success: true });
+}
+
 export async function PATCH(request: NextRequest) {
   try {
     if (!(await requireUser())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const body = await request.json();
+    if (body.scope === 'group') return updateGroupProfile(body);
     const id = String(body.id || '');
     const originScope = body.originScope === 'crew' ? 'crew' : 'team';
     const firstName = String(body.firstName || '').trim();

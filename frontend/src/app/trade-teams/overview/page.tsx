@@ -426,7 +426,22 @@ export default function TradeTeamsOverviewPage() {
       <div className="max-w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-x-auto">
         {showGroups && (
           <div className="mb-6">
-            <DirectoryPeople groups={shownGroups} />
+            <DirectoryPeople
+              groups={shownGroups}
+              onEdit={(person) => setEditor({
+                mode: 'edit',
+                entry: {
+                  id: person.user.id,
+                  kind: 'group',
+                  role: person.role,
+                  startDate: person.startDate,
+                  endDate: person.endDate,
+                  tradeTeamId: '',
+                  crewId: null,
+                  user: person.user,
+                },
+              })}
+            />
           </div>
         )}
         {viewMode === 'grid' ? (

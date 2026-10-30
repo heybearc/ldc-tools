@@ -8,6 +8,8 @@ export type DirectoryContact = {
   id: string;
   role: string;
   roleLabel: string;
+  startDate?: string | null;
+  endDate?: string | null;
   user: DirectoryUser;
 };
 
@@ -23,10 +25,16 @@ export type DirectoryGroups = {
   ancillary: { role: string; people: DirectoryContact[] }[];
 };
 
-function PersonLine({ person }: { person: DirectoryContact }) {
+function PersonLine({
+  person,
+  onEdit,
+}: {
+  person: DirectoryContact;
+  onEdit?: (person: DirectoryContact) => void;
+}) {
   const name = directoryPersonName(person.user);
-  return (
-    <div className="flex items-center gap-1.5 min-w-0">
+  const label = (
+    <>
       {person.user.image ? (
         <ProfilePhoto
           src={person.user.image}
@@ -34,6 +42,21 @@ function PersonLine({ person }: { person: DirectoryContact }) {
         />
       ) : null}
       <span className="truncate text-gray-900">{name}</span>
+    </>
+  );
+  return (
+    <div className="flex items-center gap-1.5 min-w-0">
+      {onEdit ? (
+        <button
+          type="button"
+          className="flex items-center gap-1.5 min-w-0 text-left hover:underline"
+          onClick={() => onEdit(person)}
+        >
+          {label}
+        </button>
+      ) : (
+        <div className="flex items-center gap-1.5 min-w-0">{label}</div>
+      )}
       {person.user.email && (
         <button
           type="button"
@@ -92,10 +115,12 @@ function RoleCard({
   title,
   headerClass,
   columns,
+  onEdit,
 }: {
   title: string;
   headerClass: string;
   columns: DirectoryRoleColumns;
+  onEdit?: (person: DirectoryContact) => void;
 }) {
   const labeled = [
     { label: 'Contact', people: columns.contact },
@@ -117,7 +142,7 @@ function RoleCard({
             ) : (
               <div className="flex flex-col gap-1 text-sm">
                 {column.people.map((person) => (
-                  <PersonLine key={person.id} person={person} />
+                  <PersonLine key={person.id} person={person} onEdit={onEdit} />
                 ))}
               </div>
             )}
@@ -128,11 +153,17 @@ function RoleCard({
   );
 }
 
-export default function DirectoryPeople({ groups }: { groups: DirectoryGroups }) {
+export default function DirectoryPeople({
+  groups,
+  onEdit,
+}: {
+  groups: DirectoryGroups;
+  onEdit?: (person: DirectoryContact) => void;
+}) {
   return (
     <div className="space-y-6">
-      <RoleCard title="Construction group" headerClass="bg-slate-700" columns={groups.constructionGroup} />
-      <RoleCard title="Personnel" headerClass="bg-teal-700" columns={groups.personnel} />
+      <RoleCard title="Construction group" headerClass="bg-slate-700" columns={groups.constructionGroup} onEdit={onEdit} />
+      <RoleCard title="Personnel" headerClass="bg-teal-700" columns={groups.personnel} onEdit={onEdit} />
 
       <section className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="bg-stone-600 text-white p-3">
@@ -147,7 +178,7 @@ export default function DirectoryPeople({ groups }: { groups: DirectoryGroups })
                 <div className="font-medium text-gray-800">{group.role}</div>
                 <div className="sm:col-span-3 flex flex-col gap-1">
                   {group.people.map((person) => (
-                    <PersonLine key={person.id} person={person} />
+                    <PersonLine key={person.id} person={person} onEdit={onEdit} />
                   ))}
                 </div>
               </div>
