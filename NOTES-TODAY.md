@@ -6,9 +6,12 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
-- v1.34.0 is LIVE on green. Processes are on STANDBY blue. Next is to ship processes, then the crew-request import.
+- v1.35.0 is LIVE on blue (CT133) and synced on green (CT135), both `422989e`. Next is the crew-request import, which waits on the spreadsheet.
 
 ### Discoveries / Notes
+- Shipped v1.35.0 (`422989e`). Processes start onto the work list. Personnel has its own directory card. Sign-in opens the dashboard. qa-01 full suite 64/64 plus 6 generated tests. LIVE blue CT133, STANDBY green CT135.
+- The crew-request spreadsheet is not in the repo. Slice 6 stays unmapped until that file is here.
+- Open urgent feedback: 0.
 - Shipped v1.33.0 (`9db88f9`). Projects list. Oversight assigns Personnel. qa-01 full suite 61/61.
 - Shipped v1.34.0 (`707ae63`). A project date shows on the project and the work list. LIVE green CT135, both nodes were synced on that release before the next slice.
 - Processes (`163f0a3`) are on STANDBY blue CT133. Starting a template creates a work item per step, with its explanation. The standby check passed. Not shipped.

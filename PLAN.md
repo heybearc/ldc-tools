@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.34.0 is LIVE on green (CT135) at `707ae63`. Slice 5 (`163f0a3`) is on STANDBY blue (CT133), not shipped. Hub dates are paused.
+**Status:** v1.35.0 is LIVE on blue (CT133) at `422989e`. STANDBY green (CT135) is the same commit. Next is slice 6, waiting on the crew-request spreadsheet. Hub dates are paused.
 
 ---
 
@@ -25,8 +25,8 @@
 - [x] Slice 2 — work list
 - [x] Slice 3 — projects; `/ship` v1.33.0
 - [x] Slice 4 — project dates on the project and the work list
-- [x] Slice 5 — process templates whose steps become work items
-- [ ] Slice 6 below
+- [x] Slice 5 — process templates; `/ship` v1.35.0
+- [ ] Slice 6 below — blocked until the Microsoft Form spreadsheet is in hand
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
@@ -53,8 +53,9 @@ People already on the construction group:
 Show three groups on the directory, all for the signed-in construction group:
 
 - Trade teams and crews (already there)
-- Construction group: Personnel Contact, Assistant, Support
-- Ancillary: other region-support and construction-group staff who are not trade oversight
+- Construction group: overseer, assistant, and support
+- Personnel: Personnel Contact, Assistant, and Support
+- Ancillary: other region-support and construction-group staff who are not those two groups
 
 A directory contact who is not Personnel stays a contact. Do not create a login for them. Splitting those contacts off the user table waits until after slice 6.
 

@@ -2,17 +2,18 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Region work queue, slice 5 (processes) on standby
+**Working on:** Region work queue, slice 6 (crew-request import) waiting on the spreadsheet
 
 ---
 
 ## Current Task
-**Processes** — built (slice 5). Next is the crew-request import (slice 6) after this is on standby.
+**Crew-request import** — next (slice 6). The Microsoft Form file is not in the repo, so the column map is not started.
 
 ### What I'm doing right now
-v1.34.0 (`707ae63`) is LIVE on green (CT135). Processes (`163f0a3`) are on STANDBY blue (CT133) and are not shipped.
+v1.35.0 (`422989e`) is LIVE on blue (CT133) and STANDBY on green (CT135).
 
 ### Recent completions
+- ✅ Shipped v1.35.0 (`422989e`); qa-01 full suite 64/64 plus generated tests passed
 - ✅ Shipped v1.34.0 (`707ae63`); qa-01 directory gate plus the project-schedule test passed
 - ✅ Shipped v1.33.0 (`9db88f9`); qa-01 full suite 61/61 plus the projects tests passed
 - ✅ Shipped v1.32.0 (`33baf50`); qa-01 full suite 60/60 plus the work-list test passed
@@ -24,7 +25,7 @@ v1.34.0 (`707ae63`) is LIVE on green (CT135). Processes (`163f0a3`) are on STAND
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Ship processes, then the crew-request import (slice 6)
+Crew-request import (slice 6) once the spreadsheet is here
 
 ---
 
@@ -36,4 +37,4 @@ Ship processes, then the crew-request import (slice 6)
 ---
 
 ## Exact Next Command
-Ship processes, then the crew-request import (slice 6)
+Crew-request import (slice 6) once the spreadsheet is here
