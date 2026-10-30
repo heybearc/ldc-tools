@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-29  
+**Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.32.0 is LIVE on green (CT135) at `33baf50`. Slice 3 (`58009bd`) is on STANDBY blue (CT133), not shipped. Hub dates are paused.
+**Status:** v1.33.0 is LIVE on blue (CT133). Slice 4 (project dates) is the unreleased work. Hub dates are paused.
 
 ---
 
@@ -23,8 +23,9 @@
 - [x] Home is the directory; open a team; place a photo; `/ship` v1.30.0 (effort: M)
 - [x] Slice 1 — directory groups (Construction group and ancillary, same construction group only)
 - [x] Slice 2 — work list
-- [x] Slice 3 — projects
-- [ ] Slices 4–6 below, in order
+- [x] Slice 3 — projects; `/ship` v1.33.0
+- [x] Slice 4 — project dates on the project and the work list
+- [ ] Slices 5–6 below, in order
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
@@ -80,7 +81,7 @@ Done when Oversight can put a Personnel person on a project, and the project lis
 
 Dated work on a project, such as PPS meeting prep or assessment queues setup. Each entry is also a work item with that date, so it shows on the work list. Do not bring back the old trade-crew calendar. `ProjectScheduleEntry` is shaped for trade crews and volunteer counts; store these items as work items with a project and a date instead of reusing that shape.
 
-Done when a dated project item appears on the project and on the work list.
+Done when a dated project item appears on the project and on the work list. Personnel add the date on the project. It is a work item with that project and date.
 
 ### 5. Processes
 

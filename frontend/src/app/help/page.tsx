@@ -47,7 +47,7 @@ const helpTopics: HelpTopic[] = [
   {
     id: 'projects',
     title: 'Projects',
-    description: 'See this construction group’s projects and who is assigned as Personnel',
+    description: 'See this construction group’s projects, dated work, and who is assigned as Personnel',
     roles: ['SUPER_ADMIN', 'ZONE_OVERSEER', 'PERSONNEL_CONTACT', 'READ_ONLY'],
     icon: '🏗️'
   },

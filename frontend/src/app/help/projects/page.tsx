@@ -38,6 +38,12 @@ export default async function ProjectsHelpPage() {
             A Builder Assistant link appears when the project has one.
           </p>
 
+          <h2>Add a date</h2>
+          <p>
+            Personnel can add dated work on a project, such as meeting prep. Enter a title, detail, and date, then choose Add date.
+            That date stays on the project and also appears on the work list.
+          </p>
+
           <h2>Assign Personnel</h2>
           <p>
             Construction group oversight can add Personnel to a project. Choose a person under Add Personnel, then choose Assign.

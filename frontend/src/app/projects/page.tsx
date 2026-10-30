@@ -9,6 +9,14 @@ interface Person {
   email: string;
 }
 
+interface ScheduleItem {
+  id: string;
+  title: string;
+  detail: string;
+  date: string | null;
+  status: 'OPEN' | 'DONE';
+}
+
 interface ProjectRow {
   id: string;
   name: string;
@@ -19,7 +27,16 @@ interface ProjectRow {
   end: string | null;
   builderAssistantUrl: string | null;
   personnel: Person[];
+  schedule: ScheduleItem[];
 }
+
+interface DateDraft {
+  title: string;
+  detail: string;
+  date: string;
+}
+
+const EMPTY_DATE: DateDraft = { title: '', detail: '', date: '' };
 
 const STATUS_LABELS: Record<string, string> = {
   PLANNING: 'Planning',
@@ -37,10 +54,12 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [personnel, setPersonnel] = useState<Person[]>([]);
   const [canAssign, setCanAssign] = useState(false);
+  const [canAddDate, setCanAddDate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [choice, setChoice] = useState<Record<string, string>>({});
+  const [drafts, setDrafts] = useState<Record<string, DateDraft>>({});
 
   const load = useCallback(async () => {
     setError('');
@@ -54,6 +73,7 @@ export default function ProjectsPage() {
     setProjects(body.projects || []);
     setPersonnel(body.personnel || []);
     setCanAssign(Boolean(body.canAssign));
+    setCanAddDate(Boolean(body.canAddDate));
     setLoading(false);
   }, []);
 
@@ -90,6 +110,39 @@ export default function ProjectsPage() {
     }
   }
 
+  function draftFor(projectId: string) {
+    return drafts[projectId] || EMPTY_DATE;
+  }
+
+  async function addDate(projectId: string) {
+    const draft = draftFor(projectId);
+    setBusyId(projectId);
+    setError('');
+    try {
+      const response = await fetch('/api/v1/work-items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: draft.title,
+          detail: draft.detail,
+          timingKind: 'PROJECT_DATE',
+          dueOn: draft.date,
+          projectId,
+          claimable: false,
+        }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error || 'Failed to add a date');
+        return;
+      }
+      setDrafts((current) => ({ ...current, [projectId]: EMPTY_DATE }));
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function remove(projectId: string, userId: string) {
     setBusyId(projectId);
     setError('');
@@ -113,7 +166,7 @@ export default function ProjectsPage() {
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Projects</h1>
         <p className="mt-2 text-gray-600 max-w-3xl">
-          Projects for this construction group. Oversight assigns Personnel. Crews, budget, and congregations stay off this list.
+          Projects for this construction group. Oversight assigns Personnel. Personnel add a date, and that date also shows on the work list. Crews, budget, and congregations stay off this list.
         </p>
       </div>
 
@@ -188,6 +241,64 @@ export default function ProjectsPage() {
                     >
                       Assign
                     </button>
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <p className="text-sm font-medium text-gray-700">Schedule</p>
+                {project.schedule.length === 0 ? (
+                  <p className="mt-1 text-sm text-gray-500">No dated work on this project.</p>
+                ) : (
+                  <ul className="mt-2 space-y-2">
+                    {project.schedule.map((item) => (
+                      <li key={item.id} className="text-sm text-gray-800">
+                        <span className="font-medium">{item.date}</span>
+                        <span> · {item.title}</span>
+                        {item.status === 'DONE' && (
+                          <span className="ml-2 text-xs font-medium text-gray-500">Done</span>
+                        )}
+                        <p className="text-gray-600">{item.detail}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {canAddDate && (
+                  <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm text-gray-700">Title</span>
+                      <input
+                        value={draftFor(project.id).title}
+                        onChange={(event) => setDrafts({ ...drafts, [project.id]: { ...draftFor(project.id), title: event.target.value } })}
+                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                      />
+                    </label>
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm text-gray-700">Detail</span>
+                      <input
+                        value={draftFor(project.id).detail}
+                        onChange={(event) => setDrafts({ ...drafts, [project.id]: { ...draftFor(project.id), detail: event.target.value } })}
+                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm text-gray-700">Date</span>
+                      <input
+                        type="date"
+                        value={draftFor(project.id).date}
+                        onChange={(event) => setDrafts({ ...drafts, [project.id]: { ...draftFor(project.id), date: event.target.value } })}
+                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                      />
+                    </label>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        disabled={!draftFor(project.id).title || !draftFor(project.id).detail || !draftFor(project.id).date || busyId === project.id}
+                        onClick={() => addDate(project.id)}
+                        className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
+                      >
+                        Add date
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
