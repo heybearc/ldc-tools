@@ -1,5 +1,15 @@
 # LDC Tools Release Notes
 
+## v1.33.0 - Projects
+
+**Release Date:** October 29, 2026
+
+### ✨ New Features
+
+- A projects list for this construction group
+- Oversight assigns Personnel to a project
+- Crews, budget, and congregations stay off this list
+
 ## v1.32.0 - Work list
 
 **Release Date:** October 29, 2026

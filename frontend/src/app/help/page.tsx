@@ -45,6 +45,13 @@ const helpTopics: HelpTopic[] = [
     icon: '📋'
   },
   {
+    id: 'projects',
+    title: 'Projects',
+    description: 'See this construction group’s projects and who is assigned as Personnel',
+    roles: ['SUPER_ADMIN', 'ZONE_OVERSEER', 'PERSONNEL_CONTACT', 'READ_ONLY'],
+    icon: '🏗️'
+  },
+  {
     id: 'trade-teams',
     title: 'Directory and Trade Teams',
     description: 'Look up trade and crew leadership, and maintain the team structure',
