@@ -49,7 +49,7 @@ test('a dated project item shows on the project and on the work list', async ({ 
   }
 
   const card = page.locator('article').filter({ hasText: project.name });
-  await expect(card.getByText('Schedule')).toBeVisible();
+  await expect(card.getByText('Schedule', { exact: true })).toBeVisible();
 
   if (!list.canAddDate) {
     await expect(card.getByRole('button', { name: 'Add date' })).toHaveCount(0);
@@ -84,9 +84,9 @@ test('a dated project item shows on the project and on the work list', async ({ 
   expect(missingDate.status()).toBe(400);
 
   await page.reload();
-  await expect(card.getByText(title)).toBeVisible();
-  await expect(card.getByText('Dec 15, 2026')).toBeVisible();
-  await expect(card.getByText('PPS meeting prep')).toBeVisible();
+  const row = card.locator('li').filter({ hasText: title });
+  await expect(row.getByText('Dec 15, 2026')).toBeVisible();
+  await expect(row.getByText('PPS meeting prep')).toBeVisible();
 
   await page.goto('/work');
   const workRow = page.locator('article').filter({ hasText: title });
