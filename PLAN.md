@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-29  
 **Current phase:** Region work queue  
-**Status:** v1.32.0 is LIVE on green (CT135) and synced to blue (CT133), both `33baf50`. Slice 3 (projects) is built for STANDBY. Hub dates are paused.
+**Status:** v1.32.0 is LIVE on green (CT135) at `33baf50`. Slice 3 (`58009bd`) is on STANDBY blue (CT133), not shipped. Hub dates are paused.
 
 ---
 
@@ -127,4 +127,4 @@ Projects and crew-change requests stay. The schedule is dated work on the work l
 
 - HAProxy ACL: `is_ldc` → LIVE backend; `is_ldc_blue` / `is_ldc_green` for color hosts
 - DB: `postgresql://…@10.92.3.23:5432/ldc_tools` (RW VIP)
-- LIVE is green (CT135). STANDBY is blue (CT133). Both are v1.32.0 at `33baf50`. Slice 3 is the next standby deploy.
+- LIVE is green (CT135) at `33baf50`. STANDBY is blue (CT133) at `58009bd` (projects, not shipped).

@@ -10,7 +10,7 @@
 **Project schedule** — next (slice 4)
 
 ### What I'm doing right now
-v1.32.0 (`33baf50`) is LIVE on green (CT135) and synced to blue (CT133). Slice 3 puts the construction group's projects at `/projects`. Oversight assigns Personnel. Crews, budget, and congregations stay off that page.
+v1.32.0 (`33baf50`) is LIVE on green (CT135). Slice 3 (`58009bd`) is on STANDBY blue (CT133) at `/projects` and is not shipped. Oversight assigns Personnel. Next is the project schedule.
 
 ### Recent completions
 - ✅ Shipped v1.32.0 (`33baf50`); qa-01 full suite 60/60 plus the work-list test passed

@@ -6,7 +6,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
-- Ship directory groups, then build the work list
+- Work list is LIVE. Projects are on STANDBY. Next is the project schedule.
 
 ### Discoveries / Notes
 - Removed 167 volunteer records that were not in the directory and had no login. Removed Dathan Sours and Tobias Torres. Kept the other asked-about accounts.
@@ -16,7 +16,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - Shipped v1.31.0 (`7bbb610`). LIVE blue CT133, STANDBY green CT135. qa-01 directory+admin gate plus directory-groups tests passed. Docs note `9681859` is after the release and is not on the nodes.
 - Hub start and end dates stay paused until the Persons export is back.
 - Shipped v1.32.0 (`33baf50`). LIVE green CT135, STANDBY blue CT133. qa-01 full suite 60/60 plus the work-list test passed.
-- Projects page lists name, number, location, status, start, end, and the Builder Assistant link for the signed-in construction group. Oversight assigns Personnel. 
+- Projects (`58009bd`) is on STANDBY blue only. The page lists name, number, location, status, start, end, and the Builder Assistant link. Oversight assigns Personnel. Not shipped. 
 
 ### 2026-10-28
 - Import export alerts were escaped backticks, so the component did not typecheck. Restored real template literals.
