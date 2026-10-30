@@ -1,5 +1,18 @@
 # LDC Tools Release Notes
 
+## v1.38.0 - Invite from User Management
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- Invite someone from the form at the top of User Management
+- Confirmations appear as a notice instead of a browser popup
+
+### 🐛 Bug Fixes
+
+- An invitation is not saved when the email cannot be sent
+
 ## v1.37.0 - Directory profiles and user corrections
 
 **Release Date:** October 30, 2026
