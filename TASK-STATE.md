@@ -2,17 +2,18 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Slice 6 crew-request import on STANDBY
+**Working on:** Nothing queued. Hub dates stay paused.
 
 ---
 
 ## Current Task
-Crew-request import (slice 6) reads the Construction Group 01.12 form export and creates claimable work.
+v1.39.0 is shipped. Hub start and end dates stay paused until the Persons export is back.
 
 ### What I'm doing right now
-v1.38.1 (`e384d04`) is LIVE on blue (CT133). Crew-request import is deploying to STANDBY green (CT135).
+v1.39.0 (`6ab0f34`) is LIVE on green (CT135) and STANDBY on blue (CT133). qa-01 full suite 69/69 plus the crew-import test passed.
 
 ### Recent completions
+- ✅ Shipped v1.39.0 (`6ab0f34`). Crew-update import creates claimable work and keeps the requestor. qa-01 full suite 69/69. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.38.1 (`e384d04`). Resend Invitation no longer writes region fields. qa-01 admin gate passed. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.38.0 (`9f56415`). Invite form on User Management. Confirmations are toasts.
 - ✅ Shipped v1.37.0 (`756ef8b`). Directory names open a profile. Admin can save name and email and cancel an invitation.
@@ -32,7 +33,7 @@ v1.38.1 (`e384d04`) is LIVE on blue (CT133). Crew-request import is deploying to
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Import the crew-update spreadsheet on Work, then finish one task and confirm the requestor stays on it.
+Hub dates stay paused until the Persons export is back.
 
 ---
 
@@ -44,4 +45,4 @@ Import the crew-update spreadsheet on Work, then finish one task and confirm the
 ---
 
 ## Exact Next Command
-Import the crew-update spreadsheet on Work, then finish one task and confirm the requestor stays on it.
+Hub dates stay paused until the Persons export is back.

@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.38.1 is LIVE on blue (CT133) at `e384d04`. Slice 6 imports the crew-update form onto the work list. Hub dates are paused.
+**Status:** v1.39.0 is LIVE on green (CT135) at `6ab0f34`. STANDBY blue (CT133) matches. Slices 1–6 are shipped. Hub dates are paused.
 
 ---
 

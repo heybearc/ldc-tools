@@ -6,7 +6,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
-- Slice 6 imports the Construction Group 01.12 crew-update form onto the work list. v1.38.1 (`e384d04`) is still LIVE on blue (CT133).
+- Shipped v1.39.0 (`6ab0f34`). LIVE green CT135, STANDBY blue CT133. qa-01 full suite 69/69 plus the crew-import test. Hub dates stay paused.
 
 ### Mid-day
 - Shipped v1.37.0 (`756ef8b`): directory profile from a name; admin name, email, and cancel invitation. Then v1.38.0 (`9f56415`): invite form on User Management and toast confirmations.
