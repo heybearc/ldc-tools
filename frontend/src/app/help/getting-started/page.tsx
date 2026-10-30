@@ -39,7 +39,7 @@ export default async function GettingStartedPage() {
           <h2>⚡ Quick Start</h2>
           <ol>
             <li><strong>Log In</strong> - Navigate to the login page and enter your credentials</li>
-            <li><strong>Open the Dashboard</strong> - See trade teams, crews, and leadership contacts</li>
+            <li><strong>Open the Dashboard</strong> - See your assigned work, available work, and the directory</li>
             <li><strong>Use the Directory</strong> - Search by trade, person, or role</li>
             <li><strong>Get Help</strong> - Click "Help" anytime you need assistance</li>
           </ol>
@@ -104,7 +104,7 @@ export default async function GettingStartedPage() {
           <h2>✨ Main Features</h2>
 
           <h3>Dashboard</h3>
-          <p>Your home page, with counts for trade teams, crews, and leadership contacts, plus links into the directory and trade teams.</p>
+          <p>Your home page. It lists work assigned to you, how much work is available to claim, trade teams, and how many people are in the directory. Cards open My Work, the directory, Work, Projects, and trade teams.</p>
 
           <h3>Directory</h3>
           <p>The list you use day to day:</p>

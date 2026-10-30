@@ -70,3 +70,52 @@ export async function sendWorkCompletionEmail(input: {
   });
   return true;
 }
+
+export async function sendWorkHelpEmail(input: {
+  to: string[];
+  title: string;
+  detail: string;
+  message: string;
+  askedByName: string;
+}): Promise<number> {
+  if (input.to.length === 0) return 0;
+  const emailConfig = await prisma.emailConfiguration.findFirst({
+    where: { isActive: true },
+  });
+  if (!emailConfig?.fromEmail || !emailConfig.smtpHost) {
+    return 0;
+  }
+
+  const password = decryptPassword(emailConfig.appPasswordEncrypted || '');
+  const transporter = nodemailer.createTransport({
+    host: emailConfig.smtpHost,
+    port: emailConfig.smtpPort || 587,
+    secure: emailConfig.encryption === 'ssl',
+    auth: {
+      user: emailConfig.username || '',
+      pass: password,
+    },
+    ...(emailConfig.encryption === 'tls' ? { tls: { ciphers: 'SSLv3' } } : {}),
+  });
+
+  await transporter.sendMail({
+    from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
+    to: input.to.join(', '),
+    subject: `Help requested — ${input.title}`,
+    text: [
+      `${input.askedByName} asked for help on a work item.`,
+      '',
+      input.title,
+      input.detail,
+      '',
+      input.message,
+    ].join('\n'),
+    html: `
+      <p>${escapeHtml(input.askedByName)} asked for help on a work item.</p>
+      <p><strong>${escapeHtml(input.title)}</strong></p>
+      <p style="white-space: pre-wrap;">${escapeHtml(input.detail)}</p>
+      <p style="white-space: pre-wrap;">${escapeHtml(input.message)}</p>
+    `,
+  });
+  return input.to.length;
+}

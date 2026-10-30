@@ -25,7 +25,7 @@ interface WorkNote {
   author: Person;
 }
 
-interface WorkItem {
+export interface WorkItem {
   id: string;
   title: string;
   detail: string;
@@ -324,6 +324,7 @@ export default function WorkPage() {
   const openItems = items.filter((item) => item.status === 'OPEN');
   const doneItems = items.filter((item) => item.status === 'DONE');
   const processes = data?.processes || [];
+  const helpItems = openItems.filter((item) => (item.notes || []).some((note) => note.kind === 'HELP'));
   const currentUserId = data?.currentUserId || '';
   const canAssign = Boolean(data?.canAssign);
   const canSelect = (item: WorkItem) => canAssign || item.assignee?.id === currentUserId;
@@ -537,6 +538,24 @@ export default function WorkPage() {
         </div>
       ) : (
         <div className="space-y-6">
+          {helpItems.length > 0 && (
+            <section id="help" className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-900">
+                Help requested ({helpItems.length})
+              </h2>
+              <ul className="space-y-2">
+                {helpItems.map((item) => {
+                  const latest = [...(item.notes || [])].reverse().find((note) => note.kind === 'HELP');
+                  return (
+                    <li key={item.id} className="text-sm text-amber-950">
+                      <a href={`#work-${item.id}`} className="font-medium hover:underline">{item.title}</a>
+                      {latest ? ` — ${latest.body}` : ''}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
           {processes.length > 0 && (
             <section className="space-y-3">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Available processes</h2>
@@ -797,7 +816,7 @@ function StepList({ steps }: { steps: Step[] }) {
   );
 }
 
-function WorkRow({
+export function WorkRow({
   item,
   currentUserId,
   canAssign,
@@ -821,6 +840,7 @@ function WorkRow({
   const [note, setNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
   const [noteError, setNoteError] = useState('');
+  const [noteNotice, setNoteNotice] = useState('');
   const canClaim = item.status === 'OPEN' && item.claimable && !item.assignee;
   const canFinish = item.status === 'OPEN' && (canAssign || item.assignee?.id === currentUserId);
   const canReopen = item.status === 'DONE' && (canAssign || item.assignee?.id === currentUserId);
@@ -846,6 +866,15 @@ function WorkRow({
         return;
       }
       setNote('');
+      if (kind === 'HELP') {
+        setNoteNotice(
+          body.notified > 0
+            ? 'Personnel were emailed, and this request is listed under Help requested.'
+            : 'Personnel can see this under Help requested on Work.',
+        );
+      } else {
+        setNoteNotice('Note saved.');
+      }
       await onChanged();
     } finally {
       setSavingNote(false);
@@ -853,7 +882,7 @@ function WorkRow({
   }
 
   return (
-    <article data-work-id={item.id} className="bg-white rounded-lg shadow p-5">
+    <article id={`work-${item.id}`} data-work-id={item.id} className="bg-white rounded-lg shadow p-5">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         {onToggle && (
           <input
@@ -926,6 +955,7 @@ function WorkRow({
               />
             </label>
             {noteError && <p className="text-sm text-red-700">{noteError}</p>}
+            {noteNotice && <p className="text-sm text-green-800">{noteNotice}</p>}
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
