@@ -869,8 +869,8 @@ export function WorkRow({
       if (kind === 'HELP') {
         setNoteNotice(
           body.notified > 0
-            ? 'Personnel were emailed, and this request is listed under Help requested.'
-            : 'Personnel can see this under Help requested on Work.',
+            ? 'The Personnel Contact and Assistant were emailed. The request is also listed under Help requested.'
+            : 'The Personnel Contact and Assistant can see this under Help requested on Work.',
         );
       } else {
         setNoteNotice('Note saved.');

@@ -60,7 +60,7 @@ export async function POST(
               constructionGroupId: item.constructionGroupId,
               isActive: true,
               endDate: null,
-              role: { in: ['PC', 'PCA', 'PC_SUPPORT'] },
+              role: { in: ['PC', 'PCA'] },
             },
             select: { user: { select: { email: true } } },
           }),
@@ -68,19 +68,29 @@ export async function POST(
             where: {
               isActive: true,
               endDate: null,
-              roleCode: { in: ['PC', 'PCA', 'PC-Support', 'PC_SUPPORT'] },
+              roleCode: { in: ['PC', 'PCA'] },
               volunteer: { isActive: true, constructionGroupId: item.constructionGroupId },
             },
-            select: { volunteer: { select: { user: { select: { email: true } } } } },
+            select: {
+              volunteer: {
+                select: {
+                  emailJw: true,
+                  emailPersonal: true,
+                  user: { select: { email: true } },
+                },
+              },
+            },
           }),
         ]);
         const emails = new Set<string>();
-        for (const contact of contacts) {
-          if (contact.user.email) emails.add(contact.user.email);
-        }
+        const addEmail = (email: string | null | undefined) => {
+          if (email && email.includes('@')) emails.add(email);
+        };
+        for (const contact of contacts) addEmail(contact.user.email);
         for (const role of volunteers) {
-          const email = role.volunteer.user?.email;
-          if (email) emails.add(email);
+          addEmail(role.volunteer.user?.email);
+          addEmail(role.volunteer.emailJw);
+          addEmail(role.volunteer.emailPersonal);
         }
         if (session.user.email) emails.delete(session.user.email);
         notified = await sendWorkHelpEmail({
