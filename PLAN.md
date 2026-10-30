@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.40.0 is LIVE on blue (CT133) at `9f368a3`. STANDBY green (CT135) is `8b8291c` (not shipped). Slices 1–6 are shipped. Hub dates are paused.
+**Status:** v1.41.0 is LIVE on green (CT135) at `16ffef1` and synced to blue (CT133). Slices 1–6 are shipped. Hub dates are paused.
 
 ---
 

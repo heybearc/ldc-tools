@@ -2,17 +2,18 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Work list, help, and team chat on STANDBY. Not shipped. Hub dates stay paused.
+**Working on:** Hub dates stay paused. v1.41.0 is shipped.
 
 ---
 
 ## Current Task
-v1.40.0 is shipped. Hub start and end dates stay paused until the Persons export is back.
+v1.41.0 is shipped. Hub start and end dates stay paused until the Persons export is back.
 
 ### What I'm doing right now
-v1.40.0 (`9f368a3`) is LIVE on blue (CT133). STANDBY green (CT135) is `8b8291c`: process runs, My Work, help replies, team chat, and air-gapped mail blocked. Not shipped. Chat and the email toggles were not retested in the browser after that deploy.
+v1.41.0 (`16ffef1`) is LIVE on green (CT135) and synced to blue (CT133).
 
 ### Recent completions
+- ✅ Shipped v1.41.0 (`16ffef1`). Team chat, My Work, help replies, and finishing several tasks. qa-01 full suite 72/72. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.40.0 (`9f368a3`). Work opens on the group already chosen. A task can have no deadline. Several open tasks can be assigned to one person. qa-01 full suite 71/71. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.39.0 (`6ab0f34`). Crew-update import creates claimable work and keeps the requestor. qa-01 full suite 69/69. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.38.1 (`e384d04`). Resend Invitation no longer writes region fields. qa-01 admin gate passed. LIVE blue CT133, STANDBY green CT135.
