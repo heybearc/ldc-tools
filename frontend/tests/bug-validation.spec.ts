@@ -214,7 +214,8 @@ test.describe('Bug Validation Suite', () => {
 
     const firstUserName = await page.locator('tbody tr').first().locator('td').first().textContent();
     console.log(`BUG-008: First user after sort: ${firstUserName}`);
-    await expect(page.locator('[role="alert"]')).toHaveCount(0);
+    const alertText = (await page.getByRole('alert').allTextContents()).join('').trim();
+    expect(alertText).toBe('');
   });
 
   test('BUG-009: Admin navigation menu overlap on small screens', async ({ page }) => {
