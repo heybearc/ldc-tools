@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.34.0**
+Current: **1.35.0**
 
 ## Version History
+- **v1.35.0** (2026-10-30) - Start a process onto the work list, and give Personnel its own directory card
 - **v1.34.0** (2026-10-30) - Dated work on a project also shows on the work list
 - **v1.33.0** (2026-10-29) - Projects list for the construction group, with Personnel assigned by oversight
 - **v1.32.0** (2026-10-29) - Work list for the construction group
@@ -33,6 +34,14 @@ Current: **1.34.0**
 - Tasks for the signed-in construction group
 - Personnel add and assign them
 - Claimable tasks can be taken by anyone signed in to that group
+
+### Processes
+- A checklist saved for this construction group
+- Starting it puts each step on the work list
+
+### Directory
+- Construction group, Personnel, and ancillary contacts sit above the trades
+- Sign-in opens the dashboard
 
 ### Projects
 - Projects for the signed-in construction group

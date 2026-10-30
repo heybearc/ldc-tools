@@ -1,5 +1,16 @@
 # LDC Tools Release Notes
 
+## v1.35.0 - Processes and Personnel
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- Save a process for this construction group and start it
+- Each step shows up on the work list
+- Personnel has its own card on the directory
+- Sign-in opens the dashboard
+
 ## v1.34.0 - Project dates
 
 **Release Date:** October 30, 2026
