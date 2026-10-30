@@ -39,7 +39,6 @@ function retiredDestination(pathname: string): string | null {
   }
 
   const retiredHelp = [
-    '/help/projects',
     '/help/volunteers',
     '/help/volunteer-roles',
     '/help/crew-requests',

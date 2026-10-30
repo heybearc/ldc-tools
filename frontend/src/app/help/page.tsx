@@ -45,6 +45,13 @@ const helpTopics: HelpTopic[] = [
     icon: '📋'
   },
   {
+    id: 'processes',
+    title: 'Processes',
+    description: 'Start a checklist and put each step on the work list',
+    roles: ['SUPER_ADMIN', 'ZONE_OVERSEER', 'PERSONNEL_CONTACT', 'READ_ONLY'],
+    icon: '✅'
+  },
+  {
     id: 'projects',
     title: 'Projects',
     description: 'See this construction group’s projects, dated work, and who is assigned as Personnel',

@@ -2,15 +2,15 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Release v1.34.0, then processes (slice 5)
+**Working on:** Region work queue, slice 5 (processes) on standby
 
 ---
 
 ## Current Task
-**Processes** — next (slice 5), after v1.34.0 is live
+**Processes** — built (slice 5). Next is the crew-request import (slice 6) after this is on standby.
 
 ### What I'm doing right now
-v1.34.0 puts a project date on the project and on the work list. Next is a process template whose steps become work items.
+v1.34.0 is LIVE on green. Personnel save a process and start it. Each step becomes a work item with its explanation. Not shipped.
 
 ### Recent completions
 - ✅ Shipped v1.33.0 (`9db88f9`); qa-01 full suite 61/61 plus the projects tests passed
@@ -23,7 +23,7 @@ v1.34.0 puts a project date on the project and on the work list. Next is a proce
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Build processes (slice 5)
+Crew-request import (slice 6), after processes are on standby
 
 ---
 
@@ -35,4 +35,4 @@ Build processes (slice 5)
 ---
 
 ## Exact Next Command
-Build processes (slice 5)
+Crew-request import (slice 6), after processes are on standby

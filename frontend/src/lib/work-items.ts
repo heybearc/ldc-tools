@@ -1,4 +1,4 @@
-export const WORK_TIMING_KINDS = ['DEADLINE', 'PROJECT_DATE', 'MONTHLY', 'YEARLY'] as const;
+export const WORK_TIMING_KINDS = ['DEADLINE', 'PROJECT_DATE', 'MONTHLY', 'YEARLY', 'PROCESS'] as const;
 export type WorkTimingKind = (typeof WORK_TIMING_KINDS)[number];
 
 export const PERSONNEL_ROLE_CODES = ['PC', 'PCA', 'PC-Support', 'PC_SUPPORT'] as const;
@@ -37,6 +37,7 @@ export function timingLabel(
 ): string {
   if (kind === 'MONTHLY') return 'Monthly';
   if (kind === 'YEARLY') return 'Yearly';
+  if (kind === 'PROCESS') return projectName ? `Process · ${projectName}` : 'Process';
   const date = formatCalendarDate(dueOn);
   if (kind === 'PROJECT_DATE') {
     return [date, projectName].filter(Boolean).join(' · ');
@@ -68,6 +69,9 @@ export function validateWorkItemInput(body: Record<string, unknown>): { ok: true
   const dueOn = optionalText(body.dueOn);
   if ((timingKind === 'DEADLINE' || timingKind === 'PROJECT_DATE') && !dueOn) {
     return { ok: false, error: 'A date is required' };
+  }
+  if (timingKind === 'PROCESS' && dueOn) {
+    return { ok: false, error: 'A process step does not take a date' };
   }
   if (dueOn && !/^\d{4}-\d{2}-\d{2}$/.test(dueOn)) {
     return { ok: false, error: 'Use a calendar date' };
@@ -103,7 +107,7 @@ export function validateWorkItemInput(body: Record<string, unknown>): { ok: true
       explanation: optionalText(body.explanation),
       referenceUrl,
       timingKind: timingKind as WorkTimingKind,
-      dueOn: timingKind === 'MONTHLY' || timingKind === 'YEARLY' ? null : dueOn,
+      dueOn: timingKind === 'MONTHLY' || timingKind === 'YEARLY' || timingKind === 'PROCESS' ? null : dueOn,
       projectId,
       claimable: body.claimable === true,
       assigneeId: optionalText(body.assigneeId),

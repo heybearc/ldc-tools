@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.34.0 is the project-date release. Next is processes (slice 5). Hub dates are paused.
+**Status:** v1.34.0 is LIVE. Slice 5 (processes) is the unreleased work. Hub dates are paused.
 
 ---
 
@@ -25,7 +25,8 @@
 - [x] Slice 2 — work list
 - [x] Slice 3 — projects; `/ship` v1.33.0
 - [x] Slice 4 — project dates on the project and the work list
-- [ ] Slices 5–6 below, in order
+- [x] Slice 5 — process templates whose steps become work items
+- [ ] Slice 6 below
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

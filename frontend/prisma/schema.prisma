@@ -81,6 +81,7 @@ model User {
   assignedWorkItems   WorkItem[]          @relation("WorkItemAssignee")
   createdWorkItems    WorkItem[]          @relation("WorkItemCreator")
   projectPersonnel    ProjectPersonnel[]
+  processTemplates    ProcessTemplate[]   @relation("ProcessTemplateCreator")
 }
 
 model VerificationToken {
@@ -432,6 +433,7 @@ model ConstructionGroup {
   announcements   Announcement[]
   crewChangeRequests CrewChangeRequest[]
   workItems       WorkItem[]
+  processTemplates ProcessTemplate[]
   auditLogsFrom   AuditLog[]  @relation("AuditLogFromCG")
   auditLogsTo     AuditLog[]  @relation("AuditLogToCG")
 
@@ -992,6 +994,7 @@ enum WorkTimingKind {
   PROJECT_DATE
   MONTHLY
   YEARLY
+  PROCESS
 }
 
 enum WorkStatus {
@@ -1030,6 +1033,38 @@ model WorkItem {
   @@index([status])
   @@index([assigneeId])
   @@map("work_items")
+}
+
+model ProcessTemplate {
+  id                  String   @id @default(cuid())
+  constructionGroupId String
+  name                String
+  isActive            Boolean  @default(true)
+  createdById         String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  constructionGroup   ConstructionGroup @relation(fields: [constructionGroupId], references: [id], onDelete: Cascade)
+  createdBy           User              @relation("ProcessTemplateCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  steps               ProcessStep[]
+
+  @@index([constructionGroupId])
+  @@map("process_templates")
+}
+
+model ProcessStep {
+  id            String  @id @default(cuid())
+  templateId    String
+  position      Int
+  title         String
+  detail        String  @db.Text
+  explanation   String? @db.Text
+  referenceUrl  String?
+
+  template      ProcessTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@map("process_steps")
 }
 
 model ProjectPersonnel {
