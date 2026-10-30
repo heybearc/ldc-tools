@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.35.0 is LIVE on blue (CT133) at `422989e`. STANDBY green (CT135) is the same commit. Next is slice 6, waiting on the crew-request spreadsheet. Hub dates are paused.
+**Status:** v1.36.0 is LIVE on green (CT135) at `7537896`. STANDBY blue (CT133) has Personnel profile links (`12d9e2b`). Next is slice 6, waiting on the crew-request spreadsheet. Hub dates are paused.
 
 ---
 
@@ -26,6 +26,8 @@
 - [x] Slice 3 — projects; `/ship` v1.33.0
 - [x] Slice 4 — project dates on the project and the work list
 - [x] Slice 5 — process templates; `/ship` v1.35.0
+- [x] Admin link, Personnel user list, construction-group access; `/ship` v1.36.0
+- [x] CG 01.12 Personnel roster loaded; profile links on STANDBY (`12d9e2b`)
 - [ ] Slice 6 below — blocked until the Microsoft Form spreadsheet is in hand
 
 ### Completed This Phase

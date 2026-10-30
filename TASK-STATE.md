@@ -2,17 +2,20 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Region work queue, slice 6 (crew-request import) waiting on the spreadsheet
+**Working on:** User management save and cancel-invitation, then slice 6 when the spreadsheet arrives
 
 ---
 
 ## Current Task
-**Crew-request import** — next (slice 6). The Microsoft Form file is not in the repo, so the column map is not started.
+**User management** — name and email save, and cancel an invitation. Crew-request import (slice 6) still waits on the spreadsheet.
 
 ### What I'm doing right now
-v1.35.0 (`422989e`) is LIVE on blue (CT133) and STANDBY on green (CT135).
+v1.36.0 (`7537896`) is LIVE on green (CT135). STANDBY blue (CT133) has the Personnel profile links (`12d9e2b`).
 
 ### Recent completions
+- ✅ Personnel directory names open a profile (`12d9e2b`) on STANDBY
+- ✅ Shipped v1.36.0 (`7537896`); qa-01 admin gate plus construction-group access test passed
+- ✅ Loaded the CG 01.12 Personnel roster into the shared database
 - ✅ Shipped v1.35.0 (`422989e`); qa-01 full suite 64/64 plus generated tests passed
 - ✅ Shipped v1.34.0 (`707ae63`); qa-01 directory gate plus the project-schedule test passed
 - ✅ Shipped v1.33.0 (`9db88f9`); qa-01 full suite 61/61 plus the projects tests passed

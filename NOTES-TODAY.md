@@ -6,9 +6,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
-- v1.35.0 is LIVE on blue (CT133) and synced on green (CT135), both `422989e`. Next is the crew-request import, which waits on the spreadsheet.
+- v1.36.0 (`7537896`) is LIVE on green (CT135). STANDBY blue (CT133) is `12d9e2b` plus the user-management save fix. Crew-request import still waits on the spreadsheet.
 
 ### Discoveries / Notes
+- Shipped v1.36.0 (`7537896`). Admin is a direct link. User management lists this region's Personnel. Super admin and Personnel keep a construction group, so Work and Projects can add items. LIVE green CT135, STANDBY was synced to the same commit.
+- CG 01.12 Personnel roster from the hub screenshot is in the shared database, including invited user accounts. New accounts have no password until an admin sets one.
+- Personnel, Construction group, and Ancillary names open a profile on STANDBY (`12d9e2b`). Live does not have that until the next ship.
+- User management name and email inputs were not bound, so Save reported success and wrote the old values. Cancel invitation is on the row menu for invited users.
+- Open urgent feedback: 0.
 - Shipped v1.35.0 (`422989e`). Processes start onto the work list. Personnel has its own directory card. Sign-in opens the dashboard. qa-01 full suite 64/64 plus 6 generated tests. LIVE blue CT133, STANDBY green CT135.
 - The crew-request spreadsheet is not in the repo. Slice 6 stays unmapped until that file is here.
 - Open urgent feedback: 0.
