@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Nothing queued. Hub dates stay paused.
+**Working on:** Work list, help, and team chat on STANDBY. Not shipped. Hub dates stay paused.
 
 ---
 
@@ -10,7 +10,7 @@
 v1.40.0 is shipped. Hub start and end dates stay paused until the Persons export is back.
 
 ### What I'm doing right now
-v1.40.0 (`9f368a3`) is LIVE on blue (CT133) and STANDBY on green (CT135). qa-01 full suite 71/71 plus the work-assign tests passed.
+v1.40.0 (`9f368a3`) is LIVE on blue (CT133). STANDBY green (CT135) is `8b8291c`: process runs, My Work, help replies, team chat, and air-gapped mail blocked. Not shipped. Chat and the email toggles were not retested in the browser after that deploy.
 
 ### Recent completions
 - ✅ Shipped v1.40.0 (`9f368a3`). Work opens on the group already chosen. A task can have no deadline. Several open tasks can be assigned to one person. qa-01 full suite 71/71. LIVE blue CT133, STANDBY green CT135.
@@ -34,7 +34,7 @@ v1.40.0 (`9f368a3`) is LIVE on blue (CT133) and STANDBY on green (CT135). qa-01 
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Hub dates stay paused until the Persons export is back.
+Test chat and the email toggles on `https://green.ldctools.com`. Do not switch traffic until that passes.
 
 ---
 
@@ -46,4 +46,4 @@ Hub dates stay paused until the Persons export is back.
 ---
 
 ## Exact Next Command
-Hub dates stay paused until the Persons export is back.
+Test chat and the email toggles on `https://green.ldctools.com`. Do not switch traffic until that passes.

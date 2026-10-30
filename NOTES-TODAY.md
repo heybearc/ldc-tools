@@ -8,6 +8,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ### Focus
 - Shipped v1.40.0 (`9f368a3`). LIVE blue CT133, STANDBY green CT135. qa-01 full suite 71/71. Work uses the header group, a task can have no deadline, and several tasks can be assigned together. Bulk claim was left out. Hub dates stay paused.
 
+### Mid-day (evening)
+- STANDBY green CT135 is `8b8291c`. LIVE is still v1.40.0 (`9f368a3`) on blue CT133. Not shipped.
+- A process is one work item. Steps stay inside it. Done stores a date. Done rows sit in a collapsed section. Bulk select, page size, My Work, and a dashboard summary of assigned work are on STANDBY.
+- Help emails only the Personnel Contact and Assistant. Replies and an unread mark stay on the work item. Chat is separate: one team room and direct messages, with browser notifications after Turn on notifications.
+- `bethel.jw.org` and `jwpub.org` are never mailed, on crew requests and on help. Crew-request completion email can be turned off on one request or in bulk.
+- Open urgent feedback: 0. Chat and the email toggles were not retested in the browser after `8b8291c`.
+- The Excel import template and `frontend/tsconfig.tsbuildinfo` are still uncommitted.
+
 ### Mid-day
 - Shipped v1.37.0 (`756ef8b`): directory profile from a name; admin name, email, and cancel invitation. Then v1.38.0 (`9f56415`): invite form on User Management and toast confirmations.
 - Shipped v1.38.1 (`e384d04`): Resend Invitation failed because it wrote `regionId` and `zoneId` onto `UserInvitation`. qa-01 admin gate passed. Both nodes synced.
@@ -53,6 +61,9 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - No usage watch or alert. Sign-in updates lastLogin and loginCount. Admin health is on demand only.
 
 ### Decisions to Promote
+- D-LDC-011: a process is one work item. Steps stay inside it.
+- D-LDC-012: never mail `bethel.jw.org` or `jwpub.org`.
+- D-LDC-013: team chat is a construction-group room plus direct messages. Help stays on the work item.
 - D-LDC-010: directory groups plus construction-group work. Oversight assigns projects. Personnel assign tasks. Claimable tasks can be claimed by the team.
 - Sisters can only be Support. Mark Sister on each woman; they are not classified automatically.
 - The populated trade name is Sitework/Civil. Site/Civil was an empty duplicate.

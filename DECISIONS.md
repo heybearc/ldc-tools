@@ -79,3 +79,15 @@ For shared architectural decisions that apply to all apps, see `.cloudy-work/_cl
 - **Date:** 2026-10-29
 - **Decision:** Directory lists trades, construction group contacts, and ancillary region people. Oversight assigns Personnel to projects. Personnel Contact, Assistant, and Support assign tasks. A claimable task can be taken by anyone signed in to that construction group. No hierarchy editor.
 - **Why:** Other regions may use the same app. A person belongs to the construction group where they serve, and that group's data does not leak.
+
+## D-LDC-011: A process is one work item
+- **Date:** 2026-10-30
+- **Decision:** Starting or claiming a process creates one claimable work item. Steps stay inside it. Completing it marks that item done and stores the date.
+
+## D-LDC-012: Bethel and JW Pub mail is never sent
+- **Date:** 2026-10-30
+- **Decision:** `bethel.jw.org` and `jwpub.org` (and subdomains) are air-gapped. Crew-request completion mail and help mail never use them. The address can still show on the request.
+
+## D-LDC-013: Team chat is separate from help
+- **Date:** 2026-10-30
+- **Decision:** Each construction group has one team room and direct messages, with browser notifications after the person turns them on. Help stays a note on the work item and emails only the Personnel Contact and Assistant.
