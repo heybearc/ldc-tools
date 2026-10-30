@@ -629,8 +629,8 @@ export default function UserManagementPage() {
                               } else {
                                 const rect = e.currentTarget.getBoundingClientRect();
                                 setDropdownPosition({
-                                  top: rect.bottom + window.scrollY + 8,
-                                  left: rect.right + window.scrollX - 192 // 192px = w-48
+                                  top: rect.bottom + 8,
+                                  left: Math.max(8, rect.right - 192)
                                 });
                                 setOpenDropdownId(user.id);
                               }
