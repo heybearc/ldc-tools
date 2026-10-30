@@ -1,14 +1,20 @@
 ---
-date: 2026-10-29
+date: 2026-10-30
 purpose: Scratchpad for today's discoveries (promote on /end-day)
 ---
 
 ## Today
 
 ### Focus
-- Work list is LIVE. Projects are on STANDBY. Next is the project schedule.
+- v1.34.0 is LIVE on green. Processes are on STANDBY blue. Next is to ship processes, then the crew-request import.
 
 ### Discoveries / Notes
+- Shipped v1.33.0 (`9db88f9`). Projects list. Oversight assigns Personnel. qa-01 full suite 61/61.
+- Shipped v1.34.0 (`707ae63`). A project date shows on the project and the work list. LIVE green CT135, both nodes were synced on that release before the next slice.
+- Processes (`163f0a3`) are on STANDBY blue CT133. Starting a template creates a work item per step, with its explanation. The standby check passed. Not shipped.
+- `/help/projects` is no longer a retired route, so the projects help page loads.
+- Local `git push` over SSH was denied. The release and process commits went out with `gh` credentials.
+- The Excel import template and `frontend/tsconfig.tsbuildinfo` are still uncommitted.
 - Removed 167 volunteer records that were not in the directory and had no login. Removed Dathan Sours and Tobias Torres. Kept the other asked-about accounts.
 - Construction group section on CG 01.12: Cory Allen (Contact), Matt Hirsch (Assistant), Amber Allen, Cory L Test, Ruth Hirsch, Kennedy Allen, Amber Williams (Support). Ancillary is empty.
 - Support for those five is a volunteer role, not a PersonnelContact row.

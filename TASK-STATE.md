@@ -10,9 +10,10 @@
 **Processes** — built (slice 5). Next is the crew-request import (slice 6) after this is on standby.
 
 ### What I'm doing right now
-v1.34.0 is LIVE on green. Personnel save a process and start it. Each step becomes a work item with its explanation. Not shipped.
+v1.34.0 (`707ae63`) is LIVE on green (CT135). Processes (`163f0a3`) are on STANDBY blue (CT133) and are not shipped.
 
 ### Recent completions
+- ✅ Shipped v1.34.0 (`707ae63`); qa-01 directory gate plus the project-schedule test passed
 - ✅ Shipped v1.33.0 (`9db88f9`); qa-01 full suite 61/61 plus the projects tests passed
 - ✅ Shipped v1.32.0 (`33baf50`); qa-01 full suite 60/60 plus the work-list test passed
 - ✅ Shipped v1.31.0 (`7bbb610`); qa-01 directory+admin gate and directory-groups tests passed
@@ -23,7 +24,7 @@ v1.34.0 is LIVE on green. Personnel save a process and start it. Each step becom
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Crew-request import (slice 6), after processes are on standby
+Ship processes, then the crew-request import (slice 6)
 
 ---
 
@@ -35,4 +36,4 @@ Crew-request import (slice 6), after processes are on standby
 ---
 
 ## Exact Next Command
-Crew-request import (slice 6), after processes are on standby
+Ship processes, then the crew-request import (slice 6)

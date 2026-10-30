@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.34.0 is LIVE. Slice 5 (processes) is the unreleased work. Hub dates are paused.
+**Status:** v1.34.0 is LIVE on green (CT135) at `707ae63`. Slice 5 (`163f0a3`) is on STANDBY blue (CT133), not shipped. Hub dates are paused.
 
 ---
 
