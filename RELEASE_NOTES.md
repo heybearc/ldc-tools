@@ -1,5 +1,22 @@
 # LDC Tools Release Notes
 
+## v1.41.0 - Chat with your team
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- Message the team, or one teammate, in this construction group
+- Assigned tasks are on My Work
+- Reply on a help request, and see when a reply is unread
+- Select several open tasks and mark them done together
+
+### 🐛 Bug Fixes
+
+- A help request goes to the Personnel Contact and Assistant
+- A Bethel or jwpub.org address is not emailed
+- Marking a crew request done still shows who asked for it
+
 ## v1.40.0 - Work without a deadline
 
 **Release Date:** October 30, 2026

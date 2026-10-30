@@ -38,6 +38,13 @@ const helpTopics: HelpTopic[] = [
     icon: '📋'
   },
   {
+    id: 'chat',
+    title: 'Chat',
+    description: 'Message the team or one person in this construction group',
+    roles: ['SUPER_ADMIN', 'ZONE_OVERSEER', 'PERSONNEL_CONTACT', 'READ_ONLY'],
+    icon: '💬'
+  },
+  {
     id: 'work',
     title: 'Work',
     description: 'Add, assign, and claim tasks for this construction group',

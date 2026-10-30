@@ -5,6 +5,19 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.41.0] - 2026-10-30
+
+### Added
+- Team chat and a direct message for the signed-in construction group
+- My Work for tasks assigned to you
+- Replies on a help request, with unread until the reply is opened
+- Finish several selected tasks together
+
+### Fixed
+- Help email goes to the Personnel Contact and Assistant
+- Bethel and jwpub.org addresses are not emailed
+- Finishing a task still returns the requestor
+
 ## [1.40.0] - 2026-10-30
 
 ### Added

@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.40.0**
+Current: **1.41.0**
 
 ## Version History
+- **v1.41.0** (2026-10-30) - Team chat, My Work, help replies, and finishing several tasks
 - **v1.40.0** (2026-10-30) - Tasks can have no deadline, and several can be assigned at once
 - **v1.39.0** (2026-10-30) - Import a crew-update spreadsheet onto the work list
 - **v1.38.1** (2026-10-30) - Resend an invitation email for someone who is already invited
@@ -40,10 +41,13 @@ Current: **1.40.0**
 - Tasks for the signed-in construction group
 - Personnel add and assign them
 - Claimable tasks can be taken by anyone signed in to that group
+- Assigned tasks are on My Work
+- Several open tasks can be marked done together
+- Help requests can be answered on the task
 
 ### Processes
 - A checklist saved for this construction group
-- Starting it puts each step on the work list
+- Starting it adds one claimable process, and the steps stay inside it
 
 ### Directory
 - Construction group, Personnel, and ancillary contacts sit above the trades
@@ -61,6 +65,7 @@ Current: **1.40.0**
 - Crew change request workflow
 
 ### Communication
+- Team chat and a direct message for this construction group
 - Email configuration (Gmail/SMTP)
 - Invitation emails with personalized greetings
 - Crew request notifications

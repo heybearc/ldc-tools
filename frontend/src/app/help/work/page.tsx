@@ -49,7 +49,7 @@ export default async function WorkHelpPage() {
             Personnel can import the Microsoft Form spreadsheet from Work. Each row becomes a claimable task
             with the requestor, volunteer, crew, project roster, and comments. Importing the same spreadsheet again
             does not add those rows a second time. Marking the task Done keeps the requestor on it. If email is
-            already configured, the requestor is told.
+            already configured, the requestor is told. A Bethel or jwpub.org address is not emailed.
           </p>
 
           <h2>Finish a task</h2>
