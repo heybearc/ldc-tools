@@ -39,7 +39,7 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
   await expect(page.getByText('Available work')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Assigned to you' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Projects' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Projects' })).toBeVisible();
   await expect(page.getByText('Leadership contacts')).toHaveCount(0);
 
   await page.goto('/my-work');
