@@ -1,5 +1,19 @@
 # LDC Tools Release Notes
 
+## v1.37.0 - Directory profiles and user corrections
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- Open a profile from a construction group, Personnel, or ancillary name
+- Change a user's name or email
+- Cancel an invitation that has not been accepted
+
+### 🐛 Bug Fixes
+
+- The user actions menu stays on screen
+
 ## v1.36.0 - Construction group access
 
 **Release Date:** October 30, 2026

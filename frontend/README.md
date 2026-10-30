@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.36.0**
+Current: **1.37.0**
 
 ## Version History
+- **v1.37.0** (2026-10-30) - Open a profile from the directory, and correct a user name, email, or invitation
 - **v1.36.0** (2026-10-30) - Stay in your construction group so Personnel can add work and projects
 - **v1.35.0** (2026-10-30) - Start a process onto the work list, and give Personnel its own directory card
 - **v1.34.0** (2026-10-30) - Dated work on a project also shows on the work list
