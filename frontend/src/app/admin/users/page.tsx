@@ -344,7 +344,7 @@ export default function UserManagementPage() {
             User Management
           </h2>
           <p className="text-sm sm:text-base text-gray-600 mt-1">
-            Manage user accounts, roles, and invitations
+            Personnel team for this region. Contact, Assistant, and Support.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -520,7 +520,7 @@ export default function UserManagementPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Last Login
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="sticky right-0 z-10 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.2)]">
                   Actions
                 </th>
               </tr>
@@ -534,7 +534,7 @@ export default function UserManagementPage() {
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr key={user.id} className="group hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
@@ -579,7 +579,7 @@ export default function UserManagementPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium relative">
+                    <td className="sticky right-0 z-10 bg-white group-hover:bg-gray-50 px-6 py-4 whitespace-nowrap text-right text-sm font-medium shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.2)]">
                       <div className="flex items-center justify-end space-x-2 relative">
                         <button
                           onClick={() => {

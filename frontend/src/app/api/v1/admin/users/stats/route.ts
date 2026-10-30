@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { isAdmin } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
+import { getCGScope } from '@/lib/cg-scope';
+import { personnelAccountWhere } from '@/lib/personnel-accounts';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,21 +18,17 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Get total users
-    const totalUsers = await prisma.user.count();
-    
-    // Get active users (email verified)
+    const cgScope = await getCGScope();
+    const personnel = personnelAccountWhere(cgScope?.regionId || null);
+
+    const totalUsers = await prisma.user.count({ where: personnel });
+
     const activeUsers = await prisma.user.count({
-      where: {
-        emailVerified: { not: null }
-      }
+      where: { AND: [personnel, { emailVerified: { not: null } }] },
     });
-    
-    // Get invited users (not verified)
+
     const invitedUsers = await prisma.user.count({
-      where: {
-        emailVerified: null
-      }
+      where: { AND: [personnel, { emailVerified: null }] },
     });
     
     const stats = {

@@ -115,27 +115,10 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                   Trade Teams
                 </Link>
 
-                {/* Admin Dropdown */}
                 {canAccessAdmin(session) && (
-                  <div className="relative">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpenDropdown(openDropdown === 'admin' ? null : 'admin');
-                      }}
-                      className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1"
-                    >
-                      <span>Admin</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
-                    {openDropdown === 'admin' && (
-                      <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                        <Link href="/admin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Admin Dashboard
-                        </Link>
-                      </div>
-                    )}
-                  </div>
+                  <Link href="/admin" className={navClass(pathname?.startsWith('/admin'))}>
+                    Admin
+                  </Link>
                 )}
 
                 <span className="text-gray-300">|</span>
@@ -252,7 +235,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                     className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    🔐 Admin Dashboard
+                    Admin Control Center
                   </Link>
                 </div>
               )}

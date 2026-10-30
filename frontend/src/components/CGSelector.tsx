@@ -27,10 +27,29 @@ export default function CGSelector() {
 
     const loadCGs = async () => {
       try {
-        const response = await fetch('/api/v1/construction-groups');
-        if (response.ok) {
-          const data = await response.json();
-          setConstructionGroups(data.constructionGroups || []);
+        const [groupsResponse, filterResponse] = await Promise.all([
+          fetch('/api/v1/construction-groups'),
+          fetch('/api/v1/user/set-cg-filter'),
+        ]);
+        const data = groupsResponse.ok ? await groupsResponse.json() : {};
+        const filter = filterResponse.ok ? await filterResponse.json() : {};
+        setConstructionGroups(data.constructionGroups || []);
+
+        const storedCG = localStorage.getItem('selectedCG');
+        if (storedCG && storedCG !== filter.constructionGroupId) {
+          setSelectedCG(storedCG);
+          await fetch('/api/v1/user/set-cg-filter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ constructionGroupId: storedCG }),
+          });
+          window.dispatchEvent(new CustomEvent('cg-filter-changed'));
+        } else if (filter.viewingAll) {
+          setSelectedCG(null);
+        } else if (filter.constructionGroupId || data.effectiveConstructionGroupId) {
+          const activeId = filter.constructionGroupId || data.effectiveConstructionGroupId;
+          setSelectedCG(activeId);
+          localStorage.setItem('selectedCG', activeId);
         }
       } catch (error) {
         console.error('Failed to load construction groups:', error);
@@ -40,11 +59,6 @@ export default function CGSelector() {
     };
 
     loadCGs();
-
-    const storedCG = localStorage.getItem('selectedCG');
-    if (storedCG) {
-      setSelectedCG(storedCG);
-    }
   }, [isSuperAdmin]);
 
   const handleCGChange = async (cgId: string | null) => {

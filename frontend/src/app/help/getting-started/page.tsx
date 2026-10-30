@@ -54,11 +54,11 @@ export default async function GettingStartedPage() {
               <li><strong>Dashboard</strong> → Home, with counts and links into the directory</li>
               <li><strong>Directory</strong> → Trade and crew leadership, search, and export</li>
               <li><strong>Trade Teams</strong> → The teams and the crews under them</li>
-              <li><strong>Admin</strong> → Admin Dashboard (administrators only)</li>
+              <li><strong>Admin</strong> → Admin Control Center (administrators only)</li>
               <li><strong>Help</strong> → Help Center, My Feedback, Release Notes</li>
             </ul>
             <p className="text-green-800 mt-3 mb-0">
-              Simply click on any menu item to see the dropdown options, then click your desired page.
+              Admin opens the Admin Control Center. Help opens the help pages.
             </p>
           </div>
 

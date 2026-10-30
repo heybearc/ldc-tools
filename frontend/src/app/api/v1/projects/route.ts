@@ -5,6 +5,8 @@ import { authOptions } from '@/lib/auth-config';
 import { getCGScope } from '@/lib/cg-scope';
 import { getUserOrgRoles, checkPermission } from '@/lib/api-permissions';
 import { canManageProjects } from '@/lib/permissions';
+import { canPostWork } from '@/lib/work-item-access';
+import { canAssignProjectPersonnel } from '@/lib/project-personnel';
 
 // GET /api/v1/projects - List all projects (CG scoped)
 export async function GET(request: NextRequest) {
@@ -81,9 +83,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check permissions - requires management role or admin
+    const cgScope = await getCGScope();
     const userOrgRoles = await getUserOrgRoles(session);
-    const permissionError = checkPermission(canManageProjects(session, userOrgRoles));
+    const inGroup = Boolean(session.user.id && cgScope?.constructionGroupId);
+    const allowed =
+      canManageProjects(session, userOrgRoles) ||
+      (inGroup &&
+        ((await canPostWork(session.user.id, cgScope!)) ||
+          (await canAssignProjectPersonnel(session.user.id, cgScope!))));
+    const permissionError = checkPermission(allowed);
     if (permissionError) return permissionError;
 
     const body = await request.json();
@@ -106,9 +114,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Project name is required' }, { status: 400 });
     }
 
-    // Get CG scope to determine the construction group
-    const cgScope = await getCGScope();
-    const cgId = constructionGroupId || cgScope?.constructionGroupId;
+    const cgId = cgScope?.constructionGroupId || (canManageProjects(session, userOrgRoles) ? constructionGroupId : null);
     
     if (!cgId) {
       return NextResponse.json({ error: 'Construction Group is required' }, { status: 400 });

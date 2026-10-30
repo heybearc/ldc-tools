@@ -20,6 +20,42 @@ export interface CGScope {
   canManageCG: boolean;
 }
 
+const constructionGroupScopeInclude = {
+  region: {
+    include: {
+      zone: {
+        include: { branch: true },
+      },
+    },
+  },
+} as const;
+
+async function constructionGroupForUser(userId: string, email: string | null | undefined) {
+  const volunteer = await prisma.volunteer.findFirst({
+    where: {
+      isActive: true,
+      OR: [
+        { user: { id: userId } },
+        ...(email
+          ? [
+              { emailPersonal: { equals: email, mode: 'insensitive' as const } },
+              { emailJw: { equals: email, mode: 'insensitive' as const } },
+            ]
+          : []),
+      ],
+    },
+    include: { constructionGroup: { include: constructionGroupScopeInclude } },
+  });
+  if (volunteer?.constructionGroup) return volunteer.constructionGroup;
+
+  const contact = await prisma.personnelContact.findFirst({
+    where: { userId, isActive: true, endDate: null },
+    include: { constructionGroup: { include: constructionGroupScopeInclude } },
+    orderBy: { startDate: 'desc' },
+  });
+  return contact?.constructionGroup || null;
+}
+
 // Roles that can see all data across branches
 const BRANCH_LEVEL_ROLES = ['SUPER_ADMIN'];
 
@@ -86,37 +122,32 @@ export async function getCGScope(): Promise<CGScope | null> {
   if (!user) return null;
 
   const role = user.role;
-  
+
   // Derive CG from linked volunteer (source of truth)
   // Fall back to user.constructionGroup for break-glass SUPER_ADMIN accounts
-  let cg = user.volunteer?.constructionGroup || user.constructionGroup;
+  let cg = user.volunteer?.constructionGroup || user.constructionGroup || null;
 
-  // For SUPER_ADMIN, check if they have a CG filter set
+  if (!cg) {
+    cg = await constructionGroupForUser(user.id, user.email);
+  }
+
+  // SUPER_ADMIN stays in their own group unless they explicitly choose All or another group.
+  // A missing cookie used to mean "all groups", which blocked Work and Projects.
   if (role === 'SUPER_ADMIN') {
     const cookieStore = await cookies();
-    const cgFilter = cookieStore.get('cg_filter');
-    
-    if (cgFilter?.value) {
-      // SUPER_ADMIN has selected a specific CG to view
+    const cgFilter = cookieStore.get('cg_filter')?.value;
+
+    if (cgFilter === 'all') {
+      cg = null;
+    } else if (cgFilter) {
       const selectedCG = await prisma.constructionGroup.findUnique({
-        where: { id: cgFilter.value },
-        include: {
-          region: {
-            include: {
-              zone: {
-                include: { branch: true },
-              },
-            },
-          },
-        },
+        where: { id: cgFilter },
+        include: constructionGroupScopeInclude,
       });
-      
+
       if (selectedCG) {
         cg = selectedCG;
       }
-    } else {
-      // No filter cookie means SUPER_ADMIN wants to see ALL CGs
-      cg = null;
     }
   }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
+import { getCGScope } from '@/lib/cg-scope';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,10 +29,14 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    const scope = await getCGScope();
+
     return NextResponse.json({
       success: true,
       constructionGroups: constructionGroups,
       data: constructionGroups,
+      effectiveConstructionGroupId: scope?.constructionGroupId ?? null,
+      viewingAll: Boolean(scope?.canViewAllBranches && !scope?.constructionGroupId),
     });
   } catch (error) {
     console.error('Failed to fetch construction groups:', error);

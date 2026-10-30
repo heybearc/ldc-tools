@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Building2 } from 'lucide-react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { Building2, Plus } from 'lucide-react';
 
 interface Person {
   id: string;
@@ -60,6 +60,9 @@ export default function ProjectsPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [choice, setChoice] = useState<Record<string, string>>({});
   const [drafts, setDrafts] = useState<Record<string, DateDraft>>({});
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [projectForm, setProjectForm] = useState({ name: '', number: '', location: '' });
 
   const load = useCallback(async () => {
     setError('');
@@ -161,14 +164,94 @@ export default function ProjectsPage() {
     }
   }
 
+  const canCreate = canAssign || canAddDate;
+
+  async function createProject(event: FormEvent) {
+    event.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      const response = await fetch('/api/v1/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: projectForm.name,
+          projectNumber: projectForm.number || null,
+          location: projectForm.location || null,
+        }),
+      });
+      const body = await response.json();
+      if (!response.ok) {
+        setError(body.error || 'Failed to add a project');
+        return;
+      }
+      setProjectForm({ name: '', number: '', location: '' });
+      setShowForm(false);
+      await load();
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Projects</h1>
-        <p className="mt-2 text-gray-600 max-w-3xl">
-          Projects for this construction group. Oversight assigns Personnel. Personnel add a date, and that date also shows on the work list. Crews, budget, and congregations stay off this list.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Projects</h1>
+          <p className="mt-2 text-gray-600 max-w-3xl">
+            Projects for this construction group. Oversight assigns Personnel. Personnel add a date, and that date also shows on the work list. Crews, budget, and congregations stay off this list.
+          </p>
+        </div>
+        {canCreate && (
+          <button
+            type="button"
+            onClick={() => setShowForm((open) => !open)}
+            className="inline-flex items-center justify-center px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add project
+          </button>
+        )}
       </div>
+
+      {showForm && canCreate && (
+        <form onSubmit={createProject} className="bg-white rounded-lg shadow p-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label className="block md:col-span-2">
+              <span className="text-sm font-medium text-gray-700">Name</span>
+              <input
+                required
+                value={projectForm.name}
+                onChange={(event) => setProjectForm({ ...projectForm, name: event.target.value })}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Number</span>
+              <input
+                value={projectForm.number}
+                onChange={(event) => setProjectForm({ ...projectForm, number: event.target.value })}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Location</span>
+              <input
+                value={projectForm.location}
+                onChange={(event) => setProjectForm({ ...projectForm, location: event.target.value })}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+              />
+            </label>
+          </div>
+          <button
+            type="submit"
+            disabled={saving}
+            className="inline-flex items-center justify-center px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
+          >
+            {saving ? 'Saving…' : 'Save project'}
+          </button>
+        </form>
+      )}
 
       {error && <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>}
 
