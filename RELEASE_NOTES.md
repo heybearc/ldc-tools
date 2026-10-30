@@ -1,5 +1,13 @@
 # LDC Tools Release Notes
 
+## v1.38.1 - Resend an invitation
+
+**Release Date:** October 30, 2026
+
+### 🐛 Bug Fixes
+
+- Resend Invitation sends the setup email for someone already marked Invited
+
 ## v1.38.0 - Invite from User Management
 
 **Release Date:** October 30, 2026
