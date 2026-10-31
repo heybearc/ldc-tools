@@ -88,6 +88,11 @@ For shared architectural decisions that apply to all apps, see `.cloudy-work/_cl
 - **Date:** 2026-10-30
 - **Decision:** `bethel.jw.org` and `jwpub.org` (and subdomains) are air-gapped. Crew-request completion mail and help mail never use them. The address can still show on the request.
 
+## D-LDC-014: A persons role with no crew is left unchanged
+- **Date:** 2026-10-30
+- **Decision:** The persons list names current trade roles. A role that includes the trade and crew is current. A role with no crew does not end any assignment. The list has no start or end dates, so no end date is written.
+- **Why:** Ending a crew from an incomplete line would drop the wrong person.
+
 ## D-LDC-013: Team chat is separate from help
 - **Date:** 2026-10-30
 - **Decision:** Each construction group has one team room and direct messages, with browser notifications after the person turns them on. Help stays a note on the work item and emails only the Personnel Contact and Assistant.

@@ -10,7 +10,7 @@
 v1.41.0 is shipped. The persons list is committed. It has no start or end dates, so older assignments are not ended yet.
 
 ### What I'm doing right now
-v1.41.0 (`16ffef1`) is LIVE on green (CT135) and synced to blue (CT133).
+v1.41.0 (`16ffef1`) is LIVE on green (CT135). STANDBY blue (CT133) is `41db3b5` (persons compare, not shipped).
 
 ### Recent completions
 - ✅ Shipped v1.41.0 (`16ffef1`). Team chat, My Work, help replies, and finishing several tasks. qa-01 full suite 72/72. LIVE green CT135, STANDBY blue CT133.
@@ -35,16 +35,16 @@ v1.41.0 (`16ffef1`) is LIVE on green (CT135) and synced to blue (CT133).
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Test chat and the email toggles on `https://green.ldctools.com`. Do not switch traffic until that passes.
+Do not end assignments until the persons list includes start and end dates.
 
 ---
 
 ## Known Issues
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
 - ~9 TC Support without crew → parked as TT Support on an inferred team
-- Hub start and end dates are paused until the Persons export is back
+- Persons list has current roles and no start or end dates. Incomplete crew roles are left unchanged.
 
 ---
 
 ## Exact Next Command
-Test chat and the email toggles on `https://green.ldctools.com`. Do not switch traffic until that passes.
+Do not end assignments until the persons list includes start and end dates.
