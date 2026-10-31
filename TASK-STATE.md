@@ -2,15 +2,15 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Hub assignments from the persons list. Dates are still missing, so nothing is ended.
+**Working on:** Directory contacts. A new trade or crew person is not a sign-in account.
 
 ---
 
 ## Current Task
-v1.41.0 is shipped. The persons list is committed. It has no start or end dates, so older assignments are not ended yet.
+v1.41.0 is shipped. New trade and crew people are directory contacts, not sign-in accounts. Hub dates stay paused.
 
 ### What I'm doing right now
-v1.41.0 (`16ffef1`) is LIVE on green (CT135). STANDBY blue (CT133) is `41db3b5` (persons compare, not shipped).
+v1.41.0 (`16ffef1`) is LIVE on green (CT135). Directory contacts are the next standby build. Hub dates stay paused.
 
 ### Recent completions
 - ✅ Shipped v1.41.0 (`16ffef1`). Team chat, My Work, help replies, and finishing several tasks. qa-01 full suite 72/72. LIVE green CT135, STANDBY blue CT133.
@@ -35,7 +35,7 @@ v1.41.0 (`16ffef1`) is LIVE on green (CT135). STANDBY blue (CT133) is `41db3b5` 
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Do not end assignments until the persons list includes start and end dates.
+Add a trade or crew person on STANDBY and confirm they are not in User Management.
 
 ---
 
@@ -47,4 +47,4 @@ Do not end assignments until the persons list includes start and end dates.
 ---
 
 ## Exact Next Command
-Do not end assignments until the persons list includes start and end dates.
+Add a trade or crew person on STANDBY and confirm they are not in User Management.

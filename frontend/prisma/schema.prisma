@@ -440,6 +440,7 @@ model ConstructionGroup {
   workItems       WorkItem[]
   processTemplates ProcessTemplate[]
   chatChannels    ChatChannel[]
+  directoryContacts DirectoryContact[]
   auditLogsFrom   AuditLog[]  @relation("AuditLogFromCG")
   auditLogsTo     AuditLog[]  @relation("AuditLogToCG")
 
@@ -609,11 +610,33 @@ enum PersonnelContactRole {
   PC_SUPPORT // Personnel Contact Support (multiple)
 }
 
-// Trade Team Oversight - assigns users to trade team leadership roles
+// A directory contact is not a sign-in account. Personnel keep a User.
+model DirectoryContact {
+  id                  String              @id @default(cuid())
+  constructionGroupId String
+  firstName           String
+  lastName            String
+  email               String
+  phone               String?
+  image               String?
+  isSister            Boolean             @default(false)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  constructionGroup   ConstructionGroup   @relation(fields: [constructionGroupId], references: [id], onDelete: Cascade)
+  tradeTeamOversight  TradeTeamOversight[]
+  tradeCrewOversight  TradeCrewOversight[]
+
+  @@unique([constructionGroupId, email])
+  @@map("directory_contacts")
+}
+
+// Trade Team Oversight - a login or a directory contact
 model TradeTeamOversight {
   id          String                   @id @default(cuid())
   tradeTeamId String
-  userId      String
+  userId      String?
+  contactId   String?
   role        TradeTeamOversightRole
   isActive    Boolean                  @default(true)
   startDate   DateTime                 @default(now())
@@ -622,9 +645,11 @@ model TradeTeamOversight {
   updatedAt   DateTime                 @updatedAt
   
   tradeTeam   TradeTeam                @relation(fields: [tradeTeamId], references: [id], onDelete: Cascade)
-  user        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact     DirectoryContact?        @relation(fields: [contactId], references: [id], onDelete: Cascade)
 
   @@unique([tradeTeamId, userId, role])
+  @@unique([tradeTeamId, contactId, role])
   @@map("trade_team_oversight")
 }
 
@@ -632,7 +657,8 @@ model TradeTeamOversight {
 model TradeCrewOversight {
   id          String                   @id @default(cuid())
   crewId      String
-  userId      String
+  userId      String?
+  contactId   String?
   role        TradeCrewOversightRole
   isActive    Boolean                  @default(true)
   startDate   DateTime                 @default(now())
@@ -641,9 +667,11 @@ model TradeCrewOversight {
   updatedAt   DateTime                 @updatedAt
   
   crew        Crew                     @relation(fields: [crewId], references: [id], onDelete: Cascade)
-  user        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact     DirectoryContact?        @relation(fields: [contactId], references: [id], onDelete: Cascade)
 
   @@unique([crewId, userId, role])
+  @@unique([crewId, contactId, role])
   @@map("trade_crew_oversight")
 }
 

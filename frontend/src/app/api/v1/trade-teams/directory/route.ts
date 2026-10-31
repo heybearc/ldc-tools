@@ -27,7 +27,8 @@ async function moveAssignment(
   input: {
     originScope: 'crew' | 'team';
     originId: string;
-    userId: string;
+    userId: string | null;
+    contactId: string | null;
     tradeTeamId: string;
     crewId: string | null;
     role: string;
@@ -41,16 +42,27 @@ async function moveAssignment(
     startDate: input.startDate,
     endDate: input.endDate,
   };
+  const person = input.userId ? { userId: input.userId } : { contactId: input.contactId };
   if (input.crewId) {
-    const existing = await tx.tradeCrewOversight.findUnique({
-      where: {
-        crewId_userId_role: {
-          crewId: input.crewId,
-          userId: input.userId,
-          role: input.role as 'TCO',
-        },
-      },
-    });
+    const existing = input.userId
+      ? await tx.tradeCrewOversight.findUnique({
+          where: {
+            crewId_userId_role: {
+              crewId: input.crewId,
+              userId: input.userId,
+              role: input.role as 'TCO',
+            },
+          },
+        })
+      : await tx.tradeCrewOversight.findUnique({
+          where: {
+            crewId_contactId_role: {
+              crewId: input.crewId,
+              contactId: input.contactId || '',
+              role: input.role as 'TCO',
+            },
+          },
+        });
     if (existing && !(input.originScope === 'crew' && existing.id === input.originId)) {
       const saved = await tx.tradeCrewOversight.update({ where: { id: existing.id }, data: dates });
       if (input.originScope === 'crew') await tx.tradeCrewOversight.delete({ where: { id: input.originId } });
@@ -64,21 +76,31 @@ async function moveAssignment(
       });
     }
     const saved = await tx.tradeCrewOversight.create({
-      data: { crewId: input.crewId, userId: input.userId, role: input.role as 'TCO', ...dates },
+      data: { crewId: input.crewId, role: input.role as 'TCO', ...person, ...dates },
     });
     await tx.tradeTeamOversight.delete({ where: { id: input.originId } });
     return saved;
   }
 
-  const existing = await tx.tradeTeamOversight.findUnique({
-    where: {
-      tradeTeamId_userId_role: {
-        tradeTeamId: input.tradeTeamId,
-        userId: input.userId,
-        role: input.role as 'TTO',
-      },
-    },
-  });
+  const existing = input.userId
+    ? await tx.tradeTeamOversight.findUnique({
+        where: {
+          tradeTeamId_userId_role: {
+            tradeTeamId: input.tradeTeamId,
+            userId: input.userId,
+            role: input.role as 'TTO',
+          },
+        },
+      })
+    : await tx.tradeTeamOversight.findUnique({
+        where: {
+          tradeTeamId_contactId_role: {
+            tradeTeamId: input.tradeTeamId,
+            contactId: input.contactId || '',
+            role: input.role as 'TTO',
+          },
+        },
+      });
   if (existing && !(input.originScope === 'team' && existing.id === input.originId)) {
     const saved = await tx.tradeTeamOversight.update({ where: { id: existing.id }, data: dates });
     if (input.originScope === 'team') await tx.tradeTeamOversight.delete({ where: { id: input.originId } });
@@ -92,7 +114,7 @@ async function moveAssignment(
     });
   }
   const saved = await tx.tradeTeamOversight.create({
-    data: { tradeTeamId: input.tradeTeamId, userId: input.userId, role: input.role as 'TTO', ...dates },
+    data: { tradeTeamId: input.tradeTeamId, role: input.role as 'TTO', ...person, ...dates },
   });
   await tx.tradeCrewOversight.delete({ where: { id: input.originId } });
   return saved;
@@ -200,44 +222,58 @@ export async function POST(request: NextRequest) {
     if (sisterError) return NextResponse.json({ error: sisterError }, { status: 400 });
 
     const team = await prisma.tradeTeam.findUnique({ where: { id: tradeTeamId } });
-    if (!team || !team.isActive) {
+    if (!team || !team.isActive || !team.constructionGroupId) {
       return NextResponse.json({ error: 'Trade team not found' }, { status: 404 });
     }
+    const constructionGroupId = team.constructionGroupId;
     if (crewId) {
       const crew = await prisma.crew.findFirst({ where: { id: crewId, tradeTeamId, isActive: true } });
       if (!crew) return NextResponse.json({ error: 'Crew not found on that trade' }, { status: 404 });
     }
 
     const displayName = `${firstName} ${lastName}`.trim();
-    let user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      user = await prisma.user.create({
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    let userId: string | null = null;
+    let contactId: string | null = null;
+    if (existingUser) {
+      const user = await prisma.user.update({
+        where: { id: existingUser.id },
         data: {
-          email,
-          name: displayName,
+          name: existingUser.name || displayName,
+          firstName: existingUser.firstName || firstName,
+          lastName: existingUser.lastName || lastName,
+          isSister,
+          ...(image ? { image } : {}),
+          constructionGroupId: existingUser.constructionGroupId || constructionGroupId,
+        },
+      });
+      userId = user.id;
+      await ensureVolunteer(user.id, constructionGroupId, { firstName, lastName, email, phone });
+    } else {
+      const contact = await prisma.directoryContact.upsert({
+        where: {
+          constructionGroupId_email: { constructionGroupId, email },
+        },
+        update: {
           firstName,
           lastName,
+          phone,
           isSister,
           ...(image ? { image } : {}),
-          role: 'READ_ONLY',
-          status: 'INVITED',
-          constructionGroupId: team.constructionGroupId,
         },
-      });
-    } else {
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          name: user.name || displayName,
-          firstName: user.firstName || firstName,
-          lastName: user.lastName || lastName,
+        create: {
+          constructionGroupId,
+          firstName,
+          lastName,
+          email,
+          phone,
           isSister,
-          ...(image ? { image } : {}),
-          constructionGroupId: user.constructionGroupId || team.constructionGroupId,
+          image,
         },
       });
+      contactId = contact.id;
     }
-    await ensureVolunteer(user.id, team.constructionGroupId, { firstName, lastName, email, phone });
+    const person = userId ? { userId } : { contactId };
 
     if (crewId) {
       const currentCount = await prisma.tradeCrewOversight.count({
@@ -245,9 +281,13 @@ export async function POST(request: NextRequest) {
       });
       const validation = validateRoleLimit(TRADE_CREW_OVERSIGHT_CONFIG, role, currentCount);
       if (!validation.valid) return NextResponse.json({ error: validation.message }, { status: 400 });
-      const existing = await prisma.tradeCrewOversight.findUnique({
-        where: { crewId_userId_role: { crewId, userId: user.id, role: role as 'TCO' } },
-      });
+      const existing = userId
+        ? await prisma.tradeCrewOversight.findUnique({
+            where: { crewId_userId_role: { crewId, userId, role: role as 'TCO' } },
+          })
+        : await prisma.tradeCrewOversight.findUnique({
+            where: { crewId_contactId_role: { crewId, contactId: contactId || '', role: role as 'TCO' } },
+          });
       if (existing?.isActive) {
         return NextResponse.json({ error: 'This person already has that role on this crew' }, { status: 409 });
       }
@@ -257,9 +297,9 @@ export async function POST(request: NextRequest) {
             data: { isActive: true, startDate, endDate: null },
           })
         : await prisma.tradeCrewOversight.create({
-            data: { crewId, userId: user.id, role: role as 'TCO', isActive: true, startDate },
+            data: { crewId, role: role as 'TCO', isActive: true, startDate, ...person },
           });
-      await syncPersonActive(user.id);
+      if (userId) await syncPersonActive(userId);
       return NextResponse.json(saved, { status: 201 });
     }
 
@@ -268,9 +308,13 @@ export async function POST(request: NextRequest) {
     });
     const validation = validateRoleLimit(TRADE_TEAM_OVERSIGHT_CONFIG, role, currentCount);
     if (!validation.valid) return NextResponse.json({ error: validation.message }, { status: 400 });
-    const existing = await prisma.tradeTeamOversight.findUnique({
-      where: { tradeTeamId_userId_role: { tradeTeamId, userId: user.id, role: role as 'TTO' } },
-    });
+    const existing = userId
+      ? await prisma.tradeTeamOversight.findUnique({
+          where: { tradeTeamId_userId_role: { tradeTeamId, userId, role: role as 'TTO' } },
+        })
+      : await prisma.tradeTeamOversight.findUnique({
+          where: { tradeTeamId_contactId_role: { tradeTeamId, contactId: contactId || '', role: role as 'TTO' } },
+        });
     if (existing?.isActive) {
       return NextResponse.json({ error: 'This person already has that role on this trade' }, { status: 409 });
     }
@@ -280,9 +324,9 @@ export async function POST(request: NextRequest) {
           data: { isActive: true, startDate, endDate: null },
         })
       : await prisma.tradeTeamOversight.create({
-          data: { tradeTeamId, userId: user.id, role: role as 'TTO', isActive: true, startDate },
+          data: { tradeTeamId, role: role as 'TTO', isActive: true, startDate, ...person },
         });
-    await syncPersonActive(user.id);
+    if (userId) await syncPersonActive(userId);
     return NextResponse.json(saved, { status: 201 });
   } catch (error) {
     console.error('Directory POST error:', error);
@@ -458,17 +502,18 @@ export async function PATCH(request: NextRequest) {
     if (sisterError) return NextResponse.json({ error: sisterError }, { status: 400 });
 
     const team = await prisma.tradeTeam.findUnique({ where: { id: tradeTeamId } });
-    if (!team || !team.isActive) {
+    if (!team || !team.isActive || !team.constructionGroupId) {
       return NextResponse.json({ error: 'Trade team not found' }, { status: 404 });
     }
+    const constructionGroupId = team.constructionGroupId;
     if (crewId) {
       const crew = await prisma.crew.findFirst({ where: { id: crewId, tradeTeamId, isActive: true } });
       if (!crew) return NextResponse.json({ error: 'Crew not found on that trade' }, { status: 404 });
     }
 
     const current = originScope === 'crew'
-      ? await prisma.tradeCrewOversight.findUnique({ where: { id }, include: { user: true } })
-      : await prisma.tradeTeamOversight.findUnique({ where: { id }, include: { user: true } });
+      ? await prisma.tradeCrewOversight.findUnique({ where: { id }, include: { user: true, contact: true } })
+      : await prisma.tradeTeamOversight.findUnique({ where: { id }, include: { user: true, contact: true } });
     if (!current) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
 
     if (isActive) {
@@ -501,20 +546,38 @@ export async function PATCH(request: NextRequest) {
     if (emailOwner && emailOwner.id !== current.userId) {
       return NextResponse.json({ error: 'That email belongs to someone else' }, { status: 409 });
     }
-    await prisma.user.update({
-      where: { id: current.userId },
-      data: { email, firstName, lastName, isSister, image, name: `${firstName} ${lastName}`.trim() },
-    });
-    await ensureVolunteer(current.userId, team.constructionGroupId, {
-      firstName,
-      lastName,
-      email,
-      phone,
-    });
+    if (current.userId) {
+      await prisma.user.update({
+        where: { id: current.userId },
+        data: { email, firstName, lastName, isSister, image, name: `${firstName} ${lastName}`.trim() },
+      });
+      await ensureVolunteer(current.userId, constructionGroupId, {
+        firstName,
+        lastName,
+        email,
+        phone,
+      });
+    } else if (current.contactId) {
+      const otherContact = await prisma.directoryContact.findFirst({
+        where: {
+          constructionGroupId,
+          email,
+          NOT: { id: current.contactId },
+        },
+      });
+      if (otherContact) {
+        return NextResponse.json({ error: 'That email belongs to someone else' }, { status: 409 });
+      }
+      await prisma.directoryContact.update({
+        where: { id: current.contactId },
+        data: { email, firstName, lastName, phone, isSister, image },
+      });
+    }
     const saved = await prisma.$transaction((tx) => moveAssignment(tx, {
       originScope,
       originId: id,
       userId: current.userId,
+      contactId: current.contactId,
       tradeTeamId,
       crewId,
       role,
@@ -522,7 +585,7 @@ export async function PATCH(request: NextRequest) {
       startDate: startDateInput || current.startDate,
       endDate,
     }));
-    await syncPersonActive(current.userId);
+    if (current.userId) await syncPersonActive(current.userId);
     return NextResponse.json(saved);
   } catch (error) {
     console.error('Directory PATCH error:', error);

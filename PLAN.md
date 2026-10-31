@@ -31,6 +31,7 @@
 - [x] Directory profiles, invite form, toasts; `/ship` v1.37.0 and v1.38.0
 - [x] Resend Invitation; `/ship` v1.38.1
 - [x] Slice 6 — crew-request spreadsheet import onto the work list
+- [x] Slice 8 — directory contacts are not sign-in accounts
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
@@ -61,7 +62,7 @@ Show three groups on the directory, all for the signed-in construction group:
 - Personnel: Personnel Contact, Assistant, and Support
 - Ancillary: other region-support and construction-group staff who are not those two groups
 
-A directory contact who is not Personnel stays a contact. Do not create a login for them. Splitting those contacts off the user table waits until after slice 6.
+A directory contact who is not Personnel stays a contact. Do not create a login for them. New trade and crew people are directory contacts. People who already have an account stay on that account.
 
 Done when the directory lists Personnel and ancillary people beside the trades, and a person from another construction group does not appear.
 
@@ -108,6 +109,12 @@ The persons list is in `docs/templates/LDC-Trade-Leadership-Import-Template.xlsx
 A fully listed role names the trade and, for a crew role, the crew. Those are the current assignments. Any other assignment for that person is older. A role with no crew is incomplete, and that person is left unchanged. Nothing is written until the dates are in the list.
 
 Done when an older assignment gets an end date and the directory shows the current one.
+
+### 8. Directory contacts — done
+
+A person added on a trade or crew is a directory contact. That add does not create a sign-in account. Someone who already has an account keeps it, and the new role is attached to that account. People who have signed in are not removed.
+
+Done when a new trade or crew person shows on the directory and does not appear as a user who can be invited.
 
 ### Do not build
 

@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
                     email: true,
                   },
                 },
+                contact: true,
               },
             },
           },
@@ -51,6 +52,7 @@ export async function GET(request: NextRequest) {
                 email: true,
               },
             },
+            contact: true,
           },
         },
       },
@@ -76,15 +78,19 @@ export async function GET(request: NextRequest) {
 }
 
 function generatePDFHTML(tradeTeams: any[]): string {
-  const formatUserName = (user: any) => user.name || user.email.split('@')[0];
+  const formatUserName = (user: any) => user?.name || user?.email?.split('@')[0] || '';
   
   const getOversightByRole = (oversight: any[], role: string) => {
     return oversight.filter((o: any) => o.role === role);
   };
 
   const formatUserList = (assignments: any[]) => {
-    if (assignments.length === 0) return '—';
-    return assignments.map((a: any) => formatUserName(a.user)).join(', ');
+    const names = assignments.map((assignment: any) => {
+      if (assignment.contact) return `${assignment.contact.firstName} ${assignment.contact.lastName}`.trim();
+      return formatUserName(assignment.user);
+    }).filter(Boolean);
+    if (names.length === 0) return '—';
+    return names.join(', ');
   };
 
   const rows = tradeTeams.map((team: any) => {

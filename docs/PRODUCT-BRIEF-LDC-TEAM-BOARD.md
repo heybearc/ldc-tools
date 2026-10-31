@@ -67,7 +67,7 @@ The directory is the front door, not the whole product. The same app serves othe
 
 Keep trade team and trade crew oversight. Also list Construction Group people and other ancillary people connected to that region. Personnel Contact, assistant, and support already exist as `PersonnelContact` on the construction group. Ancillary people need a region-scoped place in the same directory, separate from trade oversight.
 
-A directory contact who is not Personnel does not need a login. Personnel are the people who use this app. Trade oversight, Construction Group contacts, and ancillary people are directory records. Today those oversight rows still hang off a user account; splitting the contact from the login is a later change. Do not delete a user who has signed in without asking.
+A directory contact who is not Personnel does not need a login. Personnel are the people who use this app. Trade oversight, Construction Group contacts, and ancillary people are directory records. A new trade or crew person is a directory contact and does not get a login. Someone who already has an account keeps it. Do not delete a user who has signed in without asking.
 
 Volunteers who are not in the directory are removed. The old volunteer roster is not part of this product.
 

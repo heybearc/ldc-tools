@@ -245,7 +245,8 @@ export async function GET(request: NextRequest) {
                 isSister: true,
                 volunteer: { select: { phone: true, firstName: true, lastName: true } }
               }
-            }
+            },
+            contact: true,
           }
         },
         crews: {
@@ -272,7 +273,8 @@ export async function GET(request: NextRequest) {
                     isSister: true,
                     volunteer: { select: { phone: true, firstName: true, lastName: true } }
                   }
-                }
+                },
+                contact: true,
               }
             }
           }
@@ -288,6 +290,15 @@ export async function GET(request: NextRequest) {
       awaitingReplacement: boolean;
       startDate: Date;
       endDate: Date | null;
+      contact: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        phone: string | null;
+        image: string | null;
+        isSister: boolean;
+      } | null;
       user: {
         id: string;
         name: string | null;
@@ -297,31 +308,50 @@ export async function GET(request: NextRequest) {
         lastName: string | null;
         isSister: boolean;
         volunteer: { phone: string | null; firstName: string; lastName: string } | null;
+      } | null;
+    }) => {
+      const contact = assignment.contact;
+      const user = assignment.user;
+      const person = contact
+        ? {
+            id: contact.id,
+            name: `${contact.firstName} ${contact.lastName}`.trim(),
+            email: contact.email,
+            image: contact.image,
+            firstName: contact.firstName,
+            lastName: contact.lastName,
+            phone: contact.phone,
+            isSister: contact.isSister,
+          }
+        : user
+          ? {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              image: user.image,
+              firstName: user.volunteer?.firstName || user.firstName,
+              lastName: user.volunteer?.lastName || user.lastName,
+              phone: user.volunteer?.phone || null,
+              isSister: user.isSister,
+            }
+          : null;
+      if (!person) return null;
+      return {
+        id: assignment.id,
+        role: assignment.role,
+        isActive: assignment.isActive,
+        awaitingReplacement: assignment.awaitingReplacement,
+        startDate: assignment.startDate,
+        endDate: assignment.endDate,
+        user: person,
       };
-    }) => ({
-      id: assignment.id,
-      role: assignment.role,
-      isActive: assignment.isActive,
-      awaitingReplacement: assignment.awaitingReplacement,
-      startDate: assignment.startDate,
-      endDate: assignment.endDate,
-      user: {
-        id: assignment.user.id,
-        name: assignment.user.name,
-        email: assignment.user.email,
-        image: assignment.user.image,
-        firstName: assignment.user.volunteer?.firstName || assignment.user.firstName,
-        lastName: assignment.user.volunteer?.lastName || assignment.user.lastName,
-        phone: assignment.user.volunteer?.phone || null,
-        isSister: assignment.user.isSister
-      }
-    });
+    };
 
     const formattedTeams = tradeTeams.map(team => ({
       id: team.id,
       name: team.name,
       description: team.description,
-      oversight: visibleAssignments(team.oversight).map(presentPerson),
+      oversight: visibleAssignments(team.oversight).map(presentPerson).filter((row) => row != null),
       crews: team.crews.map(crew => ({
         id: crew.id,
         name: crew.name,
@@ -329,7 +359,7 @@ export async function GET(request: NextRequest) {
         scopeOfWork: crew.scopeOfWork,
         isRequired: crew.isRequired,
         status: crew.status,
-        oversight: visibleAssignments(crew.oversight).map(presentPerson)
+        oversight: visibleAssignments(crew.oversight).map(presentPerson).filter((row) => row != null)
       }))
     }));
 
