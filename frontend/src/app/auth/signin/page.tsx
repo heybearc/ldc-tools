@@ -4,7 +4,7 @@ import SignInForm from './SignInForm'
 // Modern Next.js 15 App Router pattern
 export default function SignInPage() {
   return (
-    <div className="p-8 bg-white rounded-lg shadow-sm">
+    <div className="p-5 sm:p-8 bg-white rounded-lg shadow-sm">
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
           <svg width="96" height="96" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -84,7 +84,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+              className="lg:hidden inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-gray-700 hover:bg-gray-100"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -317,7 +317,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
       )}
 
       <FeedbackUpdateBanner />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8">
         <AnnouncementBanner />
         {children}
       </main>

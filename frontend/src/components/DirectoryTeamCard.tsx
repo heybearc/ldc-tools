@@ -158,7 +158,7 @@ export default function DirectoryTeamCard({
       {!onlyCrewId && (
         <div className={`${colors.light} ${colors.border} border-x p-3`}>
           <div className="text-xs font-semibold text-gray-500 mb-1">Trade Team</div>
-          <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-3 sm:gap-2 sm:text-xs">
             <div>
               <div className="font-medium text-gray-600">Overseer</div>
               <div className="text-gray-900">
@@ -191,7 +191,7 @@ export default function DirectoryTeamCard({
       )}
 
       <div className={`${colors.bg} text-white p-2`}>
-        <div className="grid grid-cols-4 gap-1 text-xs font-medium">
+        <div className="hidden sm:grid grid-cols-4 gap-1 text-xs font-medium">
           <div>{onlyCrewId ? 'Crew' : 'Discipline'}</div>
           <div>TCO</div>
           <div>TCOA</div>
@@ -208,8 +208,9 @@ export default function DirectoryTeamCard({
               key={crew.id}
               className={`p-2 text-xs ${crewIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-b last:border-b-0`}
             >
-              <div className="grid grid-cols-4 gap-1">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-4 sm:gap-1">
                 <div className="font-medium text-gray-900" title={crew.scopeOfWork || ''}>
+                  <div className="sm:hidden text-[10px] font-semibold uppercase tracking-wide text-gray-500">Crew</div>
                   {linkCrews && !onlyCrewId ? (
                     <Link href={`/trade-teams/${team.id}/crews/${crew.id}`} className="text-blue-700 hover:underline">
                       {crew.name}
@@ -219,18 +220,21 @@ export default function DirectoryTeamCard({
                   )}
                 </div>
                 <div className="text-gray-700">
+                  <div className="sm:hidden text-[10px] font-semibold uppercase tracking-wide text-gray-500">Overseer</div>
                   <OversightNames
                     assignments={assignmentsForRole(crew.oversight, 'TCO')}
                     onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, crew.id) : undefined}
                   />
                 </div>
                 <div className="text-gray-700">
+                  <div className="sm:hidden text-[10px] font-semibold uppercase tracking-wide text-gray-500">Assistant</div>
                   <OversightNames
                     assignments={assignmentsForRole(crew.oversight, 'TCOA')}
                     onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, crew.id) : undefined}
                   />
                 </div>
                 <div className="text-gray-700">
+                  <div className="sm:hidden text-[10px] font-semibold uppercase tracking-wide text-gray-500">Support</div>
                   <OversightNames
                     assignments={assignmentsForRole(crew.oversight, 'TC_SUPPORT')}
                     onEdit={onEdit ? (assignment) => onEdit(assignment, team.id, crew.id) : undefined}

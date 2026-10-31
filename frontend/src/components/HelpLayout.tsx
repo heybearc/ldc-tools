@@ -26,35 +26,35 @@ function HelpLayoutContent({ children, title }: HelpLayoutProps) {
       {/* Top Navigation Bar with Gradient */}
       <nav className="bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-3">
-                <img src="/logo.svg" alt="LDC Logo" className="h-10 w-10" />
-                <div>
-                  <h1 className="text-xl font-bold text-white">
+          <div className="flex flex-wrap items-center justify-between gap-2 py-2 min-h-16">
+            <div className="flex items-center min-w-0">
+              <Link href="/" className="flex items-center space-x-3 min-w-0">
+                <img src="/logo.svg" alt="LDC Logo" className="h-10 w-10 shrink-0" />
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl font-bold text-white truncate">
                     {title || 'LDC Tools'}
                   </h1>
                 </div>
               </Link>
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               {/* Navigation Links */}
               <Link
                 href="/help"
-                className={`text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`text-white/90 hover:text-white hover:bg-white/10 px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
                   pathname === '/help' ? 'bg-white/20 text-white' : ''
                 }`}
               >
-                📚 Help Center
+                Help
               </Link>
               <Link
                 href="/release-notes"
-                className={`text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`text-white/90 hover:text-white hover:bg-white/10 px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
                   pathname === '/release-notes' ? 'bg-white/20 text-white' : ''
                 }`}
               >
-                📋 Release Notes
+                Notes
               </Link>
 
               {/* User Menu */}
@@ -68,9 +68,9 @@ function HelpLayoutContent({ children, title }: HelpLayoutProps) {
                 {/* Back to App Button */}
                 <Link
                   href={session?.user?.role === 'SUPER_ADMIN' ? '/admin' : '/'}
-                  className="bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-md"
+                  className="bg-white text-blue-600 hover:bg-blue-50 px-3 py-2 min-h-[44px] rounded-lg text-sm font-semibold transition-colors shadow-md"
                 >
-                  ← Back to App
+                  App
                 </Link>
                 
                 <button

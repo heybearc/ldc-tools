@@ -2,12 +2,12 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Directory contacts. A new trade or crew person is not a sign-in account.
+**Working on:** Phone layout of the website, and the Expo store app in `mobile/`.
 
 ---
 
 ## Current Task
-v1.41.0 is shipped. New trade and crew people are directory contacts, not sign-in accounts. Hub dates stay paused.
+v1.41.0 is shipped. The website is being tightened for phones. The store app signs in and shows My Work and the directory. Hub dates stay paused.
 
 ### What I'm doing right now
 v1.41.0 (`16ffef1`) is LIVE on green (CT135). Directory contacts are the next standby build. Hub dates stay paused.
@@ -35,7 +35,7 @@ v1.41.0 (`16ffef1`) is LIVE on green (CT135). Directory contacts are the next st
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Add a trade or crew person on STANDBY and confirm they are not in User Management.
+On a phone, open STANDBY and walk Directory, Work, and Chat. The store app starts with `cd mobile && npm start`.
 
 ---
 
@@ -47,4 +47,4 @@ Add a trade or crew person on STANDBY and confirm they are not in User Managemen
 ---
 
 ## Exact Next Command
-Add a trade or crew person on STANDBY and confirm they are not in User Management.
+On a phone, open STANDBY and walk Directory, Work, and Chat. The store app starts with `cd mobile && npm start`.

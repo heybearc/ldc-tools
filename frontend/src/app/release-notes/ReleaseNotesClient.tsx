@@ -69,10 +69,10 @@ export default function ReleaseNotesClient({ releases }: ReleaseNotesClientProps
 
       {/* Main Layout with Sidebar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
+        <div className="flex flex-col gap-6 md:flex-row md:gap-8">
           {/* Sidebar Navigation with Collapsible Groups */}
-          <aside className="w-64 flex-shrink-0">
-            <div className="sticky top-24 bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-h-[calc(100vh-120px)] overflow-y-auto">
+          <aside className="w-full md:w-64 md:flex-shrink-0">
+            <div className="md:sticky md:top-24 bg-white rounded-lg shadow-sm border border-gray-200 p-4 max-h-[40vh] md:max-h-[calc(100vh-120px)] overflow-y-auto">
               <h2 className="text-sm font-semibold text-gray-900 mb-3 px-2">Versions</h2>
               <nav className="space-y-2">
                 {Object.entries(releaseGroups).map(([groupName, groupReleases]) => (

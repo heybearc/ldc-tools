@@ -120,7 +120,7 @@ Done when a new trade or crew person shows on the directory and does not appear 
 
 Volunteer roster, congregation assignment, budget, crew-to-project assignment, the hierarchy editor, a separate calendar, and logins for directory contacts who are not Personnel.
 
-Mobile and PWA wait until the work list is in use. Team chat notifications are browser push, not a separate app.
+The phone layout of the website is in progress. The store app is a separate Expo project in `mobile/`. It signs in with the same email and password and reads My Work and the directory. Team chat notifications on the website stay browser push.
 
 ## Prioritized Backlog
 

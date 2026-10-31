@@ -213,7 +213,7 @@ function ChatScreen() {
       {error && <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>}
       {notice && <p className="rounded-md bg-green-50 text-green-800 px-4 py-3 text-sm">{notice}</p>}
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4 min-h-[60vh]">
-        <aside className="bg-white rounded-lg shadow p-3 space-y-3">
+        <aside className={`${selectedId ? 'hidden lg:block' : ''} bg-white rounded-lg shadow p-3 space-y-3`}>
           <div className="flex gap-2">
             <select
               value={teammateId}
@@ -255,9 +255,16 @@ function ChatScreen() {
             ))}
           </ul>
         </aside>
-        <section className="bg-white rounded-lg shadow flex flex-col min-h-[60vh]">
-          <div className="border-b border-gray-100 px-4 py-3 font-semibold text-gray-900">
-            {selected?.title || 'Chat'}
+        <section className={`${selectedId ? 'flex' : 'hidden lg:flex'} bg-white rounded-lg shadow flex-col min-h-[70vh]`}>
+          <div className="border-b border-gray-100 px-4 py-3 font-semibold text-gray-900 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              className="lg:hidden min-h-[44px] text-sm font-medium text-blue-700"
+            >
+              Chats
+            </button>
+            <span className="min-w-0 truncate">{selected?.title || 'Chat'}</span>
           </div>
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
             {messages.map((message) => (

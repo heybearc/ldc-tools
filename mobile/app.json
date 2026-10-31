@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "LDC Tools",
+    "slug": "ldc-tools",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "ldctools",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ldctools.mobile"
+    },
+    "android": {
+      "package": "com.ldctools.mobile"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
