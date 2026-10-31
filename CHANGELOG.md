@@ -5,6 +5,13 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.42.0] - 2026-10-30
+
+### Added
+- Phone layout for the menu, directory, chat, help, and release notes
+- A new trade or crew person is stored as a directory contact, without a sign-in account
+- A phone app project that signs in and shows My Work and the directory
+
 ## [1.41.0] - 2026-10-30
 
 ### Added

@@ -1,5 +1,14 @@
 # LDC Tools Release Notes
 
+## v1.42.0 - Use it on a phone
+
+**Release Date:** October 30, 2026
+
+### ✨ New Features
+
+- The menu, directory, work, and chat fit a phone
+- Adding a person on a trade or crew does not create a sign-in account
+
 ## v1.41.0 - Chat with your team
 
 **Release Date:** October 30, 2026

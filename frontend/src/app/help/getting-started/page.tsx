@@ -126,7 +126,7 @@ export default async function GettingStartedPage() {
           {/* Navigation Tips */}
           <h2>🧭 Navigation Tips</h2>
           <ul>
-            <li><strong>Sidebar Menu</strong> - Access all main features</li>
+            <li><strong>Menu</strong> - On a phone, use the menu button at the top. On a wider screen, the same links stay in the header.</li>
             <li><strong>Top Bar</strong> - User menu, notifications, and quick actions</li>
             <li><strong>Breadcrumbs</strong> - Know where you are in the app</li>
             <li><strong>Back Button</strong> - Return to previous page</li>

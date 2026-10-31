@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.41.0**
+Current: **1.42.0**
 
 ## Version History
+- **v1.42.0** (2026-10-30) - Phone layout, and a new trade or crew person is not a sign-in account
 - **v1.41.0** (2026-10-30) - Team chat, My Work, help replies, and finishing several tasks
 - **v1.40.0** (2026-10-30) - Tasks can have no deadline, and several can be assigned at once
 - **v1.39.0** (2026-10-30) - Import a crew-update spreadsheet onto the work list

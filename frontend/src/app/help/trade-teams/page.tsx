@@ -36,7 +36,7 @@ export default async function TradeTeamsHelpPage() {
           <p>
             Open Directory in the main menu. Search by trade, person, or role. Construction group, Personnel, and ancillary region people are listed above the trades.
             Click one of those names to open their profile. You can update the name, email, phone, photo, role, and dates. That profile does not ask for a trade or crew.
-            Click a name on a trade or crew to edit that assignment, including the trade, crew, role, and dates. Drag the photo so the face sits in the circle, then save. That crop is what the directory and trade team cards show. Add person creates a new oversight entry.
+            Click a name on a trade or crew to edit that assignment, including the trade, crew, role, and dates. Drag the photo so the face sits in the circle, then save. That crop is what the directory and trade team cards show. Add person creates a new oversight entry and does not create a sign-in account. On a phone, each crew lists overseer, assistant, and support under the crew name.
             Sisters can only be Support.
             An end date deactivates that assignment. The person stays listed until someone else in the same role is added with a start date.
           </p>
