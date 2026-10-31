@@ -6,6 +6,7 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Focus
+- Shipped v1.42.0 (`2351513`). LIVE blue CT133, STANDBY green CT135. qa-01 full suite 74/74 plus the generated mobile test. Phone layout and directory contacts. The Expo app is not in the stores. Hub dates stay paused.
 - Shipped v1.41.0 (`16ffef1`). LIVE green CT135, STANDBY blue CT133. qa-01 full suite 72/72 plus the generated chat test. Team chat, My Work, help replies, and finishing several tasks. Hub dates stay paused.
 - Shipped v1.40.0 (`9f368a3`). LIVE was blue CT133. qa-01 full suite 71/71. Work uses the header group, a task can have no deadline, and several tasks can be assigned together. Bulk claim was left out.
 
@@ -17,6 +18,13 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 - Governance submodule is `15f30eb`. Context budget blocks the next prompt around 40k tokens.
 
 ### Mid-day (evening)
+- v1.42.0 is live on blue. Green is synced to `2351513`.
+- A new trade or crew person is a directory contact. The phone menu, stacked directory crews, and chat list-then-thread shipped.
+- The store app is `mobile/`. It signs in and shows My Work and the directory. It stays portrait. Wide tablet layout is not built.
+- Open urgent feedback: 0.
+- This session shipped the release. Start a new chat before the next slice.
+
+### Mid-day (after v1.41.0)
 - v1.41.0 is live. The notes below described STANDBY before the ship.
 - A process is one work item. Steps stay inside it. Done stores a date. Done rows sit in a collapsed section. Bulk select, page size, My Work, and a dashboard summary of assigned work are on STANDBY.
 - Help emails only the Personnel Contact and Assistant. Replies and an unread mark stay on the work item. Chat is separate: one team room and direct messages, with browser notifications after Turn on notifications.

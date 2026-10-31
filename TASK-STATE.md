@@ -2,17 +2,18 @@
 
 **Last updated:** 2026-10-30  
 **Current branch:** main  
-**Working on:** Phone layout of the website, and the Expo store app in `mobile/`.
+**Working on:** v1.42.0 is live. The store app is started and not in the stores.
 
 ---
 
 ## Current Task
-v1.41.0 is shipped. The website is being tightened for phones. The store app signs in and shows My Work and the directory. Hub dates stay paused.
+v1.42.0 (`2351513`) is LIVE on blue (CT133). STANDBY green (CT135) is synced to the same commit. Hub dates stay paused.
 
 ### What I'm doing right now
-v1.41.0 (`16ffef1`) is LIVE on green (CT135). Directory contacts are the next standby build. Hub dates stay paused.
+v1.42.0 is live. Phone layout and directory contacts shipped. The Expo app in `mobile/` is not submitted.
 
 ### Recent completions
+- ✅ Shipped v1.42.0 (`2351513`). Phone layout and directory contacts. qa-01 full suite 74/74 plus the generated mobile test. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.41.0 (`16ffef1`). Team chat, My Work, help replies, and finishing several tasks. qa-01 full suite 72/72. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.40.0 (`9f368a3`). Work opens on the group already chosen. A task can have no deadline. Several open tasks can be assigned to one person. qa-01 full suite 71/71. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.39.0 (`6ab0f34`). Crew-update import creates claimable work and keeps the requestor. qa-01 full suite 69/69. LIVE green CT135, STANDBY blue CT133.
@@ -35,7 +36,7 @@ v1.41.0 (`16ffef1`) is LIVE on green (CT135). Directory contacts are the next st
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-On a phone, open STANDBY and walk Directory, Work, and Chat. The store app starts with `cd mobile && npm start`.
+Walk Directory, Work, and Chat on a phone at https://ldctools.com. Start the store app with `cd mobile && npm start`.
 
 ---
 
@@ -47,4 +48,4 @@ On a phone, open STANDBY and walk Directory, Work, and Chat. The store app start
 ---
 
 ## Exact Next Command
-On a phone, open STANDBY and walk Directory, Work, and Chat. The store app starts with `cd mobile && npm start`.
+Walk Directory, Work, and Chat on a phone at https://ldctools.com. Start the store app with `cd mobile && npm start`.

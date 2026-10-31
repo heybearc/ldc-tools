@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-30  
 **Current phase:** Region work queue  
-**Status:** v1.41.0 is LIVE on green (CT135) at `16ffef1` and synced to blue (CT133). Slices 1–6 are shipped. Hub dates are paused.
+**Status:** v1.42.0 is LIVE on blue (CT133) at `2351513` and synced to green (CT135). Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app is started and not submitted.
 
 ---
 
