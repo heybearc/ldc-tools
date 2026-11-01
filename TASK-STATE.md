@@ -2,17 +2,18 @@
 
 **Last updated:** 2026-10-31  
 **Current branch:** main  
-**Working on:** v1.43.0 release. The store app has a wide tablet layout and is not in the stores.
+**Working on:** v1.43.0 is live. The store app has a wide tablet layout and is not in the stores.
 
 ---
 
 ## Current Task
-v1.42.0 (`2351513`) is LIVE on blue (CT133). STANDBY green (CT135) is synced to the same commit. Hub dates stay paused.
+v1.43.0 (`cc8dcde`) is LIVE on green (CT135). STANDBY blue (CT133) is synced to the same commit. Hub dates stay paused.
 
 ### What I'm doing right now
-v1.43.0 is the release candidate. The Expo app shows My Work and the directory side by side on a tablet. An ended session asks you to sign in again. Hub dates stay paused. The app is not in the stores.
+v1.43.0 (`cc8dcde`) is LIVE on green CT135 and synced to blue CT133. The Expo app shows My Work and the directory side by side on a tablet. An ended session asks you to sign in again. Hub dates stay paused. The app is not in the stores.
 
 ### Recent completions
+- ✅ Shipped v1.43.0 (`cc8dcde`). Tablet layout, and failures say what happened. qa-01 directory gate plus the generated user-error test. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.42.0 (`2351513`). Phone layout and directory contacts. qa-01 full suite 74/74 plus the generated mobile test. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.41.0 (`16ffef1`). Team chat, My Work, help replies, and finishing several tasks. qa-01 full suite 72/72. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.40.0 (`9f368a3`). Work opens on the group already chosen. A task can have no deadline. Several open tasks can be assigned to one person. qa-01 full suite 71/71. LIVE blue CT133, STANDBY green CT135.

@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-31  
 **Current phase:** Region work queue  
-**Status:** v1.43.0 is the release candidate. Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app has a wide tablet layout and is not submitted.
+**Status:** v1.43.0 is LIVE on green (CT135) at `cc8dcde` and synced to blue (CT133). Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app has a wide tablet layout and is not submitted.
 
 ---
 
