@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-10-31  
 **Current branch:** main  
-**Working on:** v1.42.0 is live. The store app has a wide tablet layout and is not in the stores.
+**Working on:** v1.43.0 release. The store app has a wide tablet layout and is not in the stores.
 
 ---
 
@@ -10,7 +10,7 @@
 v1.42.0 (`2351513`) is LIVE on blue (CT133). STANDBY green (CT135) is synced to the same commit. Hub dates stay paused.
 
 ### What I'm doing right now
-v1.42.0 is live. The Expo app shows My Work and the directory side by side on a tablet. Smoke covers directory, work, chat, projects, and processes. Those pages say what failed and to try again. Hub dates stay paused. The app is not in the stores.
+v1.43.0 is the release candidate. The Expo app shows My Work and the directory side by side on a tablet. An ended session asks you to sign in again. Hub dates stay paused. The app is not in the stores.
 
 ### Recent completions
 - ✅ Shipped v1.42.0 (`2351513`). Phone layout and directory contacts. qa-01 full suite 74/74 plus the generated mobile test. LIVE blue CT133, STANDBY green CT135.

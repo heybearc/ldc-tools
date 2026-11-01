@@ -5,6 +5,13 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.43.0] - 2026-10-31
+
+### Added
+- On a tablet, the app shows My Work and the directory side by side
+- Pages say what failed and ask you to try again
+- An ended session asks you to sign in again
+
 ## [1.42.0] - 2026-10-30
 
 ### Added

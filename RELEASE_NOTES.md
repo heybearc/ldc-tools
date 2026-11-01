@@ -1,5 +1,19 @@
 # LDC Tools Release Notes
 
+## v1.43.0 - Use it on a tablet
+
+**Release Date:** October 31, 2026
+
+### ✨ New Features
+
+- On a tablet, the app shows My Work and the directory together
+- A phone still keeps those on separate tabs
+
+### 🐛 Bug Fixes
+
+- A page that cannot load says what failed and asks you to try again
+- An ended session asks you to sign in again
+
 ## v1.42.0 - Use it on a phone
 
 **Release Date:** October 30, 2026
