@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { loadDirectoryGroups } from '@/lib/directory-groups';
+import { groupPeople } from '@/lib/mobile-directory';
 import { readMobileToken } from '@/lib/mobile-session';
 import { timingLabel } from '@/lib/work-items';
 
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     const groupId = user.constructionGroupId;
-    const [work, teams] = await Promise.all([
+    const [work, teams, groups] = await Promise.all([
       prisma.workItem.findMany({
         where: { constructionGroupId: groupId, assigneeId: user.id, status: 'OPEN' },
         orderBy: [{ dueOn: 'asc' }, { createdAt: 'desc' }],
@@ -77,9 +79,21 @@ export async function GET(request: NextRequest) {
           },
         },
       }),
+      loadDirectoryGroups({
+        userId: user.id,
+        constructionGroupId: groupId,
+        regionId: null,
+        zoneId: null,
+        branchId: null,
+        userRole: '',
+        canViewAllBranches: false,
+        canViewAllZones: false,
+        canViewZoneRegions: false,
+        canManageCG: false,
+      }),
     ]);
 
-    const people: Array<{ name: string; email: string; phone: string | null; role: string; place: string }> = [];
+    const people: Array<{ name: string; email: string; phone: string | null; role: string; place: string }> = groupPeople(groups);
     const pushPerson = (
       row: {
         role: string;

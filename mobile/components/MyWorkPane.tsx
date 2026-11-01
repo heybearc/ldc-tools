@@ -1,13 +1,9 @@
 import { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { ApiError, apiRequest } from '@/lib/api';
+import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-
-type Home = {
-  user: { name: string | null; email: string };
-  work: Array<{ id: string; title: string; detail: string; timing: string }>;
-};
+import { fetchHome, type Home } from '@/lib/home';
 
 export function MyWorkPane() {
   const { apiBase, token, user, signOut } = useAuth();
@@ -19,10 +15,7 @@ export function MyWorkPane() {
     if (!token) return;
     setError('');
     try {
-      const body = await apiRequest<Home>(apiBase, '/api/v1/mobile/home', {
-        token,
-        action: 'Could not load your work',
-      });
+      const body = await fetchHome(apiBase, token);
       setHome(body);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {

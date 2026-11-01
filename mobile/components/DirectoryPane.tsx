@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { ApiError, apiRequest } from '@/lib/api';
+import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { fetchHome } from '@/lib/home';
 
 type Person = {
   name: string;
@@ -23,10 +24,7 @@ export function DirectoryPane() {
     if (!token) return;
     setError('');
     try {
-      const body = await apiRequest<{ people: Person[] }>(apiBase, '/api/v1/mobile/home', {
-        token,
-        action: 'Could not load the directory',
-      });
+      const body = await fetchHome(apiBase, token);
       setPeople(body.people || []);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
