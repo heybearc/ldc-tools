@@ -90,7 +90,7 @@ export default function TradeTeamsOverviewPage() {
       // Expand all teams by default
       setExpandedTeams(new Set(data.tradeTeams?.map((t: TradeTeam) => t.id) || []));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError(userError(0, err instanceof Error ? err.message : '', 'Could not load the directory'));
     } finally {
       setLoading(false);
     }

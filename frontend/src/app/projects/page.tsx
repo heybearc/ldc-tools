@@ -70,19 +70,24 @@ export default function ProjectsPage() {
   const load = useCallback(async () => {
     const generation = ++loadGeneration.current;
     setError('');
-    const response = await fetch('/api/v1/projects/summary', { cache: 'no-store' });
-    if (generation !== loadGeneration.current) return;
-    const body = await response.json();
-    if (!response.ok) {
-      setError(userError(response.status, body.error, 'Could not load projects'));
-      setLoading(false);
-      return;
+    try {
+      const response = await fetch('/api/v1/projects/summary', { cache: 'no-store' });
+      if (generation !== loadGeneration.current) return;
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not load projects'));
+        return;
+      }
+      setProjects(body.projects || []);
+      setPersonnel(body.personnel || []);
+      setCanAssign(Boolean(body.canAssign));
+      setCanAddDate(Boolean(body.canAddDate));
+    } catch {
+      if (generation !== loadGeneration.current) return;
+      setError(userError(0, '', 'Could not load projects'));
+    } finally {
+      if (generation === loadGeneration.current) setLoading(false);
     }
-    setProjects(body.projects || []);
-    setPersonnel(body.personnel || []);
-    setCanAssign(Boolean(body.canAssign));
-    setCanAddDate(Boolean(body.canAddDate));
-    setLoading(false);
   }, []);
 
   useEffect(() => {

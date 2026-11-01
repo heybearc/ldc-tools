@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { apiRequest } from '@/lib/api';
+import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
 type Person = {
@@ -13,7 +13,7 @@ type Person = {
 };
 
 export function DirectoryPane() {
-  const { apiBase, token } = useAuth();
+  const { apiBase, token, signOut } = useAuth();
   const [people, setPeople] = useState<Person[]>([]);
   const [query, setQuery] = useState('');
   const [error, setError] = useState('');
@@ -29,6 +29,10 @@ export function DirectoryPane() {
       });
       setPeople(body.people || []);
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        await signOut();
+        return;
+      }
       setError(err instanceof Error ? err.message : 'Could not load the directory. Try again in a moment.');
     }
   }, [apiBase, token]);

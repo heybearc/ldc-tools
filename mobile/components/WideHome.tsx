@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DirectoryPane } from './DirectoryPane';
 import { MyWorkPane } from './MyWorkPane';
 
 export function WideHome() {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, { paddingTop: insets.top }]}>
       <View style={styles.work}>
         <Text style={styles.heading}>My Work</Text>
         <MyWorkPane />

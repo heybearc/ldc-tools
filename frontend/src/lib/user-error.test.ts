@@ -19,6 +19,7 @@ test('a generic failure says what to do', () => {
     'Could not reach the server. Check the connection and try again.',
   );
   assert.equal(userError(401, 'Failed to load work', 'Could not load work'), 'Sign in again. This session is no longer valid.');
+  assert.equal(userError(401, 'Unauthorized', 'Could not load work'), 'Sign in again. This session is no longer valid.');
   assert.equal(userError(403, '', 'Could not load work'), 'You do not have access to do that.');
   assert.equal(userError(404, '', 'Could not load work'), 'That item is no longer here.');
 });

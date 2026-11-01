@@ -22,16 +22,21 @@ export default function MyWorkPage() {
   const load = useCallback(async () => {
     const generation = ++loadGeneration.current;
     setError('');
-    const response = await fetch('/api/v1/work-items', { cache: 'no-store' });
-    if (generation !== loadGeneration.current) return;
-    const body = await response.json();
-    if (!response.ok) {
-      setError(userError(response.status, body.error, 'Could not load your work'));
-      setLoading(false);
-      return;
+    try {
+      const response = await fetch('/api/v1/work-items', { cache: 'no-store' });
+      if (generation !== loadGeneration.current) return;
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not load your work'));
+        return;
+      }
+      setData(body);
+    } catch {
+      if (generation !== loadGeneration.current) return;
+      setError(userError(0, '', 'Could not load your work'));
+    } finally {
+      if (generation === loadGeneration.current) setLoading(false);
     }
-    setData(body);
-    setLoading(false);
   }, []);
 
   useEffect(() => {

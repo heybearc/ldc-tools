@@ -73,7 +73,7 @@ export default function LoginScreen() {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Pressable onPress={submit} disabled={busy || !email.trim() || !password} style={styles.button}>
+        <Pressable onPress={submit} disabled={busy || !apiBase.trim() || !email.trim() || !password} style={styles.button}>
           {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
         </Pressable>
       </ScrollView>

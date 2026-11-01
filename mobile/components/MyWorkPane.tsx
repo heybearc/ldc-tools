@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { apiRequest } from '@/lib/api';
+import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
 type Home = {
@@ -25,6 +25,10 @@ export function MyWorkPane() {
       });
       setHome(body);
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        await signOut();
+        return;
+      }
       setError(err instanceof Error ? err.message : 'Could not load your work. Try again in a moment.');
     }
   }, [apiBase, token]);

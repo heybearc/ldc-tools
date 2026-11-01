@@ -41,17 +41,21 @@ export default function ProcessesPage() {
 
   const load = useCallback(async () => {
     setError('');
-    const response = await fetch('/api/v1/processes', { cache: 'no-store' });
-    const body = await response.json();
-    if (!response.ok) {
-      setError(userError(response.status, body.error, 'Could not load processes'));
+    try {
+      const response = await fetch('/api/v1/processes', { cache: 'no-store' });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not load processes'));
+        return;
+      }
+      setTemplates(body.templates || []);
+      setProjects(body.projects || []);
+      setCanPost(Boolean(body.canPost));
+    } catch {
+      setError(userError(0, '', 'Could not load processes'));
+    } finally {
       setLoading(false);
-      return;
     }
-    setTemplates(body.templates || []);
-    setProjects(body.projects || []);
-    setCanPost(Boolean(body.canPost));
-    setLoading(false);
   }, []);
 
   useEffect(() => {

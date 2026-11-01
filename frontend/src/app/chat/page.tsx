@@ -65,23 +65,36 @@ function ChatScreen() {
   const newest = useRef<string | null>(null);
 
   const loadChannels = useCallback(async () => {
-    const response = await fetch('/api/v1/chat', { cache: 'no-store' });
-    const body = await response.json();
-    if (!response.ok) {
-      setError(userError(response.status, body.error, 'Could not load chat'));
-      return;
+    try {
+      const response = await fetch('/api/v1/chat', { cache: 'no-store' });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not load chat'));
+        return;
+      }
+      setChannels(body.channels || []);
+      setTeammates(body.teammates || []);
+      setVapid(body.vapidPublicKey || null);
+      setSelectedId((current) => current || body.channels?.[0]?.id || null);
+    } catch {
+      setError(userError(0, '', 'Could not load chat'));
     }
-    setChannels(body.channels || []);
-    setTeammates(body.teammates || []);
-    setVapid(body.vapidPublicKey || null);
-    setSelectedId((current) => current || body.channels?.[0]?.id || null);
   }, []);
 
   const loadMessages = useCallback(async (channelId: string, after?: string | null) => {
     const query = after ? `?after=${encodeURIComponent(after)}` : '';
-    const response = await fetch(`/api/v1/chat/channels/${channelId}/messages${query}`, { cache: 'no-store' });
-    const body = await response.json();
-    if (!response.ok) return;
+    let response: Response;
+    try {
+      response = await fetch(`/api/v1/chat/channels/${channelId}/messages${query}`, { cache: 'no-store' });
+    } catch {
+      setError(userError(0, '', 'Could not load messages'));
+      return;
+    }
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setError(userError(response.status, body.error, 'Could not load messages'));
+      return;
+    }
     const incoming: Message[] = body.messages || [];
     setMessages((current) => {
       if (!after) return incoming;

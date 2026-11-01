@@ -1,4 +1,4 @@
-const GENERIC = /^failed to\b/i;
+const GENERIC = /^(failed to\b|unauthorized|forbidden|not found|save failed|failed to fetch|network request failed|internal server error)/i;
 
 export function userError(status: number, serverMessage: unknown, action: string): string {
   const specific = typeof serverMessage === 'string' ? serverMessage.trim() : '';
