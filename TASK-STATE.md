@@ -7,10 +7,10 @@
 ---
 
 ## Current Task
-v1.43.0 (`cc8dcde`) is LIVE on green (CT135). STANDBY blue (CT133) is synced to the same commit. Hub dates stay paused.
+v1.43.0 (`cc8dcde`) is LIVE on green (CT135). STANDBY blue (CT133) is at `8478d64` (status note after the release). Hub dates stay paused.
 
 ### What I'm doing right now
-v1.43.0 (`cc8dcde`) is LIVE on green CT135 and synced to blue CT133. The Expo app shows My Work and the directory side by side on a tablet. An ended session asks you to sign in again. Hub dates stay paused. The app is not in the stores.
+v1.43.0 (`cc8dcde`) is LIVE on green CT135. Blue is at `8478d64`. The Expo app shows My Work and the directory side by side on a tablet. An ended session asks you to sign in again. Hub dates stay paused. The app is not in the stores.
 
 ### Recent completions
 - ✅ Shipped v1.43.0 (`cc8dcde`). Tablet layout, and failures say what happened. qa-01 directory gate plus the generated user-error test. LIVE green CT135, STANDBY blue CT133.

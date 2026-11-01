@@ -5,6 +5,16 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-10-31)
+- Shipped v1.43.0 (`cc8dcde`). LIVE green CT135. qa-01 directory gate plus the generated user-error test passed on standby before the switch.
+- Blue STANDBY is `8478d64` (status note after the release). The release commit is `cc8dcde`.
+- Tablet: My Work and the directory sit side by side. A phone stays on two tabs. The app is not in the stores.
+- An ended session asks you to sign in again. A dropped connection stops the spinner.
+- A tablet still calls the home API twice. Unit tests for those messages are not in `npm test`.
+- Hub dates stay paused. The persons list still has no start or end dates.
+- Open urgent feedback: 0 (no new items in this session). Governance submodule is `15f30eb`.
+- Start a new chat before the next slice.
+
 ### Focus
 - Shipped v1.42.0 (`2351513`). LIVE blue CT133, STANDBY green CT135. qa-01 full suite 74/74 plus the generated mobile test. Phone layout and directory contacts. The Expo app is not in the stores. Hub dates stay paused.
 - Shipped v1.41.0 (`16ffef1`). LIVE green CT135, STANDBY blue CT133. qa-01 full suite 72/72 plus the generated chat test. Team chat, My Work, help replies, and finishing several tasks. Hub dates stay paused.
