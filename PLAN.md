@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-30  
+**Last updated:** 2026-10-31  
 **Current phase:** Region work queue  
-**Status:** v1.42.0 is LIVE on blue (CT133) at `2351513` and synced to green (CT135). Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app is started and not submitted.
+**Status:** v1.42.0 is LIVE on blue (CT133) at `2351513` and synced to green (CT135). Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app has a wide tablet layout and is not submitted.
 
 ---
 
@@ -120,7 +120,7 @@ Done when a new trade or crew person shows on the directory and does not appear 
 
 Volunteer roster, congregation assignment, budget, crew-to-project assignment, the hierarchy editor, a separate calendar, and logins for directory contacts who are not Personnel.
 
-The phone layout of the website is in progress. The store app is a separate Expo project in `mobile/`. It signs in with the same email and password and reads My Work and the directory. Team chat notifications on the website stay browser push.
+The store app is a separate Expo project in `mobile/`. It signs in with the same email and password and reads My Work and the directory. On a tablet, those two lists sit side by side. A phone stays stacked. Team chat notifications on the website stay browser push.
 
 ## Prioritized Backlog
 
@@ -132,8 +132,8 @@ Projects and crew-change requests stay. The schedule is dated work on the work l
 - [x] Fix TypeScript error in ImportExportButtons.tsx (effort: S)
 
 ### Medium Priority
-- [ ] Expand LDC smoke coverage beyond qa-01 quick suite (effort: M)
-- [ ] Enhanced error messages across application (effort: M)
+- [x] Expand LDC smoke coverage beyond qa-01 quick suite (effort: M)
+- [x] Enhanced error messages across application (effort: M)
 
 ### Low Priority
 - [ ] Performance optimizations for large datasets (effort: L)

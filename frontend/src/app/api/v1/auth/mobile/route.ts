@@ -19,6 +19,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Mobile sign-in error:', error);
-    return NextResponse.json({ error: 'Failed to sign in' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not sign in. Try again in a moment.' }, { status: 500 });
   }
 }

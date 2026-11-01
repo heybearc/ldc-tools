@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Building2, Plus } from 'lucide-react';
+import { userError } from '@/lib/user-error';
 
 interface Person {
   id: string;
@@ -73,7 +74,7 @@ export default function ProjectsPage() {
     if (generation !== loadGeneration.current) return;
     const body = await response.json();
     if (!response.ok) {
-      setError(body.error || 'Failed to load projects');
+      setError(userError(response.status, body.error, 'Could not load projects'));
       setLoading(false);
       return;
     }
@@ -107,7 +108,7 @@ export default function ProjectsPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to assign Personnel');
+        setError(userError(response.status, body.error, 'Could not assign Personnel'));
         return;
       }
       setChoice((current) => ({ ...current, [projectId]: '' }));
@@ -140,7 +141,7 @@ export default function ProjectsPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to add a date');
+        setError(userError(response.status, body.error, 'Could not add the date'));
         return;
       }
       setDrafts((current) => ({ ...current, [projectId]: EMPTY_DATE }));
@@ -159,7 +160,7 @@ export default function ProjectsPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to remove Personnel');
+        setError(userError(response.status, body.error, 'Could not remove Personnel'));
         return;
       }
       await load();
@@ -186,7 +187,7 @@ export default function ProjectsPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to add a project');
+        setError(userError(response.status, body.error, 'Could not add the project'));
         return;
       }
       setProjectForm({ name: '', number: '', location: '' });

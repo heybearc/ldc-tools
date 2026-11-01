@@ -120,6 +120,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Mobile home error:', error);
-    return NextResponse.json({ error: 'Failed to load' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not load My Work and the directory. Try again in a moment.' }, { status: 500 });
   }
 }

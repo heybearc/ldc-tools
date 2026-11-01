@@ -14,8 +14,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:smoke": "playwright test tests/smoke-test.spec.ts",
-    "test:smoke:quick": "playwright test tests/smoke-test.spec.ts --workers=1",
+    "test:smoke": "playwright test tests/smoke-test.spec.ts tests/product-smoke.spec.ts",
+    "test:smoke:quick": "playwright test tests/smoke-test.spec.ts tests/product-smoke.spec.ts --workers=1",
     "test:report": "playwright show-report test-results/html-report",
     "test:debug": "playwright test --debug"
   },

@@ -1,8 +1,8 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-10-30  
+**Last updated:** 2026-10-31  
 **Current branch:** main  
-**Working on:** v1.42.0 is live. The store app is started and not in the stores.
+**Working on:** v1.42.0 is live. The store app has a wide tablet layout and is not in the stores.
 
 ---
 
@@ -10,7 +10,7 @@
 v1.42.0 (`2351513`) is LIVE on blue (CT133). STANDBY green (CT135) is synced to the same commit. Hub dates stay paused.
 
 ### What I'm doing right now
-v1.42.0 is live. Phone layout and directory contacts shipped. The Expo app in `mobile/` is not submitted.
+v1.42.0 is live. The Expo app shows My Work and the directory side by side on a tablet. Smoke covers directory, work, chat, projects, and processes. Those pages say what failed and to try again. Hub dates stay paused. The app is not in the stores.
 
 ### Recent completions
 - ✅ Shipped v1.42.0 (`2351513`). Phone layout and directory contacts. qa-01 full suite 74/74 plus the generated mobile test. LIVE blue CT133, STANDBY green CT135.
@@ -36,7 +36,7 @@ v1.42.0 is live. Phone layout and directory contacts shipped. The Expo app in `m
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Walk Directory, Work, and Chat on a phone at https://ldctools.com. Start the store app with `cd mobile && npm start`.
+Reload the Expo app and open it on a tablet. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
@@ -48,4 +48,4 @@ Walk Directory, Work, and Chat on a phone at https://ldctools.com. Start the sto
 ---
 
 ## Exact Next Command
-Walk Directory, Work, and Chat on a phone at https://ldctools.com. Start the store app with `cd mobile && npm start`.
+Reload the Expo app and open it on a tablet. Hub assignment dates stay paused until the persons list has start and end dates.

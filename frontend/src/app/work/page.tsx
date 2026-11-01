@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { ClipboardList, Plus, Upload } from 'lucide-react';
 import { isAirgappedEmail } from '@/lib/reachable-email';
+import { userError } from '@/lib/user-error';
 
 interface Person {
   id: string;
@@ -127,7 +128,7 @@ export default function WorkPage() {
     if (generation !== loadGeneration.current) return;
     const body = await response.json();
     if (!response.ok) {
-      setError(body.error || 'Failed to load work');
+      setError(userError(response.status, body.error, 'Could not load work'));
       setLoading(false);
       return;
     }
@@ -171,7 +172,7 @@ export default function WorkPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to add work');
+        setError(userError(response.status, body.error, 'Could not add the work'));
         return;
       }
       setForm(EMPTY_FORM);
@@ -189,7 +190,7 @@ export default function WorkPage() {
       const response = await fetch(`/api/v1/work-items/${id}/claim`, { method: 'POST' });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to claim work');
+        setError(userError(response.status, body.error, 'Could not claim the work'));
         return;
       }
       await load();
@@ -208,7 +209,7 @@ export default function WorkPage() {
       const response = await fetch('/api/v1/work-items/import', { method: 'POST', body });
       const result = await response.json();
       if (!response.ok) {
-        setError(result.error || 'Failed to import crew requests');
+        setError(userError(response.status, result.error, 'Could not import the crew requests'));
         return;
       }
       const skipped = result.skipped ? ` ${result.skipped} already on the list or blank.` : '';
@@ -255,7 +256,7 @@ export default function WorkPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to assign work');
+        setError(userError(response.status, body.error, 'Could not assign the work'));
         return;
       }
       setNotice(`Assigned ${body.assigned} task${body.assigned === 1 ? '' : 's'}.`);
@@ -275,7 +276,7 @@ export default function WorkPage() {
       const response = await fetch(`/api/v1/processes/${id}/claim`, { method: 'POST' });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to claim the process');
+        setError(userError(response.status, body.error, 'Could not claim the process'));
         return;
       }
       setNotice('Process claimed. The steps stay on that process.');
@@ -297,14 +298,14 @@ export default function WorkPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to update email');
+        setError(userError(response.status, body.error, 'Could not update the completion email'));
         return;
       }
       setNotice(notifyRequestor ? 'Completion email is on for the selection.' : 'Completion email is off for the selection.');
       setSelectedIds([]);
       await load();
     } catch {
-      setError('Failed to update email');
+      setError(userError(0, '', 'Could not update the completion email'));
     }
   }
 
@@ -321,7 +322,7 @@ export default function WorkPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to mark work done');
+        setError(userError(response.status, body.error, 'Could not mark the work done'));
         return;
       }
       setNotice(`Marked ${body.completed} done.`);
@@ -344,7 +345,7 @@ export default function WorkPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to update work');
+        setError(userError(response.status, body.error, 'Could not update the work'));
         return;
       }
       await load();
@@ -905,7 +906,7 @@ export function NoteList({
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to reply');
+        setError(userError(response.status, body.error, 'Could not send the reply'));
         return;
       }
       setReply('');
@@ -1027,7 +1028,7 @@ export function WorkRow({
       });
       const body = await response.json();
       if (!response.ok) {
-        setNoteError(body.error || 'Failed to save the note');
+        setNoteError(userError(response.status, body.error, 'Could not save the note'));
         return;
       }
       setNote('');

@@ -67,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const result = await apiRequest<{ token: string; user: MobileUser }>(apiBase, '/api/v1/auth/mobile', {
       method: 'POST',
       body: { email, password },
+      action: 'Could not sign in',
     });
     setToken(result.token);
     setUser(result.user);

@@ -16,6 +16,7 @@ import DirectoryPeople, {
   type DirectoryGroups,
 } from '@/components/DirectoryPeople';
 import ProfilePhoto from '@/components/ProfilePhoto';
+import { userError } from '@/lib/user-error';
 
 interface OversightAssignment {
   id: string;
@@ -78,8 +79,8 @@ export default function TradeTeamsOverviewPage() {
     try {
       setLoading(true);
       const response = await fetch('/api/v1/trade-teams/overview', { cache: 'no-store' });
-      if (!response.ok) throw new Error('Failed to fetch overview data');
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(userError(response.status, data.error, 'Could not load the directory'));
       setTradeTeams(data.tradeTeams || []);
       setDirectoryGroups(data.directoryGroups || {
         constructionGroup: { contact: [], assistant: [], support: [] },

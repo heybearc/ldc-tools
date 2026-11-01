@@ -2,6 +2,7 @@
 
 import { FormEvent, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { userError } from '@/lib/user-error';
 
 interface Person {
   id: string;
@@ -67,7 +68,7 @@ function ChatScreen() {
     const response = await fetch('/api/v1/chat', { cache: 'no-store' });
     const body = await response.json();
     if (!response.ok) {
-      setError(body.error || 'Failed to load chat');
+      setError(userError(response.status, body.error, 'Could not load chat'));
       return;
     }
     setChannels(body.channels || []);
@@ -122,7 +123,7 @@ function ChatScreen() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to send');
+        setError(userError(response.status, body.error, 'Could not send the message'));
         return;
       }
       setDraft('');
@@ -144,7 +145,7 @@ function ChatScreen() {
     });
     const body = await response.json();
     if (!response.ok) {
-      setError(body.error || 'Failed to open the chat');
+      setError(userError(response.status, body.error, 'Could not open the chat'));
       return;
     }
     setTeammateId('');
@@ -182,12 +183,12 @@ function ChatScreen() {
       });
       if (!response.ok) {
         const body = await response.json();
-        setError(body.error || 'Failed to turn on notifications');
+        setError(userError(response.status, body.error, 'Could not turn on notifications'));
         return;
       }
       setNotice('Notifications are on for this browser.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to turn on notifications');
+      setError(err instanceof Error ? err.message : userError(0, '', 'Could not turn on notifications'));
     }
   }
 

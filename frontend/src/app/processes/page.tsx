@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { ListChecks } from 'lucide-react';
+import { userError } from '@/lib/user-error';
 
 interface Step {
   id?: string;
@@ -43,7 +44,7 @@ export default function ProcessesPage() {
     const response = await fetch('/api/v1/processes', { cache: 'no-store' });
     const body = await response.json();
     if (!response.ok) {
-      setError(body.error || 'Failed to load processes');
+      setError(userError(response.status, body.error, 'Could not load processes'));
       setLoading(false);
       return;
     }
@@ -87,7 +88,7 @@ export default function ProcessesPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to add a process');
+        setError(userError(response.status, body.error, 'Could not add the process'));
         return;
       }
       setName('');
@@ -110,7 +111,7 @@ export default function ProcessesPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to start the process');
+        setError(userError(response.status, body.error, 'Could not start the process'));
         return;
       }
       setProjectChoice((current) => ({ ...current, [templateId]: '' }));

@@ -3,7 +3,7 @@
     "name": "LDC Tools",
     "slug": "ldc-tools",
     "version": "0.1.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "scheme": "ldctools",
     "userInterfaceStyle": "light",
     "ios": {

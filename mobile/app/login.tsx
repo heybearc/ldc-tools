@@ -11,9 +11,11 @@ import {
   View,
 } from 'react-native';
 import { useAuth } from '@/lib/auth';
+import { useWideLayout } from '@/lib/useWideLayout';
 
 export default function LoginScreen() {
   const { apiBase, setApiBase, signIn } = useAuth();
+  const wide = useWideLayout();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -34,7 +36,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[styles.content, wide && styles.wideContent]} keyboardShouldPersistTaps="handled">
         <Text style={styles.kicker}>LDC Tools</Text>
         <Text style={styles.title}>Sign in</Text>
         <Text style={styles.help}>
@@ -82,6 +84,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#f9fafb' },
   content: { padding: 24, paddingTop: 72, gap: 8 },
+  wideContent: { maxWidth: 480, width: '100%', alignSelf: 'center' },
   kicker: { color: '#1e40af', fontWeight: '700', letterSpacing: 0.4 },
   title: { fontSize: 32, fontWeight: '700', color: '#111827', marginBottom: 8 },
   help: { color: '#4b5563', marginBottom: 16, lineHeight: 20 },

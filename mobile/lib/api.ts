@@ -1,3 +1,5 @@
+import { userError } from './user-error';
+
 export class ApiError extends Error {
   status: number;
 
@@ -10,7 +12,7 @@ export class ApiError extends Error {
 export async function apiRequest<T>(
   apiBase: string,
   path: string,
-  options: { method?: string; token?: string | null; body?: unknown } = {},
+  options: { method?: string; token?: string | null; body?: unknown; action?: string } = {},
 ): Promise<T> {
   const headers: Record<string, string> = {};
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
@@ -24,12 +26,15 @@ export async function apiRequest<T>(
       body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     });
   } catch {
-    throw new ApiError(`Could not reach ${apiBase}.`, 0);
+    throw new ApiError(userError(0, '', options.action || 'Could not finish that request'), 0);
   }
 
   const json = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new ApiError(json?.error || `Request failed (${response.status})`, response.status);
+    throw new ApiError(
+      userError(response.status, json?.error, options.action || 'Could not finish that request'),
+      response.status,
+    );
   }
   return json as T;
 }

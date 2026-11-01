@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ClipboardList } from 'lucide-react';
 import { WorkRow, type WorkItem } from '@/app/work/page';
+import { userError } from '@/lib/user-error';
 
 interface WorkResponse {
   canAssign: boolean;
@@ -25,7 +26,7 @@ export default function MyWorkPage() {
     if (generation !== loadGeneration.current) return;
     const body = await response.json();
     if (!response.ok) {
-      setError(body.error || 'Failed to load your work');
+      setError(userError(response.status, body.error, 'Could not load your work'));
       setLoading(false);
       return;
     }
@@ -60,7 +61,7 @@ export default function MyWorkPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(body.error || 'Failed to update work');
+        setError(userError(response.status, body.error, 'Could not update the work'));
         return;
       }
       await load();

@@ -2,6 +2,7 @@
 
 import React, { useMemo, useRef, useState } from 'react';
 import { dateInputValue } from '@/lib/directory-assignments';
+import { userError } from '@/lib/user-error';
 import { PhotoPositioner, type PhotoPositionHandle } from '@/components/ProfilePhoto';
 
 type TeamOption = {
@@ -206,15 +207,22 @@ export default function DirectoryEntryDialog({
           startDate,
           endDate,
         };
-    const response = await fetch('/api/v1/trade-teams/directory', {
-      method: mode === 'add' ? 'POST' : 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    let response: Response;
+    try {
+      response = await fetch('/api/v1/trade-teams/directory', {
+        method: mode === 'add' ? 'POST' : 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      setSaving(false);
+      setError(userError(0, '', 'Could not save this person'));
+      return;
+    }
     const data = await response.json().catch(() => ({}));
     setSaving(false);
     if (!response.ok) {
-      setError(data.error || 'Save failed');
+      setError(userError(response.status, data.error, 'Could not save this person'));
       return;
     }
     onSaved();
