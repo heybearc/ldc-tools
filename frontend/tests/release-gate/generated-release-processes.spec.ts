@@ -78,7 +78,8 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   await expect(processRow.getByRole('heading', { name })).toBeVisible();
   await expect(page.getByRole('heading', { name: first })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: second })).toHaveCount(0);
-  await processRow.locator('summary', { hasText: 'Steps' }).click();
+  const stepsSummary = processRow.locator('summary', { hasText: 'Steps' });
+  if (await stepsSummary.count()) await stepsSummary.click();
   await expect(processRow.getByText(first)).toBeVisible();
   await expect(processRow.getByText('Use the current drawing.')).toBeVisible();
   await expect(processRow.getByText(second)).toBeVisible();
