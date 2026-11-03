@@ -1,5 +1,13 @@
 # LDC Tools Release Notes
 
+## v1.45.1 - Chat notifications match what is already on
+
+**Release Date:** November 3, 2026
+
+### ✨ Highlights
+
+- The chat button says Turn off when notifications are already on for this browser
+
 ## v1.45.0 - Open your work and chat in the app
 
 **Release Date:** November 3, 2026

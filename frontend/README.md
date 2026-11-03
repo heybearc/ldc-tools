@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.45.0**
+Current: **1.45.1**
 
 ## Version History
+- **v1.45.1** (2026-11-03) - Chat notifications show Turn off when they are already on
 - **v1.45.0** (2026-11-03) - Open claimed work, check steps, and chat in the phone app
 - **v1.44.0** (2026-11-03) - Claim work in the app, and open a person from the directory
 - **v1.43.0** (2026-10-31) - Tablet layout in the app, and clearer messages when something fails
