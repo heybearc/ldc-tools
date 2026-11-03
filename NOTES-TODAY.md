@@ -5,6 +5,16 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-03)
+- v1.43.0 (`cc8dcde`) is still LIVE on green CT135. STANDBY blue CT133 is `e258033` and healthy.
+- Store app 1.0.0 lists Construction group, Personnel, and ancillary with the trade crews. A tablet loads that list once.
+- Android APK is built: https://expo.dev/accounts/corya92/projects/ldc-tools/builds/aaff87f3-9a0f-4dca-b0e9-496d2ae734bc
+- iOS EAS build cannot sign. Expo account `corya92` has no Apple team. Enrollment is not started.
+- Bundle ID and Android package are `com.ldctools.mobile`.
+- Open urgent feedback: 0.
+- Hub dates stay paused. The persons list still has no start or end dates.
+- Start a new chat before the next slice.
+
 ### Mid-day (2026-10-31)
 - Shipped v1.43.0 (`cc8dcde`). LIVE green CT135. qa-01 directory gate plus the generated user-error test passed on standby before the switch.
 - Blue STANDBY is `8478d64` (status note after the release). The release commit is `cc8dcde`.

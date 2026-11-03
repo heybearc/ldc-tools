@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-10-31  
+**Last updated:** 2026-11-03  
 **Current phase:** Region work queue  
-**Status:** v1.43.0 is LIVE on green (CT135) at `cc8dcde` and synced to blue (CT133). Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app has a wide tablet layout and is not submitted.
+**Status:** v1.43.0 is LIVE on green (CT135) at `cc8dcde`. STANDBY blue (CT133) is `e258033`. Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app is version 1.0.0 with an Android APK. iOS waits on Apple Developer enrollment. It is not submitted.
 
 ---
 
@@ -120,7 +120,7 @@ Done when a new trade or crew person shows on the directory and does not appear 
 
 Volunteer roster, congregation assignment, budget, crew-to-project assignment, the hierarchy editor, a separate calendar, and logins for directory contacts who are not Personnel.
 
-The store app is a separate Expo project in `mobile/`. It signs in with the same email and password and reads My Work and the directory. On a tablet, those two lists sit side by side. A phone stays stacked. Team chat notifications on the website stay browser push.
+The store app is a separate Expo project in `mobile/`. It signs in with the same email and password and reads My Work and the directory, including Construction group, Personnel, and ancillary. On a tablet, those two lists sit side by side and share one load. A phone stays stacked. Team chat notifications on the website stay browser push. The Android install file is built. iOS needs the Apple Developer Program.
 
 ## Prioritized Backlog
 

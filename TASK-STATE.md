@@ -1,16 +1,16 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-10-31  
+**Last updated:** 2026-11-03  
 **Current branch:** main  
-**Working on:** v1.43.0 is live. The store app has a wide tablet layout and is not in the stores.
+**Working on:** Store app 1.0.0 is on STANDBY. Android APK is built. iOS waits on Apple Developer enrollment.
 
 ---
 
 ## Current Task
-v1.43.0 (`cc8dcde`) is LIVE on green (CT135). STANDBY blue (CT133) is at `8478d64` (status note after the release). Hub dates stay paused.
+v1.43.0 (`cc8dcde`) is LIVE on green (CT135). STANDBY blue (CT133) is `e258033`. Hub dates stay paused. The store app is not in the stores.
 
 ### What I'm doing right now
-v1.43.0 (`cc8dcde`) is LIVE on green CT135. Blue is at `8478d64`. The Expo app shows My Work and the directory side by side on a tablet. An ended session asks you to sign in again. Hub dates stay paused. The app is not in the stores.
+`main` `e258033` is on STANDBY blue. The store app lists Construction group, Personnel, and ancillary with the trade crews. The Android APK is built. iOS is blocked until the Apple Developer Program is enrolled and `com.ldctools.mobile` exists in App Store Connect. Hub dates stay paused.
 
 ### Recent completions
 - ✅ Shipped v1.43.0 (`cc8dcde`). Tablet layout, and failures say what happened. qa-01 directory gate plus the generated user-error test. LIVE green CT135, STANDBY blue CT133.
@@ -37,11 +37,12 @@ v1.43.0 (`cc8dcde`) is LIVE on green CT135. Blue is at `8478d64`. The Expo app s
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Reload the Expo app and open it on a tablet. Hub assignment dates stay paused until the persons list has start and end dates.
+Enroll at https://developer.apple.com/programs/enroll/ and add `com.ldctools.mobile` in App Store Connect. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
 ## Known Issues
+- Apple Developer Program is not enrolled. Expo account `corya92` has no Apple team, so the iOS EAS build cannot sign.
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
 - ~9 TC Support without crew → parked as TT Support on an inferred team
 - Persons list has current roles and no start or end dates. Incomplete crew roles are left unchanged.
@@ -49,4 +50,4 @@ Reload the Expo app and open it on a tablet. Hub assignment dates stay paused un
 ---
 
 ## Exact Next Command
-Reload the Expo app and open it on a tablet. Hub assignment dates stay paused until the persons list has start and end dates.
+Enroll at https://developer.apple.com/programs/enroll/ and add `com.ldctools.mobile` in App Store Connect. Hub assignment dates stay paused until the persons list has start and end dates.
