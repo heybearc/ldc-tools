@@ -13,7 +13,11 @@
       "bundleIdentifier": "com.ldctools.mobile",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "LSApplicationQueriesSchemes": ["tel", "mailto", "sms"]
+        "LSApplicationQueriesSchemes": [
+          "tel",
+          "mailto",
+          "sms"
+        ]
       }
     },
     "android": {
@@ -24,7 +28,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "versionCode": 3
+      "versionCode": 4
     },
     "plugins": [
       "expo-router",
