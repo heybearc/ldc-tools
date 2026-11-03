@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-03  
 **Current branch:** main  
-**Working on:** Shipping v1.44.0. The store app can claim work and open a person. Apple Developer enrollment is in process.
+**Working on:** v1.44.0 (`2919abf`) is LIVE on blue (CT133). STANDBY green (CT135) is the same release. Apple Developer enrollment is in process.
 
 ---
 

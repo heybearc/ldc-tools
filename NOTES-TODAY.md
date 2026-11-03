@@ -6,9 +6,10 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ## Today
 
 ### Mid-day (2026-11-03)
+- Shipped v1.44.0 (`2919abf`). LIVE blue CT133. STANDBY green CT135 synced. qa-01 directory gate plus the generated store-app tests passed on standby before the switch.
 - Phone pass of the store app worked. Next build adds Available work, directory sections, person profiles, and the LDC Tools logo.
 - Apple Developer application is in process. Google Play Developer account is ready.
-- v1.43.0 (`cc8dcde`) is still LIVE on green CT135. STANDBY blue CT133 is `e258033` and healthy.
+- v1.43.0 (`cc8dcde`) was the previous LIVE release.
 - Store app 1.0.0 lists Construction group, Personnel, and ancillary with the trade crews. A tablet loads that list once.
 - Android APK is built: https://expo.dev/accounts/corya92/projects/ldc-tools/builds/aaff87f3-9a0f-4dca-b0e9-496d2ae734bc
 - iOS EAS build cannot sign until Apple enrollment finishes and Expo account `corya92` has a team.

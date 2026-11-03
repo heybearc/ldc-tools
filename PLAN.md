@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-03  
 **Current phase:** Region work queue  
-**Status:** v1.44.0 is the release candidate. Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app can claim work and open a person. iOS waits on Apple Developer enrollment.
+**Status:** v1.44.0 (`2919abf`) is LIVE on blue (CT133). STANDBY green (CT135) is synced. Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app can claim work and open a person. iOS waits on Apple Developer enrollment.
 
 ---
 
