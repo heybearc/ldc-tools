@@ -7,12 +7,13 @@
 ---
 
 ## Current Task
-v1.43.0 (`cc8dcde`) is LIVE on green (CT135). STANDBY blue (CT133) is `e258033`. Hub dates stay paused. The store app is not in the stores.
+v1.44.0 (`2919abf`) is LIVE on blue (CT133). STANDBY green (CT135) is synced. Hub dates stay paused. The new preview app is on the emulator.
 
 ### What I'm doing right now
-The store app has an Available tab for claimable work, directory sections for Construction group, Personnel, Ancillary, and trade team then crew, and a profile with photo, email, and phone. The API has to be on STANDBY before the new preview build can show it. Point the app Server field at the standby site. Apple enrollment is still in process. Hub dates stay paused.
+The preview APK is installed on the Medium Phone emulator. Sign in against `https://ldctools.com`. The older Play app bundle does not include Available, directory sections, or profiles. Apple enrollment is still in process. Hub dates stay paused.
 
 ### Recent completions
+- ✅ Shipped v1.44.0 (`2919abf`). Claim work, directory sections, and person profiles. qa-01 directory gate plus the generated store-app tests. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.43.0 (`cc8dcde`). Tablet layout, and failures say what happened. qa-01 directory gate plus the generated user-error test. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.42.0 (`2351513`). Phone layout and directory contacts. qa-01 full suite 74/74 plus the generated mobile test. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.41.0 (`16ffef1`). Team chat, My Work, help replies, and finishing several tasks. qa-01 full suite 72/72. LIVE green CT135, STANDBY blue CT133.
@@ -37,13 +38,13 @@ The store app has an Available tab for claimable work, directory sections for Co
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Test the store app against STANDBY. Set Server to the standby site, then check Available, the four directory sections, a person profile, and the logo icon. Hub assignment dates stay paused until the persons list has start and end dates.
+On the emulator, set Server to `https://ldctools.com` and check Available, the four directory sections, a person profile, and the logo. A new Play bundle is required before internal testing. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
 ## Known Issues
 - Apple Developer enrollment is in process. Expo account `corya92` still has no Apple team, so the iOS EAS build cannot sign.
-- Google Play app LDC Tools exists. Production app bundle is ready: https://expo.dev/artifacts/eas/3cGvubplvotAeH8tT3dOoH0lSDKbUovX-CBjj4LMaF8.aab (`d3f35b24`). It is not uploaded yet.
+- Google Play app LDC Tools exists. The uploaded-ready bundle `d3f35b24` is from before v1.44.0. The new preview APK is on the emulator: https://expo.dev/artifacts/eas/gJzun05YmHh013P1RuORKRODwBO4EoYpyt_8s1tvJuk.apk
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
 - ~9 TC Support without crew → parked as TT Support on an inferred team
 - Persons list has current roles and no start or end dates. Incomplete crew roles are left unchanged.
@@ -51,4 +52,4 @@ Test the store app against STANDBY. Set Server to the standby site, then check A
 ---
 
 ## Exact Next Command
-Test the store app against STANDBY. Set Server to the standby site, then check Available, the four directory sections, a person profile, and the logo icon. Hub assignment dates stay paused until the persons list has start and end dates.
+On the emulator, set Server to `https://ldctools.com` and check Available, the four directory sections, a person profile, and the logo. A new Play bundle is required before internal testing. Hub assignment dates stay paused until the persons list has start and end dates.

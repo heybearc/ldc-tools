@@ -7,7 +7,10 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ### Mid-day (2026-11-03)
 - Shipped v1.44.0 (`2919abf`). LIVE blue CT133. STANDBY green CT135 synced. qa-01 directory gate plus the generated store-app tests passed on standby before the switch.
-- Phone pass of the store app worked. Next build adds Available work, directory sections, person profiles, and the LDC Tools logo.
+- Preview APK is installed on the Medium Phone emulator. Server should be `https://ldctools.com`.
+- The Play bundle `d3f35b24` predates v1.44.0. Internal testing needs a new app bundle.
+- Open urgent feedback: 0. No new items in this session.
+- Phone pass of the first store build worked. v1.44.0 adds Available, directory sections, profiles, and the logo.
 - Apple Developer application is in process. Google Play Developer account is ready.
 - v1.43.0 (`cc8dcde`) was the previous LIVE release.
 - Store app 1.0.0 lists Construction group, Personnel, and ancillary with the trade crews. A tablet loads that list once.
