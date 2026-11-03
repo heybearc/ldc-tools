@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-03, later)
+- Shipped v1.45.0 (`32553ab`). LIVE green CT135. STANDBY blue CT133 synced, including version code `300c4d6`. qa-01 full suite 81/81 plus the work-step tests.
+- Claimed work opens for step checkoff, Done, and Return to pool. Phone chat is in the app. Starting a process keeps the project and confirms it.
+- Emulator APK 1.0.1 (version code 3): https://expo.dev/artifacts/eas/5yE3xvT9Y5-XxKpJ-36xD1waYzbznOKuqSm6NbINH9A.apk
+- Play bundle 1.0.1 (version code 4): https://expo.dev/artifacts/eas/pCB4NpPvFwyJ7AJrmCdEn3xT4T04jAiTEgv22MhUgg0.aab
+- Open urgent feedback: 0. No new items in this session.
+- Apple Developer enrollment is still in process. Hub dates stay paused.
+- Start a new chat before the next slice.
+
 ### Mid-day (2026-11-03)
 - Shipped v1.44.0 (`2919abf`). LIVE blue CT133. STANDBY green CT135 synced. qa-01 directory gate plus the generated store-app tests passed on standby before the switch.
 - Preview APK is installed on the Medium Phone emulator. Server should be `https://ldctools.com`.

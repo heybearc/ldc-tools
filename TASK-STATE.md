@@ -2,18 +2,19 @@
 
 **Last updated:** 2026-11-03  
 **Current branch:** main  
-**Working on:** v1.44.0 (`2919abf`) is LIVE on blue (CT133). STANDBY green (CT135) is the same release. Apple Developer enrollment is in process.
+**Working on:** v1.45.0 (`32553ab`) is LIVE on green (CT135). STANDBY blue (CT133) includes `300c4d6`. Apple Developer enrollment is in process.
 
 ---
 
 ## Current Task
-v1.44.0 (`2919abf`) is LIVE on blue (CT133). STANDBY green (CT135) is synced. Hub dates stay paused. The new preview app is on the emulator.
+v1.45.0 (`32553ab`) is LIVE on green (CT135). STANDBY blue (CT133) is synced. Hub dates stay paused. The new emulator APK and Play bundle are built.
 
 ### What I'm doing right now
-The preview APK is installed on the Medium Phone emulator. Sign in against `https://ldctools.com`. The older Play app bundle does not include Available, directory sections, or profiles. Apple enrollment is still in process. Hub dates stay paused.
+Install the version-code 3 APK on the emulator against `https://ldctools.com`. Upload the version-code 4 bundle for Matt. Apple enrollment is still in process. Hub dates stay paused.
 
 ### Recent completions
-- ✅ Shipped v1.44.0 (`2919abf`). Claim work, directory sections, and person profiles. qa-01 directory gate plus the generated store-app tests. LIVE blue CT133, STANDBY green CT135.
+- ✅ Shipped v1.45.0 (`32553ab`). Open claimed work, check steps, return to the pool, and chat in the phone app. qa-01 full suite 81/81. LIVE green CT135, STANDBY blue CT133.
+- ✅ Shipped v1.44.0 (`2919abf`). Claim work, directory sections, and person profiles. qa-01 directory gate plus the generated store-app tests. LIVE was blue CT133.
 - ✅ Shipped v1.43.0 (`cc8dcde`). Tablet layout, and failures say what happened. qa-01 directory gate plus the generated user-error test. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.42.0 (`2351513`). Phone layout and directory contacts. qa-01 full suite 74/74 plus the generated mobile test. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.41.0 (`16ffef1`). Team chat, My Work, help replies, and finishing several tasks. qa-01 full suite 72/72. LIVE green CT135, STANDBY blue CT133.
@@ -38,13 +39,13 @@ The preview APK is installed on the Medium Phone emulator. Sign in against `http
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-On the emulator, set Server to `https://ldctools.com` and check Available, the four directory sections, a person profile, and the logo. A new Play bundle is required before internal testing. Hub assignment dates stay paused until the persons list has start and end dates.
+Install the new APK on the emulator and upload the app bundle for Matt. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
 ## Known Issues
 - Apple Developer enrollment is in process. Expo account `corya92` still has no Apple team, so the iOS EAS build cannot sign.
-- Google Play app LDC Tools exists. The uploaded-ready bundle `d3f35b24` is from before v1.44.0. The new preview APK is on the emulator: https://expo.dev/artifacts/eas/gJzun05YmHh013P1RuORKRODwBO4EoYpyt_8s1tvJuk.apk
+- Google Play app LDC Tools exists. Upload bundle version code 4: https://expo.dev/artifacts/eas/pCB4NpPvFwyJ7AJrmCdEn3xT4T04jAiTEgv22MhUgg0.aab. Emulator APK version code 3: https://expo.dev/artifacts/eas/5yE3xvT9Y5-XxKpJ-36xD1waYzbznOKuqSm6NbINH9A.apk
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
 - ~9 TC Support without crew → parked as TT Support on an inferred team
 - Persons list has current roles and no start or end dates. Incomplete crew roles are left unchanged.
@@ -52,4 +53,4 @@ On the emulator, set Server to `https://ldctools.com` and check Available, the f
 ---
 
 ## Exact Next Command
-On the emulator, set Server to `https://ldctools.com` and check Available, the four directory sections, a person profile, and the logo. A new Play bundle is required before internal testing. Hub assignment dates stay paused until the persons list has start and end dates.
+Install the new APK on the emulator and upload the app bundle for Matt. Hub assignment dates stay paused until the persons list has start and end dates.
