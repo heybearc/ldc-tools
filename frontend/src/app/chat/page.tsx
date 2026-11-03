@@ -60,6 +60,7 @@ function ChatScreen() {
   const [teammateId, setTeammateId] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [notificationsOn, setNotificationsOn] = useState(false);
   const [sending, setSending] = useState(false);
   const bottom = useRef<HTMLDivElement>(null);
   const newest = useRef<string | null>(null);
@@ -109,6 +110,27 @@ function ChatScreen() {
   useEffect(() => {
     loadChannels();
   }, [loadChannels]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function checkSubscription() {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+      try {
+        const registration = await navigator.serviceWorker.getRegistration('/sw.js');
+        const subscription = await registration?.pushManager.getSubscription();
+        if (!cancelled && subscription) {
+          setNotificationsOn(true);
+          setNotice('Notifications are on for this browser.');
+        }
+      } catch {
+        // Leave the button on "Turn on" when the browser cannot report a subscription.
+      }
+    }
+    checkSubscription();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -200,9 +222,37 @@ function ChatScreen() {
         setError(userError(response.status, body.error, 'Could not turn on notifications'));
         return;
       }
+      setNotificationsOn(true);
       setNotice('Notifications are on for this browser.');
     } catch (err) {
       setError(err instanceof Error ? err.message : userError(0, '', 'Could not turn on notifications'));
+    }
+  }
+
+  async function disableNotifications() {
+    setNotice('');
+    setError('');
+    try {
+      const registration = await navigator.serviceWorker.getRegistration('/sw.js');
+      const subscription = await registration?.pushManager.getSubscription();
+      const endpoint = subscription?.endpoint || '';
+      if (subscription) await subscription.unsubscribe();
+      if (endpoint) {
+        const response = await fetch('/api/v1/chat/push/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint }),
+        });
+        if (!response.ok) {
+          const body = await response.json();
+          setError(userError(response.status, body.error, 'Could not turn off notifications'));
+          return;
+        }
+      }
+      setNotificationsOn(false);
+      setNotice('Notifications are off for this browser.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : userError(0, '', 'Could not turn off notifications'));
     }
   }
 
@@ -219,10 +269,10 @@ function ChatScreen() {
         </div>
         <button
           type="button"
-          onClick={enableNotifications}
+          onClick={notificationsOn ? disableNotifications : enableNotifications}
           className="px-4 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-800"
         >
-          Turn on notifications
+          {notificationsOn ? 'Turn off' : 'Turn on notifications'}
         </button>
       </div>
       {error && <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>}
