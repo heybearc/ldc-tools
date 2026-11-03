@@ -75,7 +75,8 @@ function ChatScreen() {
       setChannels(body.channels || []);
       setTeammates(body.teammates || []);
       setVapid(body.vapidPublicKey || null);
-      setSelectedId((current) => current || body.channels?.[0]?.id || null);
+      const wide = window.matchMedia('(min-width: 1024px)').matches;
+      setSelectedId((current) => current || (wide ? body.channels?.[0]?.id || null : null));
     } catch {
       setError(userError(0, '', 'Could not load chat'));
     }
