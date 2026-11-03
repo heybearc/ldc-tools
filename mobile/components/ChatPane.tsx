@@ -3,7 +3,8 @@ import {
   ActivityIndicator,
   AppState,
   FlatList,
-  KeyboardAvoidingView,
+  Keyboard,
+  type KeyboardEvent,
   Platform,
   Pressable,
   StyleSheet,
@@ -43,9 +44,12 @@ export function ChatPane() {
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
   const [appActive, setAppActive] = useState(AppState.currentState === 'active');
+  const [keyboardInset, setKeyboardInset] = useState(0);
   const newest = useRef<string | null>(null);
   const messageRequest = useRef(0);
   const listRef = useRef<FlatList<Message>>(null);
+  const screenRef = useRef<View>(null);
+  const keyboardInsetRef = useRef(0);
 
   const fail = useCallback(async (err: unknown, fallback: string) => {
     if (err instanceof ApiError && err.status === 401) {
@@ -111,6 +115,30 @@ export function ChatPane() {
   }, []);
 
   useEffect(() => {
+    const liftAboveKeyboard = (event: KeyboardEvent) => {
+      const keyboardTop = event.endCoordinates.screenY;
+      screenRef.current?.measureInWindow((_x, y, _width, height) => {
+        const unpaddedBottom = y + height - keyboardInsetRef.current;
+        const lift = Math.max(0, Math.round(unpaddedBottom - keyboardTop));
+        keyboardInsetRef.current = lift;
+        setKeyboardInset(lift);
+      });
+    };
+    const lower = () => {
+      keyboardInsetRef.current = 0;
+      setKeyboardInset(0);
+    };
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillChangeFrame' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSub = Keyboard.addListener(showEvent, liftAboveKeyboard);
+    const hideSub = Keyboard.addListener(hideEvent, lower);
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!selectedId) return;
     messageRequest.current += 1;
     newest.current = null;
@@ -130,7 +158,7 @@ export function ChatPane() {
   useEffect(() => {
     if (messages.length === 0) return;
     requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: false }));
-  }, [messages]);
+  }, [messages, keyboardInset]);
 
   async function send() {
     const text = draft.trim();
@@ -175,7 +203,7 @@ export function ChatPane() {
   const showThread = Boolean(selectedId);
 
   return (
-    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <View ref={screenRef} style={[styles.screen, { paddingBottom: keyboardInset }]}>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {!showThread ? (
         <FlatList
@@ -237,7 +265,7 @@ export function ChatPane() {
           </View>
         </View>
       )}
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
