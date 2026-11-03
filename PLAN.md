@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-03  
 **Current phase:** Region work queue  
-**Status:** v1.43.0 is LIVE on green (CT135) at `cc8dcde`. STANDBY blue (CT133) is `e258033`. Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app is version 1.0.0 with an Android APK. iOS waits on Apple Developer enrollment. It is not submitted.
+**Status:** v1.44.0 is the release candidate. Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app can claim work and open a person. iOS waits on Apple Developer enrollment.
 
 ---
 

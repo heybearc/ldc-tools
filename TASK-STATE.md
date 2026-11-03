@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-03  
 **Current branch:** main  
-**Working on:** Store app adds Available work, directory sections, and person profiles. Apple Developer enrollment is in process.
+**Working on:** Shipping v1.44.0. The store app can claim work and open a person. Apple Developer enrollment is in process.
 
 ---
 

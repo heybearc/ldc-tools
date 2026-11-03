@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.43.0**
+Current: **1.44.0**
 
 ## Version History
+- **v1.44.0** (2026-11-03) - Claim work in the app, and open a person from the directory
 - **v1.43.0** (2026-10-31) - Tablet layout in the app, and clearer messages when something fails
 - **v1.42.0** (2026-10-30) - Phone layout, and a new trade or crew person is not a sign-in account
 - **v1.41.0** (2026-10-30) - Team chat, My Work, help replies, and finishing several tasks

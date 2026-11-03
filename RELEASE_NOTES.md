@@ -1,5 +1,16 @@
 # LDC Tools Release Notes
 
+## v1.44.0 - Claim work in the app
+
+**Release Date:** November 3, 2026
+
+### ✨ New Features
+
+- Available lists claimable work, and Claim moves it to My Work
+- The directory opens on Construction group, Personnel, Ancillary, or a trade team and crew
+- A person opens with photo, email, and phone. Email writes to them. Phone can call or text
+- The phone app uses the LDC Tools logo
+
 ## v1.43.0 - Use it on a tablet
 
 **Release Date:** October 31, 2026
