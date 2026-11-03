@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { authOptions } from '@/lib/auth-config';
+import { prisma } from '@/lib/prisma';
+import { readMobileToken } from '@/lib/mobile-session';
 
 const PHOTO_DIR = process.env.DIRECTORY_PHOTOS_DIR || '/var/lib/ldc-tools/directory-photos';
 
@@ -11,8 +13,18 @@ export async function GET(
   { params }: { params: { file: string } }
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user) {
+  const mobile = readMobileToken(_request.headers.get('authorization'));
+  if (!session?.user && !mobile) {
     return new NextResponse('Unauthorized', { status: 401 });
+  }
+  if (!session?.user && mobile) {
+    const user = await prisma.user.findUnique({
+      where: { id: mobile.id },
+      select: { status: true, constructionGroupId: true },
+    });
+    if (!user || user.status === 'INACTIVE' || !user.constructionGroupId) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
   }
 
   const file = params.file || '';

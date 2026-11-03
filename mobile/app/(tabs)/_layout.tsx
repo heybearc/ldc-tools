@@ -25,6 +25,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="available"
+        options={{
+          title: 'Available',
+          tabBarIcon: ({ color }) => (
+            <SymbolView name={{ ios: 'tray', android: 'inbox', web: 'inbox' }} tintColor={color} size={24} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="directory"
         options={{
           title: 'Directory',

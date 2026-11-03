@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { loadDirectoryGroups } from '@/lib/directory-groups';
-import { groupPeople } from '@/lib/mobile-directory';
+import { directorySections, personFromAssignment } from '@/lib/mobile-directory';
 import { readMobileToken } from '@/lib/mobile-session';
 import { timingLabel } from '@/lib/work-items';
 
@@ -14,16 +14,15 @@ const ROLE_LABEL: Record<string, string> = {
   TC_SUPPORT: 'Support',
 };
 
-function personName(input: {
-  name?: string | null;
-  email?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-} | null) {
-  if (!input) return '';
-  const named = `${input.firstName || ''} ${input.lastName || ''}`.trim();
-  return input.name || named || input.email || '';
-}
+const USER_SELECT = {
+  id: true,
+  name: true,
+  email: true,
+  image: true,
+  firstName: true,
+  lastName: true,
+  volunteer: { select: { phone: true } },
+} as const;
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,19 +38,26 @@ export async function GET(request: NextRequest) {
     }
 
     const groupId = user.constructionGroupId;
-    const [work, teams, groups] = await Promise.all([
+    const workSelect = {
+      id: true,
+      title: true,
+      detail: true,
+      timingKind: true,
+      dueOn: true,
+      project: { select: { name: true } },
+    } as const;
+    const [work, available, teams, groups] = await Promise.all([
       prisma.workItem.findMany({
         where: { constructionGroupId: groupId, assigneeId: user.id, status: 'OPEN' },
         orderBy: [{ dueOn: 'asc' }, { createdAt: 'desc' }],
         take: 50,
-        select: {
-          id: true,
-          title: true,
-          detail: true,
-          timingKind: true,
-          dueOn: true,
-          project: { select: { name: true } },
-        },
+        select: workSelect,
+      }),
+      prisma.workItem.findMany({
+        where: { constructionGroupId: groupId, assigneeId: null, claimable: true, status: 'OPEN' },
+        orderBy: [{ dueOn: 'asc' }, { createdAt: 'desc' }],
+        take: 50,
+        select: workSelect,
       }),
       prisma.tradeTeam.findMany({
         where: { constructionGroupId: groupId, isActive: true },
@@ -60,7 +66,7 @@ export async function GET(request: NextRequest) {
           oversight: {
             where: { isActive: true, endDate: null },
             include: {
-              user: { select: { name: true, email: true, firstName: true, lastName: true } },
+              user: { select: USER_SELECT },
               contact: true,
             },
           },
@@ -71,7 +77,7 @@ export async function GET(request: NextRequest) {
               oversight: {
                 where: { isActive: true, endDate: null },
                 include: {
-                  user: { select: { name: true, email: true, firstName: true, lastName: true } },
+                  user: { select: USER_SELECT },
                   contact: true,
                 },
               },
@@ -93,44 +99,59 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const people: Array<{ name: string; email: string; phone: string | null; role: string; place: string }> = groupPeople(groups);
-    const pushPerson = (
-      row: {
-        role: string;
-        user: { name: string | null; email: string; firstName: string | null; lastName: string | null } | null;
-        contact: { firstName: string; lastName: string; email: string; phone: string | null } | null;
-      },
-      place: string,
-    ) => {
-      const contact = row.contact;
-      const account = row.user;
-      people.push({
-        name: contact ? `${contact.firstName} ${contact.lastName}`.trim() : personName(account),
-        email: contact?.email || account?.email || '',
-        phone: contact?.phone || null,
-        role: ROLE_LABEL[row.role] || row.role,
-        place,
-      });
+    const sections = directorySections(groups);
+    const directoryTeams = teams.map((team) => ({
+      id: team.id,
+      name: team.name,
+      people: team.oversight.map((row) => personFromAssignment({
+        id: row.id,
+        role: row.role,
+        user: row.user
+          ? { ...row.user, phone: row.user.volunteer?.phone || null }
+          : null,
+        contact: row.contact,
+      }, team.name, ROLE_LABEL[row.role] || row.role)),
+      crews: team.crews.map((crew) => ({
+        id: crew.id,
+        name: crew.name,
+        people: crew.oversight.map((row) => personFromAssignment({
+          id: row.id,
+          role: row.role,
+          user: row.user
+            ? { ...row.user, phone: row.user.volunteer?.phone || null }
+            : null,
+          contact: row.contact,
+        }, `${team.name} · ${crew.name}`, ROLE_LABEL[row.role] || row.role)),
+      })),
+    }));
+    const people = [
+      ...sections.people,
+      ...directoryTeams.flatMap((team) => [
+        ...team.people,
+        ...team.crews.flatMap((crew) => crew.people),
+      ]),
+    ];
+    const mapWork = (item: typeof work[number]) => {
+      const dueOn = item.dueOn ? item.dueOn.toISOString().slice(0, 10) : null;
+      return {
+        id: item.id,
+        title: item.title,
+        detail: item.detail,
+        timing: timingLabel(item.timingKind, dueOn, item.project?.name || null),
+      };
     };
-    for (const team of teams) {
-      for (const row of team.oversight) pushPerson(row, team.name);
-      for (const crew of team.crews) {
-        for (const row of crew.oversight) pushPerson(row, `${team.name} · ${crew.name}`);
-      }
-    }
 
     return NextResponse.json({
       user: { id: user.id, name: user.name, email: user.email },
-      work: work.map((item) => {
-        const dueOn = item.dueOn ? item.dueOn.toISOString().slice(0, 10) : null;
-        return {
-          id: item.id,
-          title: item.title,
-          detail: item.detail,
-          timing: timingLabel(item.timingKind, dueOn, item.project?.name || null),
-        };
-      }),
+      work: work.map(mapWork),
+      available: available.map(mapWork),
       people,
+      directory: {
+        constructionGroup: sections.constructionGroup,
+        personnel: sections.personnel,
+        ancillary: sections.ancillary,
+        teams: directoryTeams,
+      },
     });
   } catch (error) {
     console.error('Mobile home error:', error);

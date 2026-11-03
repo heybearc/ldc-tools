@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.ldctools.mobile",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": ["tel", "mailto", "sms"]
       }
     },
     "android": {
@@ -22,7 +23,8 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      }
+      },
+      "versionCode": 2
     },
     "plugins": [
       "expo-router",
@@ -34,7 +36,8 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "./plugins/withContactQueries"
     ],
     "experiments": {
       "typedRoutes": false

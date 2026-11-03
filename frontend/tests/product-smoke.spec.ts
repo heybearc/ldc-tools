@@ -61,6 +61,8 @@ test('the store app rejects a bad password and reads work and the directory', as
   expect(home.ok()).toBeTruthy();
   const payload = await home.json();
   expect(Array.isArray(payload.work)).toBe(true);
+  expect(Array.isArray(payload.available)).toBe(true);
   expect(Array.isArray(payload.people)).toBe(true);
+  expect(Array.isArray(payload.directory?.teams)).toBe(true);
   expect(payload.user?.email).toBeTruthy();
 });

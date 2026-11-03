@@ -120,7 +120,7 @@ Done when a new trade or crew person shows on the directory and does not appear 
 
 Volunteer roster, congregation assignment, budget, crew-to-project assignment, the hierarchy editor, a separate calendar, and logins for directory contacts who are not Personnel.
 
-The store app is a separate Expo project in `mobile/`. It signs in with the same email and password and reads My Work and the directory, including Construction group, Personnel, and ancillary. On a tablet, those two lists sit side by side and share one load. A phone stays stacked. Team chat notifications on the website stay browser push. The Android install file is built. iOS needs the Apple Developer Program.
+The store app is a separate Expo project in `mobile/`. It signs in with the same email and password. My Work lists assigned tasks. Available lists claimable work with no assignee, and Claim assigns it. The directory opens on Construction group, Personnel, Ancillary, or a trade team and then a crew. A person opens a profile with photo, email, and phone. Email opens mail. Phone can call or text. On a tablet, My Work and the directory sit side by side. Team chat notifications on the website stay browser push. The app icon is the LDC Tools logo. iOS needs the Apple Developer Program.
 
 ## Prioritized Backlog
 

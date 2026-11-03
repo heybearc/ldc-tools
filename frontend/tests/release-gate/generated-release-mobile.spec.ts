@@ -49,6 +49,11 @@ test('the store app can sign in and read assigned work and the directory', async
   expect(home.ok()).toBeTruthy();
   const payload = await home.json();
   expect(Array.isArray(payload.work)).toBe(true);
+  expect(Array.isArray(payload.available)).toBe(true);
   expect(Array.isArray(payload.people)).toBe(true);
+  expect(Array.isArray(payload.directory?.constructionGroup)).toBe(true);
+  expect(Array.isArray(payload.directory?.personnel)).toBe(true);
+  expect(Array.isArray(payload.directory?.ancillary)).toBe(true);
+  expect(Array.isArray(payload.directory?.teams)).toBe(true);
   expect(payload.user?.email).toBeTruthy();
 });
