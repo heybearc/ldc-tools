@@ -1,5 +1,19 @@
 # LDC Tools Release Notes
 
+## v1.45.0 - Open your work and chat in the app
+
+**Release Date:** November 3, 2026
+
+### ✨ New Features
+
+- Open claimed work to check off its steps
+- Mark the work Done, or return it to the pool
+- The phone app has Chat for the team room and a direct message
+
+### 🐛 Bug Fixes
+
+- Starting a process keeps the project you picked and confirms that it is on Work
+
 ## v1.44.0 - Claim work in the app
 
 **Release Date:** November 3, 2026
