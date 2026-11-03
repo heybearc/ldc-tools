@@ -35,6 +35,8 @@ export type WorkItem = {
   title: string;
   detail: string;
   timing: string;
+  stepsDone?: number;
+  stepsTotal?: number;
 };
 
 export type Home = {

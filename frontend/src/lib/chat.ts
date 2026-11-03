@@ -6,6 +6,13 @@ export function directKey(userA: string, userB: string) {
   return [userA, userB].sort().join(':');
 }
 
+export async function channelForMember(channelId: string, userId: string, constructionGroupId: string) {
+  const channel = await prisma.chatChannel.findUnique({ where: { id: channelId } });
+  if (!channel || channel.constructionGroupId !== constructionGroupId) return null;
+  if (channel.kind === 'DIRECT' && !channel.directKey.split(':').includes(userId)) return null;
+  return channel;
+}
+
 export async function ensureTeamChannel(constructionGroupId: string) {
   return prisma.chatChannel.upsert({
     where: { constructionGroupId_directKey: { constructionGroupId, directKey: 'team' } },

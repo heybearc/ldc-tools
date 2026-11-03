@@ -4,8 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
-import { sendWorkCompletionEmail } from '@/lib/work-completion-email';
-import { canEmailAddress } from '@/lib/reachable-email';
+import { applyWorkStatus } from '@/lib/work-item-actions';
 
 export async function PATCH(
   request: NextRequest,
@@ -54,52 +53,38 @@ export async function PATCH(
     }
 
     const personnel = await canPostWork(session.user.id, scope);
-    const isAssignee = item.assigneeId === session.user.id;
-    if (!personnel && !isAssignee) {
-      return NextResponse.json({ error: 'Only Personnel or the assignee can update this work' }, { status: 403 });
-    }
-
-    const updated = await prisma.workItem.update({
-      where: { id: item.id },
-      data: {
-        ...(hasStatus ? {
-          status: body.status,
-          completedAt: body.status === 'DONE' ? new Date() : null,
-        } : {}),
-        ...(hasNotify ? { notifyRequestor: body.notifyRequestor } : {}),
-      },
-      select: {
-        id: true,
-        status: true,
-        completedAt: true,
-        requestorName: true,
-        requestorEmail: true,
-      },
-    });
-
-    let emailSent = false;
-    if (hasStatus && body.status === 'DONE' && item.status !== 'DONE' && item.requestorEmail && canEmailAddress(item.requestorEmail, item.notifyRequestor)) {
-      try {
-        emailSent = await sendWorkCompletionEmail({
-          requestorName: item.requestorName,
-          requestorEmail: item.requestorEmail,
-          title: item.title,
-          detail: item.detail,
-          completedByName: session.user.name || 'Personnel',
-        });
-      } catch (emailError) {
-        console.error('Work completion email failed:', emailError);
+    if (!hasStatus) {
+      const isAssignee = item.assigneeId === session.user.id;
+      if (!personnel && !isAssignee) {
+        return NextResponse.json({ error: 'Only Personnel or the assignee can update this work' }, { status: 403 });
       }
+      const updated = await prisma.workItem.update({
+        where: { id: item.id },
+        data: { notifyRequestor: body.notifyRequestor },
+        select: { id: true, status: true, completedAt: true, requestorName: true, requestorEmail: true },
+      });
+      return NextResponse.json({
+        id: updated.id,
+        status: updated.status,
+        completedAt: updated.completedAt?.toISOString() || null,
+        requestorName: updated.requestorName,
+        requestorEmail: updated.requestorEmail,
+        emailSent: false,
+      });
     }
 
-    return NextResponse.json({
-      id: updated.id,
-      status: updated.status,
-      completedAt: updated.completedAt?.toISOString() || null,
-      requestorName: updated.requestorName,
-      requestorEmail: updated.requestorEmail,
-      emailSent,
+    const updated = await applyWorkStatus({
+      id: item.id,
+      status: body.status,
+      actorId: session.user.id,
+      actorName: session.user.name || 'Personnel',
+      personnel,
+      constructionGroupId: item.constructionGroupId,
     });
+    if ('error' in updated) {
+      return NextResponse.json({ error: updated.error }, { status: updated.httpStatus });
+    }
+    return NextResponse.json(updated);
   } catch (error) {
     console.error('Update work item error:', error);
     return NextResponse.json({ error: 'Failed to update work' }, { status: 500 });

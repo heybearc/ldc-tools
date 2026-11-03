@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { ListChecks } from 'lucide-react';
 import { userError } from '@/lib/user-error';
 
@@ -38,6 +39,7 @@ export default function ProcessesPage() {
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [projectChoice, setProjectChoice] = useState<Record<string, string>>({});
+  const [notice, setNotice] = useState('');
 
   const load = useCallback(async () => {
     setError('');
@@ -107,18 +109,23 @@ export default function ProcessesPage() {
   async function start(templateId: string) {
     setBusyId(templateId);
     setError('');
+    setNotice('');
+    const projectId = projectChoice[templateId] || '';
     try {
       const response = await fetch(`/api/v1/processes/${templateId}/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: projectChoice[templateId] || null }),
+        body: JSON.stringify({ projectId: projectId || null }),
       });
-      const body = await response.json();
+      const body = await response.json().catch(() => ({}));
       if (!response.ok) {
         setError(userError(response.status, body.error, 'Could not start the process'));
         return;
       }
-      setProjectChoice((current) => ({ ...current, [templateId]: '' }));
+      const projectName = projects.find((project) => project.id === projectId)?.name;
+      setNotice(projectName ? `Started on ${projectName}. It is on Work and can be claimed.` : 'Started. It is on Work and can be claimed.');
+    } catch {
+      setError(userError(0, '', 'Could not start the process'));
     } finally {
       setBusyId(null);
     }
@@ -145,6 +152,12 @@ export default function ProcessesPage() {
       </div>
 
       {error && <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>}
+      {notice && (
+        <p className="rounded-md bg-green-50 text-green-800 px-4 py-3 text-sm">
+          {notice}{' '}
+          <Link href="/work" className="font-medium underline">Open Work</Link>
+        </p>
+      )}
 
       {showForm && canPost && (
         <form onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">

@@ -10,7 +10,6 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#1e40af',
         headerShown: !wide,
-        tabBarStyle: wide ? { display: 'none' } : undefined,
         headerStyle: { backgroundColor: '#fff' },
         headerTitleStyle: { fontWeight: '700' },
       }}
@@ -40,6 +39,15 @@ export default function TabLayout() {
           href: wide ? null : undefined,
           tabBarIcon: ({ color }) => (
             <SymbolView name={{ ios: 'person.2', android: 'group', web: 'group' }} tintColor={color} size={24} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'Chat',
+          tabBarIcon: ({ color }) => (
+            <SymbolView name={{ ios: 'bubble.left.and.bubble.right', android: 'chat', web: 'chat' }} tintColor={color} size={24} />
           ),
         }}
       />

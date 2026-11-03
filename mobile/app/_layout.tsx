@@ -39,6 +39,7 @@ function RootNavigator() {
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="person" options={{ title: 'Profile', headerBackTitle: 'Directory' }} />
+      <Stack.Screen name="work/[id]" options={{ title: 'Work', headerBackTitle: 'Back' }} />
     </Stack>
   );
 }

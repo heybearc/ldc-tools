@@ -17,6 +17,7 @@ interface Step {
   detail: string;
   explanation: string | null;
   referenceUrl: string | null;
+  done?: boolean;
 }
 
 interface WorkNote {
@@ -848,25 +849,56 @@ function Pager({
   );
 }
 
-function StepList({ steps }: { steps: Step[] }) {
+function StepList({
+  steps,
+  onToggle,
+}: {
+  steps: Step[];
+  onToggle?: (stepId: string, done: boolean) => void;
+}) {
   if (steps.length === 0) return null;
+  const doneCount = steps.filter((step) => step.done).length;
+  const list = (
+    <ol className="mt-2 space-y-2 list-decimal pl-5">
+      {steps.map((step) => (
+        <li key={step.id} className="text-sm text-gray-800">
+          <label className="flex items-start gap-2">
+            {onToggle && (
+              <input
+                type="checkbox"
+                className="mt-1 h-5 w-5"
+                checked={Boolean(step.done)}
+                aria-label={step.title}
+                onChange={(event) => onToggle(step.id, event.target.checked)}
+              />
+            )}
+            <span>
+              <span className={`font-medium ${step.done ? 'line-through text-gray-500' : ''}`}>{step.title}</span>
+              <p className="text-gray-600">{step.detail}</p>
+              {step.explanation && <p className="text-gray-600">{step.explanation}</p>}
+              {step.referenceUrl && (
+                <a href={step.referenceUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+                  Reference
+                </a>
+              )}
+            </span>
+          </label>
+        </li>
+      ))}
+    </ol>
+  );
+  if (onToggle) {
+    return (
+      <div className="mt-3">
+        <p className="text-sm font-medium text-gray-700">Steps ({doneCount} of {steps.length})</p>
+        {list}
+      </div>
+    );
+  }
   return (
     <details className="mt-3">
       <summary className="cursor-pointer text-sm font-medium text-gray-700">Steps ({steps.length})</summary>
-      <ol className="mt-2 space-y-2 list-decimal pl-5">
-        {steps.map((step) => (
-          <li key={step.id} className="text-sm text-gray-800">
-            <span className="font-medium">{step.title}</span>
-            <p className="text-gray-600">{step.detail}</p>
-            {step.explanation && <p className="text-gray-600">{step.explanation}</p>}
-            {step.referenceUrl && (
-              <a href={step.referenceUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-                Reference
-              </a>
-            )}
-          </li>
-        ))}
-      </ol>
+      {list}
     </details>
   );
 }
@@ -1015,7 +1047,36 @@ export function WorkRow({
   const canClaim = item.status === 'OPEN' && item.claimable && !item.assignee;
   const canFinish = item.status === 'OPEN' && (canAssign || item.assignee?.id === currentUserId);
   const canReopen = item.status === 'DONE' && (canAssign || item.assignee?.id === currentUserId);
+  const canCheckSteps = item.status === 'OPEN' && (canAssign || item.assignee?.id === currentUserId);
+  const canRelease = item.status === 'OPEN' && Boolean(item.assignee) && (item.assignee?.id === currentUserId || canAssign);
   const doneOn = item.status === 'DONE' ? formatDone(item.completedAt) : '';
+
+  async function toggleStep(stepId: string, done: boolean) {
+    setNoteError('');
+    const response = await fetch(`/api/v1/work-items/${item.id}/steps/${stepId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ done }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setNoteError(userError(response.status, body.error, 'Could not update the step'));
+      return;
+    }
+    await onChanged();
+  }
+
+  async function release() {
+    setNoteError('');
+    const response = await fetch(`/api/v1/work-items/${item.id}/release`, { method: 'POST' });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setNoteError(userError(response.status, body.error, 'Could not return the work to the pool'));
+      return;
+    }
+    setNoteNotice('Returned to the pool. Someone in this group can claim it.');
+    await onChanged();
+  }
 
   async function saveNote(kind: 'NOTE' | 'HELP') {
     const text = note.trim();
@@ -1123,7 +1184,7 @@ export function WorkRow({
               Reference
             </a>
           )}
-          <StepList steps={item.steps || []} />
+          <StepList steps={item.steps || []} onToggle={canCheckSteps ? toggleStep : undefined} />
           <NoteList itemId={item.id} notes={item.notes || []} onChanged={onChanged} />
           <div className="mt-3 space-y-2">
             <label className="block">
@@ -1176,6 +1237,16 @@ export function WorkRow({
               className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
             >
               Done
+            </button>
+          )}
+          {canRelease && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => { release().catch(() => undefined); }}
+              className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
+            >
+              Return to pool
             </button>
           )}
           {canReopen && (

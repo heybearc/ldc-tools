@@ -40,6 +40,7 @@ function serialize(item: {
     detail: string;
     explanation: string | null;
     referenceUrl: string | null;
+    done?: boolean;
   }>;
   notes?: Array<{
     id: string;
@@ -76,6 +77,7 @@ function serialize(item: {
       detail: step.detail,
       explanation: step.explanation,
       referenceUrl: step.referenceUrl,
+      done: Boolean(step.done),
     })),
     notes: (item.notes || []).map((note) => ({
       id: note.id,

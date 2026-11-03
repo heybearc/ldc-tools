@@ -3,7 +3,7 @@
     "owner": "corya92",
     "name": "LDC Tools",
     "slug": "ldc-tools",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "ldctools",
@@ -24,7 +24,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "versionCode": 2
+      "versionCode": 3
     },
     "plugins": [
       "expo-router",

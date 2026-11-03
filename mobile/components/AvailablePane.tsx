@@ -1,12 +1,13 @@
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { fetchHome, type WorkItem } from '@/lib/home';
 
 export function AvailablePane() {
   const { apiBase, token, signOut } = useAuth();
+  const router = useRouter();
   const [items, setItems] = useState<WorkItem[]>([]);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -42,6 +43,7 @@ export function AvailablePane() {
         action: 'Could not claim the work',
       });
       await load();
+      router.push(`/work/${id}`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         await signOut();

@@ -45,6 +45,10 @@ export async function GET(request: NextRequest) {
       timingKind: true,
       dueOn: true,
       project: { select: { name: true } },
+      steps: {
+        orderBy: { position: 'asc' as const },
+        select: { id: true, done: true },
+      },
     } as const;
     const [work, available, teams, groups] = await Promise.all([
       prisma.workItem.findMany({
@@ -138,6 +142,8 @@ export async function GET(request: NextRequest) {
         title: item.title,
         detail: item.detail,
         timing: timingLabel(item.timingKind, dueOn, item.project?.name || null),
+        stepsDone: item.steps.filter((step) => step.done).length,
+        stepsTotal: item.steps.length,
       };
     };
 

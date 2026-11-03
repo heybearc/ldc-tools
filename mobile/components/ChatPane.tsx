@@ -1,0 +1,243 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { ApiError, apiRequest } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+
+type Person = { id: string; name: string | null; email: string };
+type Channel = {
+  id: string;
+  title: string;
+  unread: number;
+  latest: { body: string } | null;
+};
+type Message = {
+  id: string;
+  body: string;
+  mine: boolean;
+  author: Person;
+};
+
+function personName(person: Person) {
+  return person.name || person.email;
+}
+
+export function ChatPane() {
+  const { apiBase, token, signOut } = useAuth();
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [teammates, setTeammates] = useState<Person[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [draft, setDraft] = useState('');
+  const [error, setError] = useState('');
+  const [sending, setSending] = useState(false);
+  const newest = useRef<string | null>(null);
+
+  const fail = useCallback(async (err: unknown, fallback: string) => {
+    if (err instanceof ApiError && err.status === 401) {
+      await signOut();
+      return;
+    }
+    setError(err instanceof Error ? err.message : fallback);
+  }, [signOut]);
+
+  const loadChannels = useCallback(async () => {
+    if (!token) return;
+    try {
+      const body = await apiRequest<{ channels: Channel[]; teammates: Person[] }>(apiBase, '/api/v1/mobile/chat', {
+        token,
+        action: 'Could not load chat',
+      });
+      setChannels(body.channels || []);
+      setTeammates(body.teammates || []);
+      setSelectedId((current) => current || body.channels?.[0]?.id || null);
+    } catch (err) {
+      await fail(err, 'Could not load chat. Try again in a moment.');
+    }
+  }, [apiBase, token, fail]);
+
+  const loadMessages = useCallback(async (channelId: string, after?: string | null) => {
+    if (!token) return;
+    const query = after ? `?after=${encodeURIComponent(after)}` : '';
+    try {
+      const body = await apiRequest<{ messages: Array<Message & { createdAt: string }> }>(
+        apiBase,
+        `/api/v1/mobile/chat/channels/${channelId}/messages${query}`,
+        { token, action: 'Could not load messages' },
+      );
+      const incoming = body.messages || [];
+      setMessages((current) => {
+        if (!after) return incoming;
+        const seen = new Set(current.map((message) => message.id));
+        return [...current, ...incoming.filter((message) => !seen.has(message.id))];
+      });
+      if (incoming.length > 0) newest.current = incoming[incoming.length - 1].createdAt;
+      await apiRequest(apiBase, `/api/v1/mobile/chat/channels/${channelId}/read`, {
+        method: 'POST',
+        token,
+        action: 'Could not update the chat',
+      });
+    } catch (err) {
+      await fail(err, 'Could not load messages. Try again in a moment.');
+    }
+  }, [apiBase, token, fail]);
+
+  useFocusEffect(useCallback(() => {
+    void loadChannels();
+  }, [loadChannels]));
+
+  useEffect(() => {
+    if (!selectedId) return;
+    newest.current = null;
+    void loadMessages(selectedId);
+    const timer = setInterval(() => {
+      void loadMessages(selectedId, newest.current);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [selectedId, loadMessages]);
+
+  async function send() {
+    const text = draft.trim();
+    if (!token || !selectedId || !text || sending) return;
+    setSending(true);
+    setError('');
+    try {
+      const body = await apiRequest<Message & { createdAt: string }>(
+        apiBase,
+        `/api/v1/mobile/chat/channels/${selectedId}/messages`,
+        { method: 'POST', token, body: { body: text }, action: 'Could not send the message' },
+      );
+      setDraft('');
+      setMessages((current) => (current.some((message) => message.id === body.id) ? current : [...current, body]));
+      newest.current = body.createdAt;
+      void loadChannels();
+    } catch (err) {
+      await fail(err, 'Could not send the message. Try again in a moment.');
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function openDirect(userId: string) {
+    if (!token) return;
+    setError('');
+    try {
+      const body = await apiRequest<{ id: string }>(apiBase, '/api/v1/mobile/chat/direct', {
+        method: 'POST',
+        token,
+        body: { userId },
+        action: 'Could not open the chat',
+      });
+      await loadChannels();
+      setSelectedId(body.id);
+    } catch (err) {
+      await fail(err, 'Could not open the chat. Try again in a moment.');
+    }
+  }
+
+  const selected = channels.find((channel) => channel.id === selectedId) || null;
+  const showThread = Boolean(selectedId);
+
+  return (
+    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {!showThread ? (
+        <FlatList
+          data={channels}
+          keyExtractor={(item) => item.id}
+          ListHeaderComponent={(
+            <View style={styles.people}>
+              <Text style={styles.heading}>Message one person</Text>
+              {teammates.map((person) => (
+                <Pressable key={person.id} onPress={() => void openDirect(person.id)} style={styles.person}>
+                  <Text style={styles.personText}>{personName(person)}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => setSelectedId(item.id)} style={styles.channel}>
+              <View style={styles.channelRow}>
+                <Text style={styles.channelTitle}>{item.title}</Text>
+                {item.unread > 0 ? <Text style={styles.unread}>{item.unread}</Text> : null}
+              </View>
+              {item.latest ? <Text style={styles.preview} numberOfLines={1}>{item.latest.body}</Text> : null}
+            </Pressable>
+          )}
+          ListEmptyComponent={<Text style={styles.empty}>No chats yet.</Text>}
+        />
+      ) : (
+        <View style={styles.thread}>
+          <View style={styles.threadHeader}>
+            <Pressable onPress={() => setSelectedId(null)} style={styles.back}>
+              <Text style={styles.backText}>Chats</Text>
+            </Pressable>
+            <Text style={styles.channelTitle} numberOfLines={1}>{selected?.title || 'Chat'}</Text>
+          </View>
+          <FlatList
+            data={messages}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.messages}
+            renderItem={({ item }) => (
+              <View style={[styles.bubble, item.mine ? styles.mine : styles.theirs]}>
+                {!item.mine ? <Text style={styles.author}>{personName(item.author)}</Text> : null}
+                <Text style={[styles.body, item.mine && styles.mineText]}>{item.body}</Text>
+              </View>
+            )}
+          />
+          <View style={styles.composer}>
+            <TextInput
+              value={draft}
+              onChangeText={setDraft}
+              placeholder={selected ? `Message ${selected.title}` : 'Message'}
+              style={styles.input}
+            />
+            <Pressable onPress={() => void send()} disabled={sending || !draft.trim()} style={styles.send}>
+              {sending ? <ActivityIndicator color="#fff" /> : <Text style={styles.sendText}>Send</Text>}
+            </Pressable>
+          </View>
+        </View>
+      )}
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#f9fafb' },
+  error: { color: '#b91c1c', padding: 12 },
+  empty: { color: '#6b7280', padding: 16 },
+  heading: { fontSize: 13, fontWeight: '700', color: '#6b7280', marginBottom: 8 },
+  people: { padding: 16, gap: 8 },
+  person: { backgroundColor: '#fff', borderRadius: 10, minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
+  personText: { color: '#111827', fontWeight: '600' },
+  channel: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
+  channelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  channelTitle: { fontSize: 16, fontWeight: '700', color: '#111827', flex: 1 },
+  unread: { backgroundColor: '#fef3c7', color: '#92400e', overflow: 'hidden', borderRadius: 10, paddingHorizontal: 8, fontWeight: '700' },
+  preview: { color: '#6b7280', marginTop: 2 },
+  thread: { flex: 1 },
+  threadHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, backgroundColor: '#fff' },
+  back: { minHeight: 44, justifyContent: 'center' },
+  backText: { color: '#1e40af', fontWeight: '700' },
+  messages: { padding: 12, gap: 8 },
+  bubble: { maxWidth: '80%', borderRadius: 12, padding: 10 },
+  mine: { alignSelf: 'flex-end', backgroundColor: '#1e40af' },
+  theirs: { alignSelf: 'flex-start', backgroundColor: '#e5e7eb' },
+  author: { fontSize: 12, fontWeight: '700', color: '#374151', marginBottom: 2 },
+  body: { color: '#111827', fontSize: 15 },
+  mineText: { color: '#fff' },
+  composer: { flexDirection: 'row', gap: 8, padding: 12, backgroundColor: '#fff' },
+  input: { flex: 1, minHeight: 44, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, backgroundColor: '#fff' },
+  send: { minHeight: 44, minWidth: 72, borderRadius: 8, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center' },
+  sendText: { color: '#fff', fontWeight: '700' },
+});

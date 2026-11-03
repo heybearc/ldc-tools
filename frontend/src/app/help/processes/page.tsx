@@ -40,7 +40,7 @@ export default async function ProcessesHelpPage() {
 
           <h2>Start a process</h2>
           <p>
-            Choose Start. Pick a project when the process belongs on one. The work list shows the process as one claimable item. The steps stay inside it and are not separate tasks. Claiming it assigns the whole process. Marking it Done records the date.
+            Choose a project when the process belongs on one, then choose Start. The project stays selected. A confirmation says it started, and Work lists it as one claimable item. The steps stay inside it. Claiming it assigns the whole process. The assignee can check off each step, mark the process Done, or return it to the pool.
           </p>
         </div>
       </div>

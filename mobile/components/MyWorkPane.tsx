@@ -1,12 +1,18 @@
 import { useCallback, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { fetchHome, type Home } from '@/lib/home';
 
+function stepLine(done?: number, total?: number) {
+  if (!total) return '';
+  return `${done || 0} of ${total} steps`;
+}
+
 export function MyWorkPane() {
   const { apiBase, token, user, signOut } = useAuth();
+  const router = useRouter();
   const [home, setHome] = useState<Home | null>(null);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -24,7 +30,7 @@ export function MyWorkPane() {
       }
       setError(err instanceof Error ? err.message : 'Could not load your work. Try again in a moment.');
     }
-  }, [apiBase, token]);
+  }, [apiBase, token, signOut]);
 
   useFocusEffect(useCallback(() => {
     void load();
@@ -46,11 +52,12 @@ export function MyWorkPane() {
         <Text style={styles.empty}>No open work is assigned to you.</Text>
       ) : null}
       {(home?.work || []).map((item) => (
-        <View key={item.id} style={styles.card}>
+        <Pressable key={item.id} onPress={() => router.push(`/work/${item.id}`)} style={styles.card}>
           <Text style={styles.title}>{item.title}</Text>
           {item.timing ? <Text style={styles.timing}>{item.timing}</Text> : null}
+          {stepLine(item.stepsDone, item.stepsTotal) ? <Text style={styles.timing}>{stepLine(item.stepsDone, item.stepsTotal)}</Text> : null}
           {item.detail ? <Text style={styles.detail}>{item.detail}</Text> : null}
-        </View>
+        </Pressable>
       ))}
       <Pressable onPress={() => void signOut()} style={styles.signOut}>
         <Text style={styles.signOutText}>Sign out</Text>

@@ -1095,6 +1095,7 @@ model WorkItemStep {
   detail       String  @db.Text
   explanation  String? @db.Text
   referenceUrl String?
+  done         Boolean @default(false)
 
   workItem     WorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
 
