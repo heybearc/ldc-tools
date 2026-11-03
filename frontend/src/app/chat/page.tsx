@@ -64,6 +64,7 @@ function ChatScreen() {
   const [sending, setSending] = useState(false);
   const bottom = useRef<HTMLDivElement>(null);
   const newest = useRef<string | null>(null);
+  const messageRequest = useRef(0);
 
   const loadChannels = useCallback(async () => {
     try {
@@ -84,15 +85,17 @@ function ChatScreen() {
   }, []);
 
   const loadMessages = useCallback(async (channelId: string, after?: string | null) => {
+    const requestId = messageRequest.current;
     const query = after ? `?after=${encodeURIComponent(after)}` : '';
     let response: Response;
     try {
       response = await fetch(`/api/v1/chat/channels/${channelId}/messages${query}`, { cache: 'no-store' });
     } catch {
-      setError(userError(0, '', 'Could not load messages'));
+      if (requestId === messageRequest.current) setError(userError(0, '', 'Could not load messages'));
       return;
     }
     const body = await response.json().catch(() => ({}));
+    if (requestId !== messageRequest.current) return;
     if (!response.ok) {
       setError(userError(response.status, body.error, 'Could not load messages'));
       return;
@@ -103,6 +106,7 @@ function ChatScreen() {
       const seen = new Set(current.map((message) => message.id));
       return [...current, ...incoming.filter((message) => !seen.has(message.id))];
     });
+    if (requestId !== messageRequest.current) return;
     if (incoming.length > 0) newest.current = incoming[incoming.length - 1].createdAt;
     await fetch(`/api/v1/chat/channels/${channelId}/read`, { method: 'POST' });
   }, []);
@@ -134,7 +138,9 @@ function ChatScreen() {
 
   useEffect(() => {
     if (!selectedId) return;
+    messageRequest.current += 1;
     newest.current = null;
+    setMessages([]);
     loadMessages(selectedId);
     const timer = window.setInterval(() => {
       if (document.visibilityState === 'visible') loadMessages(selectedId, newest.current);

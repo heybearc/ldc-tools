@@ -22,13 +22,14 @@
     },
     "android": {
       "package": "com.ldctools.mobile",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#1e40af",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "versionCode": 4
+      "versionCode": 5
     },
     "plugins": [
       "expo-router",

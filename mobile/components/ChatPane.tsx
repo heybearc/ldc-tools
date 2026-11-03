@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  AppState,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -41,7 +42,10 @@ export function ChatPane() {
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
+  const [appActive, setAppActive] = useState(AppState.currentState === 'active');
   const newest = useRef<string | null>(null);
+  const messageRequest = useRef(0);
+  const listRef = useRef<FlatList<Message>>(null);
 
   const fail = useCallback(async (err: unknown, fallback: string) => {
     if (err instanceof ApiError && err.status === 401) {
@@ -60,7 +64,6 @@ export function ChatPane() {
       });
       setChannels(body.channels || []);
       setTeammates(body.teammates || []);
-      setSelectedId((current) => current || body.channels?.[0]?.id || null);
     } catch (err) {
       await fail(err, 'Could not load chat. Try again in a moment.');
     }
@@ -68,6 +71,7 @@ export function ChatPane() {
 
   const loadMessages = useCallback(async (channelId: string, after?: string | null) => {
     if (!token) return;
+    const requestId = messageRequest.current;
     const query = after ? `?after=${encodeURIComponent(after)}` : '';
     try {
       const body = await apiRequest<{ messages: Array<Message & { createdAt: string }> }>(
@@ -75,12 +79,14 @@ export function ChatPane() {
         `/api/v1/mobile/chat/channels/${channelId}/messages${query}`,
         { token, action: 'Could not load messages' },
       );
+      if (requestId !== messageRequest.current) return;
       const incoming = body.messages || [];
       setMessages((current) => {
         if (!after) return incoming;
         const seen = new Set(current.map((message) => message.id));
         return [...current, ...incoming.filter((message) => !seen.has(message.id))];
       });
+      if (requestId !== messageRequest.current) return;
       if (incoming.length > 0) newest.current = incoming[incoming.length - 1].createdAt;
       await apiRequest(apiBase, `/api/v1/mobile/chat/channels/${channelId}/read`, {
         method: 'POST',
@@ -88,6 +94,7 @@ export function ChatPane() {
         action: 'Could not update the chat',
       });
     } catch (err) {
+      if (requestId !== messageRequest.current) return;
       await fail(err, 'Could not load messages. Try again in a moment.');
     }
   }, [apiBase, token, fail]);
@@ -97,14 +104,33 @@ export function ChatPane() {
   }, [loadChannels]));
 
   useEffect(() => {
+    const subscription = AppState.addEventListener('change', (next) => {
+      setAppActive(next === 'active');
+    });
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
     if (!selectedId) return;
+    messageRequest.current += 1;
     newest.current = null;
+    setMessages([]);
     void loadMessages(selectedId);
+  }, [selectedId, loadMessages]);
+
+  useEffect(() => {
+    if (!selectedId || !appActive) return;
     const timer = setInterval(() => {
+      if (AppState.currentState !== 'active') return;
       void loadMessages(selectedId, newest.current);
     }, 4000);
     return () => clearInterval(timer);
-  }, [selectedId, loadMessages]);
+  }, [selectedId, loadMessages, appActive]);
+
+  useEffect(() => {
+    if (messages.length === 0) return;
+    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: false }));
+  }, [messages]);
 
   async function send() {
     const text = draft.trim();
@@ -149,7 +175,7 @@ export function ChatPane() {
   const showThread = Boolean(selectedId);
 
   return (
-    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {!showThread ? (
         <FlatList
@@ -185,9 +211,12 @@ export function ChatPane() {
             <Text style={styles.channelTitle} numberOfLines={1}>{selected?.title || 'Chat'}</Text>
           </View>
           <FlatList
+            ref={listRef}
+            style={styles.messageList}
             data={messages}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.messages}
+            onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
             renderItem={({ item }) => (
               <View style={[styles.bubble, item.mine ? styles.mine : styles.theirs]}>
                 {!item.mine ? <Text style={styles.author}>{personName(item.author)}</Text> : null}
@@ -226,6 +255,7 @@ const styles = StyleSheet.create({
   unread: { backgroundColor: '#fef3c7', color: '#92400e', overflow: 'hidden', borderRadius: 10, paddingHorizontal: 8, fontWeight: '700' },
   preview: { color: '#6b7280', marginTop: 2 },
   thread: { flex: 1 },
+  messageList: { flex: 1 },
   threadHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, backgroundColor: '#fff' },
   back: { minHeight: 44, justifyContent: 'center' },
   backText: { color: '#1e40af', fontWeight: '700' },

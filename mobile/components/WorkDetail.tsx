@@ -105,27 +105,30 @@ export function WorkDetail({ id }: { id: string }) {
             <View style={styles.steps}>
               <Text style={styles.stepHeading}>Steps ({doneCount} of {item.steps.length})</Text>
               {item.steps.map((step) => (
-                <Pressable
-                  key={step.id}
-                  disabled={!open || Boolean(busy)}
-                  onPress={() => void run('Could not update the step', `/api/v1/mobile/work/${id}/steps/${step.id}`, {
-                    method: 'PATCH',
-                    body: { done: !step.done },
-                  })}
-                  style={styles.step}
-                >
-                  <View style={[styles.box, step.done && styles.boxOn]}>
-                    {step.done ? <Text style={styles.check}>✓</Text> : null}
-                  </View>
-                  <View style={styles.stepBody}>
-                    <Text style={[styles.stepTitle, step.done && styles.doneText]}>{step.title}</Text>
-                    {step.detail ? <Text style={styles.detail}>{step.detail}</Text> : null}
-                    {step.explanation ? <Text style={styles.detail}>{step.explanation}</Text> : null}
-                    {step.referenceUrl ? (
-                      <Text style={styles.link} onPress={() => Linking.openURL(step.referenceUrl || '')}>Reference</Text>
-                    ) : null}
-                  </View>
-                </Pressable>
+                <View key={step.id} style={styles.step}>
+                  <Pressable
+                    disabled={!open || Boolean(busy)}
+                    onPress={() => void run('Could not update the step', `/api/v1/mobile/work/${id}/steps/${step.id}`, {
+                      method: 'PATCH',
+                      body: { done: !step.done },
+                    })}
+                    style={styles.stepToggle}
+                  >
+                    <View style={[styles.box, step.done && styles.boxOn]}>
+                      {step.done ? <Text style={styles.check}>✓</Text> : null}
+                    </View>
+                    <View style={styles.stepBody}>
+                      <Text style={[styles.stepTitle, step.done && styles.doneText]}>{step.title}</Text>
+                      {step.detail ? <Text style={styles.detail}>{step.detail}</Text> : null}
+                      {step.explanation ? <Text style={styles.detail}>{step.explanation}</Text> : null}
+                    </View>
+                  </Pressable>
+                  {step.referenceUrl ? (
+                    <Pressable onPress={() => Linking.openURL(step.referenceUrl || '')} style={styles.reference}>
+                      <Text style={styles.link}>Reference</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
               ))}
             </View>
           ) : null}
@@ -172,8 +175,10 @@ const styles = StyleSheet.create({
   link: { color: '#1e40af', fontWeight: '600' },
   steps: { gap: 10, marginTop: 8 },
   stepHeading: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  step: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', minHeight: 44 },
+  step: { gap: 2, minHeight: 44 },
+  stepToggle: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   stepBody: { flex: 1, gap: 2 },
+  reference: { marginLeft: 34, minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' },
   stepTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
   doneText: { color: '#6b7280', textDecorationLine: 'line-through' },
   box: {

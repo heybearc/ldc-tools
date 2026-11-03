@@ -22,11 +22,10 @@ test('a phone shows the menu, and chat opens the list before a thread', async ({
   await expect(page.getByRole('heading', { name: 'Chat' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Chats' })).toBeHidden();
 
-  const team = page.getByRole('button', { name: /Team chat/ }).first();
-  if (await team.count()) {
-    await team.click();
-    await expect(page.getByRole('button', { name: 'Chats' })).toBeVisible();
-  }
+  const team = page.locator('button').filter({ has: page.getByText('Team', { exact: true }) }).first();
+  await expect(team).toBeVisible();
+  await team.click();
+  await expect(page.getByRole('button', { name: 'Chats' })).toBeVisible();
 });
 
 test('the store app can sign in and read assigned work and the directory', async ({ request }) => {

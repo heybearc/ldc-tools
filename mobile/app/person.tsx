@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '@/lib/auth';
-import { selectedPerson } from '@/lib/selected-person';
+import type { Person } from '@/lib/home';
+import { loadSelectedPerson, selectedPerson } from '@/lib/selected-person';
 import { PersonPhoto } from '@/components/PersonPhoto';
 
 function Action({ label, onPress }: { label: string; onPress: () => void }) {
@@ -13,7 +15,25 @@ function Action({ label, onPress }: { label: string; onPress: () => void }) {
 
 export default function PersonScreen() {
   const { apiBase, token } = useAuth();
-  const person = selectedPerson();
+  const [person, setPerson] = useState<Person | null>(selectedPerson());
+  const [ready, setReady] = useState(selectedPerson() !== null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadSelectedPerson().then((loaded) => {
+      if (cancelled) return;
+      setPerson(loaded);
+      setReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!ready) {
+    return <View style={styles.emptyWrap} />;
+  }
+
   if (!person) {
     return (
       <View style={styles.emptyWrap}>
