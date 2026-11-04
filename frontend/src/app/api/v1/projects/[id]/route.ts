@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
+import { getServerSession, type Session } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
+import { getCGScope, canAccessCG } from '@/lib/cg-scope';
 import { getUserOrgRoles, checkPermission } from '@/lib/api-permissions';
 import { canManageProjects } from '@/lib/permissions';
+import { canPostWork } from '@/lib/work-item-access';
+import { canAssignProjectPersonnel } from '@/lib/project-personnel';
+
+const PROJECT_STATUSES = ['PLANNING', 'ACTIVE', 'ON_HOLD', 'COMPLETED', 'CANCELLED'] as const;
+
+async function canEditProjects(session: Session) {
+  const cgScope = await getCGScope();
+  const userOrgRoles = await getUserOrgRoles(session);
+  const userId = session.user?.id;
+  const inGroup = Boolean(userId && cgScope?.constructionGroupId);
+  let allowed = canManageProjects(session, userOrgRoles);
+  if (!allowed && inGroup && cgScope && userId) {
+    allowed =
+      (await canPostWork(userId, cgScope)) || (await canAssignProjectPersonnel(userId, cgScope));
+  }
+  return { cgScope, allowed };
+}
 
 // GET /api/v1/projects/[id] - Get single project with crew assignments
 export async function GET(
@@ -64,10 +82,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check permissions - requires management role or admin
-    const userOrgRoles = await getUserOrgRoles(session);
-    const permissionError = checkPermission(canManageProjects(session, userOrgRoles));
+    const { cgScope, allowed } = await canEditProjects(session);
+    const permissionError = checkPermission(allowed);
     if (permissionError) return permissionError;
+    if (!cgScope) {
+      return NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
+    }
+
+    const existing = await prisma.project.findUnique({
+      where: { id: params.id },
+      select: { id: true, constructionGroupId: true },
+    });
+    if (!existing?.constructionGroupId || !canAccessCG(cgScope, existing.constructionGroupId)) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
 
     const body = await request.json();
     const { 
@@ -84,6 +112,16 @@ export async function PATCH(
       builderAssistantUrl,
       isActive 
     } = body;
+
+    if (name !== undefined && !String(name).trim()) {
+      return NextResponse.json({ error: 'Project name is required' }, { status: 400 });
+    }
+    if (status !== undefined && !PROJECT_STATUSES.includes(status)) {
+      return NextResponse.json({ error: 'Choose a project status' }, { status: 400 });
+    }
+    if (startDate && endDate && String(startDate) > String(endDate)) {
+      return NextResponse.json({ error: 'The end date is before the start date' }, { status: 400 });
+    }
 
     const project = await prisma.project.update({
       where: { id: params.id },
@@ -124,10 +162,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check permissions - requires management role or admin
-    const userOrgRoles = await getUserOrgRoles(session);
-    const permissionError = checkPermission(canManageProjects(session, userOrgRoles));
+    const { cgScope, allowed } = await canEditProjects(session);
+    const permissionError = checkPermission(allowed);
     if (permissionError) return permissionError;
+    if (!cgScope) {
+      return NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
+    }
+
+    const existing = await prisma.project.findUnique({
+      where: { id: params.id },
+      select: { constructionGroupId: true },
+    });
+    if (!existing?.constructionGroupId || !canAccessCG(cgScope, existing.constructionGroupId)) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
 
     await prisma.project.update({
       where: { id: params.id },

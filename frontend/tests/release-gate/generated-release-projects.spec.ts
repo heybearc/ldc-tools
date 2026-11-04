@@ -41,6 +41,13 @@ test('oversight can list construction-group projects and assign Personnel', asyn
   await expect(page.getByRole('link', { name: 'Projects' }).first()).toBeVisible();
   await expect(page.getByText('Crews, budget, and congregations stay off this list.')).toBeVisible();
 
+  await page.getByRole('button', { name: 'Calendar' }).click();
+  await page.getByRole('button', { name: 'Week', exact: true }).click();
+  await page.getByRole('button', { name: 'Day', exact: true }).click();
+  await page.getByRole('button', { name: 'Month', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Today' })).toBeVisible();
+  await page.getByRole('button', { name: 'List' }).click();
+
   await page.goto('/projects/not-a-project');
   await expect(page).toHaveURL(/\/projects$/);
   await expect(page.getByRole('heading', { name: 'Projects', exact: true })).toBeVisible();
@@ -57,6 +64,12 @@ test('oversight can list construction-group projects and assign Personnel', asyn
   }
 
   const project = list.projects[0];
+  if (list.canEdit && project) {
+    const editor = page.locator('article').filter({ hasText: project.name });
+    await editor.getByRole('button', { name: 'Edit project' }).click();
+    await expect(editor.getByRole('button', { name: 'Save changes' })).toBeVisible();
+    await editor.getByRole('button', { name: 'Close' }).click();
+  }
   const person = (list.personnel || []).find(
     (candidate: { id: string }) => !project?.personnel?.some((assigned: { id: string }) => assigned.id === candidate.id),
   );

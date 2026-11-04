@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Building2, Plus } from 'lucide-react';
+import ProjectDateCalendar from '@/components/ProjectDateCalendar';
 import { userError } from '@/lib/user-error';
 
 interface Person {
@@ -15,6 +16,7 @@ interface ScheduleItem {
   title: string;
   detail: string;
   date: string | null;
+  dueOn: string | null;
   status: 'OPEN' | 'DONE';
 }
 
@@ -26,6 +28,8 @@ interface ProjectRow {
   status: string;
   start: string | null;
   end: string | null;
+  startDate: string | null;
+  endDate: string | null;
   builderAssistantUrl: string | null;
   personnel: Person[];
   schedule: ScheduleItem[];
@@ -38,6 +42,26 @@ interface DateDraft {
 }
 
 const EMPTY_DATE: DateDraft = { title: '', detail: '', date: '' };
+
+interface ProjectDraft {
+  name: string;
+  number: string;
+  location: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  builderAssistantUrl: string;
+}
+
+const EMPTY_PROJECT: ProjectDraft = {
+  name: '',
+  number: '',
+  location: '',
+  status: 'PLANNING',
+  startDate: '',
+  endDate: '',
+  builderAssistantUrl: '',
+};
 
 const STATUS_LABELS: Record<string, string> = {
   PLANNING: 'Planning',
@@ -56,6 +80,10 @@ export default function ProjectsPage() {
   const [personnel, setPersonnel] = useState<Person[]>([]);
   const [canAssign, setCanAssign] = useState(false);
   const [canAddDate, setCanAddDate] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<ProjectDraft>(EMPTY_PROJECT);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -82,6 +110,7 @@ export default function ProjectsPage() {
       setPersonnel(body.personnel || []);
       setCanAssign(Boolean(body.canAssign));
       setCanAddDate(Boolean(body.canAddDate));
+      setCanEdit(Boolean(body.canEdit ?? (body.canAssign || body.canAddDate)));
     } catch {
       if (generation !== loadGeneration.current) return;
       setError(userError(0, '', 'Could not load projects'));
@@ -174,7 +203,76 @@ export default function ProjectsPage() {
     }
   }
 
-  const canCreate = canAssign || canAddDate;
+  const canCreate = canAssign || canAddDate || canEdit;
+
+  function beginEdit(project: ProjectRow) {
+    setEditingId(project.id);
+    setEditForm({
+      name: project.name,
+      number: project.number || '',
+      location: project.location || '',
+      status: project.status || 'PLANNING',
+      startDate: project.startDate || '',
+      endDate: project.endDate || '',
+      builderAssistantUrl: project.builderAssistantUrl || '',
+    });
+  }
+
+  async function saveProject(event: FormEvent) {
+    event.preventDefault();
+    if (!editingId) return;
+    setBusyId(editingId);
+    setError('');
+    try {
+      const response = await fetch(`/api/v1/projects/${editingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editForm.name,
+          projectNumber: editForm.number || null,
+          location: editForm.location || null,
+          status: editForm.status,
+          startDate: editForm.startDate || null,
+          endDate: editForm.endDate || null,
+          builderAssistantUrl: editForm.builderAssistantUrl || null,
+        }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not save the project'));
+        return;
+      }
+      setEditingId(null);
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function removeProject(project: ProjectRow) {
+    if (!window.confirm(`Remove ${project.name} from this list? Dated work stays on the work list.`)) return;
+    setBusyId(project.id);
+    setError('');
+    try {
+      const response = await fetch(`/api/v1/projects/${project.id}`, { method: 'DELETE' });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not remove the project'));
+        return;
+      }
+      if (editingId === project.id) setEditingId(null);
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  function openFromCalendar(projectId: string) {
+    setView('list');
+    window.setTimeout(() => {
+      document.getElementById(`project-${projectId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
 
   async function createProject(event: FormEvent) {
     event.preventDefault();
@@ -209,7 +307,7 @@ export default function ProjectsPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Projects</h1>
           <p className="mt-2 text-gray-600 max-w-3xl">
-            Projects for this construction group. Oversight assigns Personnel. Personnel add a date, and that date also shows on the work list. Crews, budget, and congregations stay off this list.
+            Projects for this construction group. Edit a project to change its name, status, or dates. Oversight assigns Personnel. Personnel add a date, and that date also shows on the work list. Crews, budget, and congregations stay off this list.
           </p>
         </div>
         {canCreate && (
@@ -263,10 +361,29 @@ export default function ProjectsPage() {
         </form>
       )}
 
+      <div className="inline-flex rounded-md border border-gray-300 overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setView('list')}
+          className={`px-4 py-2 min-h-[44px] text-sm ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+        >
+          List
+        </button>
+        <button
+          type="button"
+          onClick={() => setView('calendar')}
+          className={`px-4 py-2 min-h-[44px] text-sm ${view === 'calendar' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+        >
+          Calendar
+        </button>
+      </div>
+
       {error && <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>}
 
       {loading ? (
         <p className="text-gray-500">Loading projects…</p>
+      ) : view === 'calendar' ? (
+        <ProjectDateCalendar projects={projects} onOpenProject={openFromCalendar} />
       ) : projects.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-8 text-center text-gray-600">
           <Building2 className="h-8 w-8 mx-auto text-gray-400 mb-3" />
@@ -275,13 +392,108 @@ export default function ProjectsPage() {
       ) : (
         <div className="space-y-3">
           {projects.map((project) => (
-            <article key={project.id} className="bg-white rounded-lg shadow p-5">
+            <article id={`project-${project.id}`} key={project.id} className="bg-white rounded-lg shadow p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-lg font-semibold text-gray-900">{project.name}</h2>
                 <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
                   {STATUS_LABELS[project.status] || project.status}
                 </span>
+                {canEdit && (
+                  <div className="ml-auto flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => (editingId === project.id ? setEditingId(null) : beginEdit(project))}
+                      className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm text-gray-800"
+                    >
+                      {editingId === project.id ? 'Close' : 'Edit project'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busyId === project.id}
+                      onClick={() => removeProject(project)}
+                      className="px-3 py-2 min-h-[44px] rounded-md border border-red-200 text-sm text-red-700 disabled:opacity-60"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
               </div>
+              {editingId === project.id && (
+                <form onSubmit={saveProject} className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <label className="block md:col-span-2">
+                    <span className="text-sm font-medium text-gray-700">Name</span>
+                    <input
+                      required
+                      value={editForm.name}
+                      onChange={(event) => setEditForm({ ...editForm, name: event.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-gray-700">Number</span>
+                    <input
+                      value={editForm.number}
+                      onChange={(event) => setEditForm({ ...editForm, number: event.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-gray-700">Location</span>
+                    <input
+                      value={editForm.location}
+                      onChange={(event) => setEditForm({ ...editForm, location: event.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-gray-700">Status</span>
+                    <select
+                      value={editForm.status}
+                      onChange={(event) => setEditForm({ ...editForm, status: event.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px] bg-white"
+                    >
+                      {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-gray-700">Builder Assistant link</span>
+                    <input
+                      value={editForm.builderAssistantUrl}
+                      onChange={(event) => setEditForm({ ...editForm, builderAssistantUrl: event.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-gray-700">Start</span>
+                    <input
+                      type="date"
+                      value={editForm.startDate}
+                      onChange={(event) => setEditForm({ ...editForm, startDate: event.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-gray-700">End</span>
+                    <input
+                      type="date"
+                      value={editForm.endDate}
+                      onChange={(event) => setEditForm({ ...editForm, endDate: event.target.value })}
+                      className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                    />
+                  </label>
+                  <div className="md:col-span-2">
+                    <button
+                      type="submit"
+                      disabled={busyId === project.id}
+                      className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
+                    >
+                      {busyId === project.id ? 'Saving…' : 'Save changes'}
+                    </button>
+                  </div>
+                </form>
+              )}
               <p className="mt-2 text-sm text-gray-600">
                 {[project.number, project.location, project.start, project.end].filter(Boolean).join(' · ') || 'No number, location, or dates yet'}
               </p>

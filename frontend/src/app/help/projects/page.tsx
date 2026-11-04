@@ -39,8 +39,15 @@ export default async function ProjectsHelpPage() {
 
           <h2>See a project</h2>
           <p>
-            Open Projects. Each row shows the name, status, number, location, and dates when those are on file.
+            Open Projects. List shows each project with its name, status, number, location, and dates when those are on file.
             A Builder Assistant link appears when the project has one.
+            Calendar shows the same projects by day, week, or month. Choose a project on the calendar to return to it on the list.
+          </p>
+
+          <h2>Edit a project</h2>
+          <p>
+            Personnel and oversight can choose Edit project. Change the name, number, location, status, start, end, or Builder Assistant link, then choose Save changes.
+            Choose Remove to take the project off this list. Dated work stays on the work list.
           </p>
 
           <h2>Add a date</h2>

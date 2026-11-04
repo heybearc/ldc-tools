@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { formatCalendarDate } from '@/lib/work-items';
+import { getUserOrgRoles } from '@/lib/api-permissions';
+import { canManageProjects } from '@/lib/permissions';
 import { canPostWork } from '@/lib/work-item-access';
 import { canAssignProjectPersonnel, personnelInGroup } from '@/lib/project-personnel';
 
@@ -19,10 +21,12 @@ export async function GET() {
       return NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
     }
 
-    const [canAssign, canAddDate] = await Promise.all([
+    const [canAssign, canAddDate, userOrgRoles] = await Promise.all([
       canAssignProjectPersonnel(session.user.id, scope),
       canPostWork(session.user.id, scope),
+      getUserOrgRoles(session),
     ]);
+    const canEdit = canAssign || canAddDate || canManageProjects(session, userOrgRoles);
     const [projects, personnel, dates] = await Promise.all([
       prisma.project.findMany({
         where: { constructionGroupId: scope.constructionGroupId, isActive: true },
@@ -68,6 +72,7 @@ export async function GET() {
     return NextResponse.json({
       canAssign,
       canAddDate,
+      canEdit,
       personnel,
       projects: projects.map((project) => ({
         id: project.id,
@@ -77,6 +82,8 @@ export async function GET() {
         status: project.status,
         start: project.startDate ? formatCalendarDate(project.startDate.toISOString()) : null,
         end: project.endDate ? formatCalendarDate(project.endDate.toISOString()) : null,
+        startDate: project.startDate ? project.startDate.toISOString().slice(0, 10) : null,
+        endDate: project.endDate ? project.endDate.toISOString().slice(0, 10) : null,
         builderAssistantUrl: project.builderAssistantUrl,
         personnel: project.personnel.map((row) => row.user),
         schedule: (scheduleByProject.get(project.id) || []).map((item) => ({
@@ -84,6 +91,7 @@ export async function GET() {
           title: item.title,
           detail: item.detail,
           date: item.dueOn ? formatCalendarDate(item.dueOn.toISOString()) : null,
+          dueOn: item.dueOn ? item.dueOn.toISOString().slice(0, 10) : null,
           status: item.status,
         })),
       })),
