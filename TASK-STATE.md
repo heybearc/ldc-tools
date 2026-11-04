@@ -1,19 +1,20 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-03  
+**Last updated:** 2026-11-04  
 **Current branch:** main  
-**Working on:** v1.46.0 (`f91ed69`) is LIVE on green (CT135). STANDBY blue (CT133) is the same release. Play build 1.0.2 version code 10 is building. Apple Developer enrollment is in process.
+**Working on:** v1.46.1 (`be16844`) is LIVE on blue (CT133). STANDBY green (CT135) is the same release. The iOS build is blocked until the Apple distribution certificate is set up in an interactive terminal.
 
 ---
 
 ## Current Task
-v1.46.0 (`f91ed69`) is LIVE on green (CT135) and synced to blue (CT133). Projects can be edited, shown on a calendar, and listed in the phone app. The Play build is 1.0.2 version code 10. Hub dates stay paused.
+v1.46.1 (`be16844`) is LIVE on blue (CT133) and synced to green (CT135). The phone icon and launch image are centered. The iOS production build did not start: the Apple distribution certificate is not validated for a non-interactive build. Hub dates stay paused.
 
 ### What I'm doing right now
-The Play build for 1.0.2 (10) is at https://expo.dev/accounts/corya92/projects/ldc-tools/builds/f69613d5-27fc-4c96-88df-794c638db064. Submit it to internal testing after it finishes. Apple enrollment is still in process. Hub dates stay paused.
+Run `eas build --platform ios --profile production` in a terminal that can answer the Apple credential prompts. Hub dates stay paused.
 
 ### Recent completions
-- ✅ Shipped v1.46.0 (`f91ed69`). Edit a project, calendar by day week or month, and Projects in the phone app. qa-01 directory gate plus the generated projects and mobile tests. LIVE green CT135, STANDBY blue CT133.
+- ✅ Shipped v1.46.1 (`be16844`). The phone icon and launch image are centered. qa-01 directory gate plus the generated app-icon test. LIVE blue CT133, STANDBY green CT135.
+- ✅ Shipped v1.46.0 (`f91ed69`). Edit a project, calendar by day week or month, and Projects in the phone app. qa-01 directory gate plus the generated projects and mobile tests. LIVE was green CT135.
 - ✅ Shipped v1.45.1 (`216e247`). Chat says Turn off when notifications are already on. qa-01 directory gate plus the generated chat tests. LIVE was blue CT133.
 - ✅ Phone chat composer lifts above the keyboard (`17ddbd4`) on STANDBY. Emulator has 1.0.1 version code 7. Play internal testing has version code 8.
 - ✅ Shipped v1.45.0 (`32553ab`). Open claimed work, check steps, return to the pool, and chat in the phone app. qa-01 full suite 81/81. LIVE was green CT135.
@@ -42,7 +43,7 @@ The Play build for 1.0.2 (10) is at https://expo.dev/accounts/corya92/projects/l
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-When the 1.0.2 (10) build finishes, submit it to Play internal testing. Hub assignment dates stay paused until the persons list has start and end dates.
+Run eas build --platform ios --profile production in an interactive terminal so the Apple distribution certificate can be created. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
@@ -57,4 +58,4 @@ When the 1.0.2 (10) build finishes, submit it to Play internal testing. Hub assi
 ---
 
 ## Exact Next Command
-When the 1.0.2 (10) build finishes, submit it to Play internal testing. Hub assignment dates stay paused until the persons list has start and end dates.
+Run eas build --platform ios --profile production in an interactive terminal so the Apple distribution certificate can be created. Hub assignment dates stay paused until the persons list has start and end dates.
