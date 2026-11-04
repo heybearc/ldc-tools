@@ -108,14 +108,18 @@ export default function ProjectDateCalendar({
           <h2 className="text-base font-semibold text-gray-900">{heading}</h2>
         </div>
         <div className="inline-flex rounded-md border border-gray-300 overflow-hidden">
-          {(['day', 'week', 'month'] as Span[]).map((option) => (
+          {([
+            ['day', 'Day'],
+            ['week', 'Week'],
+            ['month', 'Month'],
+          ] as const).map(([option, label]) => (
             <button
               key={option}
               type="button"
               onClick={() => setSpan(option)}
-              className={`px-3 py-2 min-h-[44px] text-sm capitalize ${span === option ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+              className={`px-3 py-2 min-h-[44px] text-sm ${span === option ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
             >
-              {option}
+              {label}
             </button>
           ))}
         </div>
