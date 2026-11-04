@@ -1,0 +1,88 @@
+import { useCallback, useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { ApiError } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { fetchProjects, projectFacts, type Project } from '@/lib/projects';
+
+export function ProjectsPane() {
+  const { apiBase, token, signOut } = useAuth();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const load = useCallback(async () => {
+    if (!token) return;
+    setError('');
+    try {
+      const body = await fetchProjects(apiBase, token);
+      setProjects(body.projects || []);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        await signOut();
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Could not load projects. Try again in a moment.');
+    }
+  }, [apiBase, token, signOut]);
+
+  useFocusEffect(useCallback(() => {
+    void load();
+  }, [load]));
+
+  return (
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => {
+        setRefreshing(true);
+        await load();
+        setRefreshing(false);
+      }} />}
+    >
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {projects.length === 0 && !error ? (
+        <Text style={styles.empty}>No projects for this construction group.</Text>
+      ) : null}
+      {projects.map((project) => {
+        const facts = projectFacts(project);
+        return (
+          <View key={project.id} style={styles.card}>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>{project.name}</Text>
+              <Text style={styles.status}>{project.status}</Text>
+            </View>
+            <Text style={styles.meta}>{facts || 'No number, location, or dates yet'}</Text>
+            <Text style={styles.section}>Personnel</Text>
+            <Text style={styles.body}>
+              {project.personnel.length === 0 ? 'No one assigned' : project.personnel.map((person) => person.name).join(', ')}
+            </Text>
+            <Text style={styles.section}>Schedule</Text>
+            {project.schedule.length === 0 ? <Text style={styles.body}>No dated work on this project.</Text> : null}
+            {project.schedule.map((item) => (
+              <Text key={item.id} style={styles.body}>
+                {[item.date, item.title].filter(Boolean).join(' · ')}
+                {item.status === 'DONE' ? ' · Done' : ''}
+                {item.detail ? `\n${item.detail}` : ''}
+              </Text>
+            ))}
+          </View>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#f9fafb' },
+  content: { padding: 16, gap: 12 },
+  empty: { color: '#6b7280' },
+  error: { color: '#b91c1c' },
+  card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, gap: 6 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  title: { flex: 1, fontSize: 17, fontWeight: '700', color: '#111827' },
+  status: { color: '#1e40af', fontSize: 13, fontWeight: '700' },
+  meta: { color: '#4b5563', fontSize: 14 },
+  section: { marginTop: 6, color: '#111827', fontSize: 14, fontWeight: '700' },
+  body: { color: '#374151', fontSize: 15 },
+});

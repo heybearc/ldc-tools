@@ -40,6 +40,7 @@ export default async function ProjectsHelpPage() {
           <h2>See a project</h2>
           <p>
             Open Projects. List shows each project with its name, status, number, location, and dates when those are on file.
+            The phone app has the same list under Projects.
             A Builder Assistant link appears when the project has one.
             Calendar shows the same projects by day, week, or month. Choose a project on the calendar to return to it on the list.
           </p>

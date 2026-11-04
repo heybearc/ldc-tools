@@ -127,7 +127,7 @@ export default async function GettingStartedPage() {
           <h2>🧭 Navigation Tips</h2>
           <ul>
             <li><strong>Menu</strong> - On a phone, use the menu button at the top. On a wider screen, the same links stay in the header.</li>
-            <li><strong>Phone and tablet app</strong> - The LDC Tools app has My Work, Available, and Directory. Available is claimable work you can take. Directory starts with Construction group, Personnel, Ancillary, or a trade team and crew. Open a person to see the photo, email, and phone. On a tablet, My Work and the directory sit side by side.</li>
+            <li><strong>Phone and tablet app</strong> - The LDC Tools app has My Work, Available, Projects, and Directory. Available is claimable work you can take. Projects lists this construction group&apos;s projects, with status, dates, Personnel, and the schedule. Directory starts with Construction group, Personnel, Ancillary, or a trade team and crew. Open a person to see the photo, email, and phone. On a tablet, My Work and the directory sit side by side.</li>
             <li><strong>When something fails</strong> - The page says what failed and asks you to try again. If the session has ended, it asks you to sign in again.</li>
             <li><strong>Top Bar</strong> - User menu, notifications, and quick actions</li>
             <li><strong>Breadcrumbs</strong> - Know where you are in the app</li>

@@ -55,4 +55,20 @@ test('the store app can sign in and read assigned work and the directory', async
   expect(Array.isArray(payload.directory?.ancillary)).toBe(true);
   expect(Array.isArray(payload.directory?.teams)).toBe(true);
   expect(payload.user?.email).toBeTruthy();
+
+  const missing = await request.get('/api/v1/mobile/projects');
+  expect(missing.status()).toBe(401);
+
+  const projects = await request.get('/api/v1/mobile/projects', {
+    headers: { Authorization: `Bearer ${session.token}` },
+  });
+  expect(projects.ok()).toBeTruthy();
+  const list = await projects.json();
+  expect(Array.isArray(list.projects)).toBe(true);
+  if (list.projects.length > 0) {
+    expect(list.projects[0].name).toBeTruthy();
+    expect(typeof list.projects[0].status).toBe('string');
+    expect(Array.isArray(list.projects[0].personnel)).toBe(true);
+    expect(Array.isArray(list.projects[0].schedule)).toBe(true);
+  }
 });
