@@ -1,5 +1,19 @@
 # LDC Tools Release Notes
 
+## v1.46.0 - Projects you can edit, and Projects in the phone app
+
+**Release Date:** November 3, 2026
+
+### ✨ New Features
+
+- Edit a project’s name, status, dates, and Builder Assistant link, or remove it from the list
+- Switch the projects page between the list and a day, week, or month calendar
+- The phone app has a Projects tab for this construction group
+
+### 🐛 Bug Fixes
+
+- The chat box stays above the keyboard
+
 ## v1.45.1 - Chat notifications match what is already on
 
 **Release Date:** November 3, 2026
