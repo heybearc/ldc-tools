@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-04, afternoon)
+- Shipped v1.46.2 (`333704c`). LIVE blue CT133. STANDBY green CT135 is synced. qa-01 admin gate plus the generated email test passed.
+- Gmail rejected the old app password. The new password is saved. The test was sending a blank password after save. That is fixed.
+- Matt Hirsch (`mwhirsch1975@gmail.com`) did not get the 2:11 PM reset. Send it again from User Management.
+- iOS 1.0.3 build 2 is submitted. App Store Connect app `6830767824`. Submission finished.
+- The emulator red screen was TheoShift’s dev server on port 8081. LDC Tools uses port 8082. No Play Store upload.
+- Open urgent feedback: 0. Hub dates stay paused.
+
 ### Mid-day (2026-11-04)
 - v1.46.1 (`be16844`) is LIVE on blue CT133. STANDBY green CT135 is synced. Phone icon and launch image are centered.
 - Apple team is Cloudigan IT Solutions LLC (`S42AL6JZDB`). App ID registration is in progress: description LDC Tools, explicit bundle ID `com.ldctools.mobile`.

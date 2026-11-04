@@ -2,18 +2,19 @@
 
 **Last updated:** 2026-11-04  
 **Current branch:** main  
-**Working on:** v1.46.1 (`be16844`) is LIVE on blue (CT133). Registering the Apple App ID `com.ldctools.mobile`. Associated Domains stays off.
+**Working on:** v1.46.2 (`333704c`) is LIVE on blue (CT133). Password emails use the saved mailbox password. iOS 1.0.3 build 2 is submitted.
 
 ---
 
 ## Current Task
-v1.46.1 (`be16844`) is LIVE on blue (CT133) and synced to green (CT135). The phone icon and launch image are centered. The iOS production build did not start: the Apple distribution certificate is not validated for a non-interactive build. Hub dates stay paused.
+v1.46.2 (`333704c`) is LIVE on blue (CT133) and synced to green (CT135). Password reset and the mailbox test use the saved app password. Send Matt Hirsch’s reset again. iOS 1.0.3 build 2 is in App Store Connect. Hub dates stay paused.
 
 ### What I'm doing right now
-Finish the App ID with no extra capabilities, then run `eas build --platform ios --profile production` in an interactive terminal. Hub dates stay paused.
+Send Matt Hirsch’s password reset again, then confirm the iOS build in TestFlight. Hub dates stay paused.
 
 ### Recent completions
-- ✅ Shipped v1.46.1 (`be16844`). The phone icon and launch image are centered. qa-01 directory gate plus the generated app-icon test. LIVE blue CT133, STANDBY green CT135.
+- ✅ Shipped v1.46.2 (`333704c`). Password emails use the saved mailbox password. qa-01 admin gate plus the generated email test. LIVE blue CT133, STANDBY green CT135.
+- ✅ Shipped v1.46.1 (`be16844`). The phone icon and launch image are centered. qa-01 directory gate plus the generated app-icon test. LIVE was green CT135, then blue before this ship.
 - ✅ Shipped v1.46.0 (`f91ed69`). Edit a project, calendar by day week or month, and Projects in the phone app. qa-01 directory gate plus the generated projects and mobile tests. LIVE was green CT135.
 - ✅ Shipped v1.45.1 (`216e247`). Chat says Turn off when notifications are already on. qa-01 directory gate plus the generated chat tests. LIVE was blue CT133.
 - ✅ Phone chat composer lifts above the keyboard (`17ddbd4`) on STANDBY. Emulator has 1.0.1 version code 7. Play internal testing has version code 8.
