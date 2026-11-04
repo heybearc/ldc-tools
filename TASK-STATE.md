@@ -2,18 +2,19 @@
 
 **Last updated:** 2026-11-03  
 **Current branch:** main  
-**Working on:** v1.45.1 (`216e247`) is LIVE on blue (CT133). STANDBY green (CT135) is `17ddbd4`. Play internal test 1.0.1 version code 8 is rolled out. Apple Developer enrollment is in process.
+**Working on:** v1.46.0 (`f91ed69`) is LIVE on green (CT135). STANDBY blue (CT133) is the same release. Play build 1.0.2 version code 10 is building. Apple Developer enrollment is in process.
 
 ---
 
 ## Current Task
-v1.45.1 (`216e247`) is LIVE on blue (CT133). STANDBY green (CT135) has the keyboard fix (`17ddbd4`). `main` is `3b66c0d` (Android version code only). Hub dates stay paused. Play internal testing is available, and the store download still says item not found.
+v1.46.0 (`f91ed69`) is LIVE on green (CT135) and synced to blue (CT133). Projects can be edited, shown on a calendar, and listed in the phone app. The Play build is 1.0.2 version code 10. Hub dates stay paused.
 
 ### What I'm doing right now
-Testers join internal testing as the Gmail on the phone's Play Store, then download 1.0.1 (8). Apple enrollment is still in process. Hub dates stay paused.
+The Play build for 1.0.2 (10) is at https://expo.dev/accounts/corya92/projects/ldc-tools/builds/f69613d5-27fc-4c96-88df-794c638db064. Submit it to internal testing after it finishes. Apple enrollment is still in process. Hub dates stay paused.
 
 ### Recent completions
-- ✅ Shipped v1.45.1 (`216e247`). Chat says Turn off when notifications are already on. qa-01 directory gate plus the generated chat tests. LIVE blue CT133, STANDBY green CT135.
+- ✅ Shipped v1.46.0 (`f91ed69`). Edit a project, calendar by day week or month, and Projects in the phone app. qa-01 directory gate plus the generated projects and mobile tests. LIVE green CT135, STANDBY blue CT133.
+- ✅ Shipped v1.45.1 (`216e247`). Chat says Turn off when notifications are already on. qa-01 directory gate plus the generated chat tests. LIVE was blue CT133.
 - ✅ Phone chat composer lifts above the keyboard (`17ddbd4`) on STANDBY. Emulator has 1.0.1 version code 7. Play internal testing has version code 8.
 - ✅ Shipped v1.45.0 (`32553ab`). Open claimed work, check steps, return to the pool, and chat in the phone app. qa-01 full suite 81/81. LIVE was green CT135.
 - ✅ Shipped v1.44.0 (`2919abf`). Claim work, directory sections, and person profiles. qa-01 directory gate plus the generated store-app tests. LIVE was blue CT133.
@@ -41,7 +42,7 @@ Testers join internal testing as the Gmail on the phone's Play Store, then downl
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Have the tester open Download test app from the Play Store account that joined the test. Hub assignment dates stay paused until the persons list has start and end dates.
+When the 1.0.2 (10) build finishes, submit it to Play internal testing. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
@@ -56,4 +57,4 @@ Have the tester open Download test app from the Play Store account that joined t
 ---
 
 ## Exact Next Command
-Have the tester open Download test app from the Play Store account that joined the test. Hub assignment dates stay paused until the persons list has start and end dates.
+When the 1.0.2 (10) build finishes, submit it to Play internal testing. Hub assignment dates stay paused until the persons list has start and end dates.
