@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-03, evening)
+- Shipped v1.45.1 (`216e247`). LIVE blue CT133. STANDBY green CT135 is `17ddbd4` (chat composer above the keyboard). `main` is `3b66c0d` (Android version code only).
+- qa-01 directory gate plus generated chat tests passed before the switch.
+- Emulator has 1.0.1 version code 7. Play internal testing has 1.0.1 version code 8 at `/Users/cory/Downloads/ldc-tools-1.0.1-version-code-8.aab`.
+- Opt-in works. Download test app returns Item not found. Release is Available to internal testers. No countries editor on that track.
+- Open urgent feedback: 0. No new items in this session.
+- Apple Developer enrollment is still in process. Hub dates stay paused.
+- Start a new chat before the next slice.
+
 ### Mid-day (2026-11-03, later)
 - Shipped v1.45.0 (`32553ab`). LIVE green CT135. STANDBY blue CT133 synced, including version code `300c4d6`. qa-01 full suite 81/81 plus the work-step tests.
 - Claimed work opens for step checkoff, Done, and Return to pool. Phone chat is in the app. Starting a process keeps the project and confirms it.

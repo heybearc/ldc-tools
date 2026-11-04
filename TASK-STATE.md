@@ -2,18 +2,20 @@
 
 **Last updated:** 2026-11-03  
 **Current branch:** main  
-**Working on:** v1.45.0 (`32553ab`) is LIVE on green (CT135). STANDBY blue (CT133) includes `300c4d6`. Apple Developer enrollment is in process.
+**Working on:** v1.45.1 (`216e247`) is LIVE on blue (CT133). STANDBY green (CT135) is `17ddbd4`. Play internal test 1.0.1 version code 8 is rolled out. Apple Developer enrollment is in process.
 
 ---
 
 ## Current Task
-v1.45.0 (`32553ab`) is LIVE on green (CT135). STANDBY blue (CT133) is synced. Hub dates stay paused. The new emulator APK and Play bundle are built.
+v1.45.1 (`216e247`) is LIVE on blue (CT133). STANDBY green (CT135) has the keyboard fix (`17ddbd4`). `main` is `3b66c0d` (Android version code only). Hub dates stay paused. Play internal testing is available, and the store download still says item not found.
 
 ### What I'm doing right now
-Install the version-code 3 APK on the emulator against `https://ldctools.com`. Upload the version-code 4 bundle for Matt. Apple enrollment is still in process. Hub dates stay paused.
+Testers join internal testing as the Gmail on the phone's Play Store, then download 1.0.1 (8). Apple enrollment is still in process. Hub dates stay paused.
 
 ### Recent completions
-- ✅ Shipped v1.45.0 (`32553ab`). Open claimed work, check steps, return to the pool, and chat in the phone app. qa-01 full suite 81/81. LIVE green CT135, STANDBY blue CT133.
+- ✅ Shipped v1.45.1 (`216e247`). Chat says Turn off when notifications are already on. qa-01 directory gate plus the generated chat tests. LIVE blue CT133, STANDBY green CT135.
+- ✅ Phone chat composer lifts above the keyboard (`17ddbd4`) on STANDBY. Emulator has 1.0.1 version code 7. Play internal testing has version code 8.
+- ✅ Shipped v1.45.0 (`32553ab`). Open claimed work, check steps, return to the pool, and chat in the phone app. qa-01 full suite 81/81. LIVE was green CT135.
 - ✅ Shipped v1.44.0 (`2919abf`). Claim work, directory sections, and person profiles. qa-01 directory gate plus the generated store-app tests. LIVE was blue CT133.
 - ✅ Shipped v1.43.0 (`cc8dcde`). Tablet layout, and failures say what happened. qa-01 directory gate plus the generated user-error test. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.42.0 (`2351513`). Phone layout and directory contacts. qa-01 full suite 74/74 plus the generated mobile test. LIVE blue CT133, STANDBY green CT135.
@@ -39,13 +41,14 @@ Install the version-code 3 APK on the emulator against `https://ldctools.com`. U
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Install the new APK on the emulator and upload the app bundle for Matt. Hub assignment dates stay paused until the persons list has start and end dates.
+Have the tester open Download test app from the Play Store account that joined the test. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
 ## Known Issues
 - Apple Developer enrollment is in process. Expo account `corya92` still has no Apple team, so the iOS EAS build cannot sign.
-- Google Play app LDC Tools exists. Upload bundle version code 4: https://expo.dev/artifacts/eas/pCB4NpPvFwyJ7AJrmCdEn3xT4T04jAiTEgv22MhUgg0.aab. Emulator APK version code 3: https://expo.dev/artifacts/eas/5yE3xvT9Y5-XxKpJ-36xD1waYzbznOKuqSm6NbINH9A.apk
+- Play internal test 1.0.1 (8) is Available to internal testers. Download test app still returns Item not found. Opt-in works for corylallen@gmail.com. Countries column is blank and not editable on this track.
+- Play bundle: `/Users/cory/Downloads/ldc-tools-1.0.1-version-code-8.aab`. Emulator APK is 1.0.1 version code 7.
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
 - ~9 TC Support without crew → parked as TT Support on an inferred team
 - Persons list has current roles and no start or end dates. Incomplete crew roles are left unchanged.
@@ -53,4 +56,4 @@ Install the new APK on the emulator and upload the app bundle for Matt. Hub assi
 ---
 
 ## Exact Next Command
-Install the new APK on the emulator and upload the app bundle for Matt. Hub assignment dates stay paused until the persons list has start and end dates.
+Have the tester open Download test app from the Play Store account that joined the test. Hub assignment dates stay paused until the persons list has start and end dates.

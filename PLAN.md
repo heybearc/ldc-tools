@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-03  
 **Current phase:** Region work queue  
-**Status:** v1.45.0 (`32553ab`) is LIVE on green (CT135). STANDBY blue (CT133) is synced. Slices 1–6 and directory contacts are shipped. Hub dates are paused. The store app can open claimed work and chat. The Play bundle is built and not uploaded. iOS waits on Apple Developer enrollment.
+**Status:** v1.45.1 (`216e247`) is LIVE on blue (CT133). STANDBY green (CT135) is `17ddbd4`. Hub dates are paused. Play internal test 1.0.1 (8) is rolled out. The store download still says item not found. iOS waits on Apple Developer enrollment.
 
 ---
 
