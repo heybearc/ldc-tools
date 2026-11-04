@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-03  
+**Last updated:** 2026-11-04  
 **Current phase:** Region work queue  
-**Status:** v1.45.1 (`216e247`) is LIVE on blue (CT133). STANDBY green (CT135) is `17ddbd4`. Hub dates are paused. Play internal test 1.0.1 (8) is rolled out. The store download still says item not found. iOS waits on Apple Developer enrollment.
+**Status:** v1.46.1 (`be16844`) is LIVE on blue (CT133). STANDBY green (CT135) is synced. Hub dates are paused. The Apple App ID `com.ldctools.mobile` is being registered. Associated Domains stays off. iOS build waits on that App ID and an interactive EAS credential prompt.
 
 ---
 

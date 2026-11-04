@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-04  
 **Current branch:** main  
-**Working on:** v1.46.1 (`be16844`) is LIVE on blue (CT133). STANDBY green (CT135) is the same release. The iOS build is blocked until the Apple distribution certificate is set up in an interactive terminal.
+**Working on:** v1.46.1 (`be16844`) is LIVE on blue (CT133). Registering the Apple App ID `com.ldctools.mobile`. Associated Domains stays off.
 
 ---
 
@@ -10,7 +10,7 @@
 v1.46.1 (`be16844`) is LIVE on blue (CT133) and synced to green (CT135). The phone icon and launch image are centered. The iOS production build did not start: the Apple distribution certificate is not validated for a non-interactive build. Hub dates stay paused.
 
 ### What I'm doing right now
-Run `eas build --platform ios --profile production` in a terminal that can answer the Apple credential prompts. Hub dates stay paused.
+Finish the App ID with no extra capabilities, then run `eas build --platform ios --profile production` in an interactive terminal. Hub dates stay paused.
 
 ### Recent completions
 - ✅ Shipped v1.46.1 (`be16844`). The phone icon and launch image are centered. qa-01 directory gate plus the generated app-icon test. LIVE blue CT133, STANDBY green CT135.

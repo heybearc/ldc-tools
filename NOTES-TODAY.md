@@ -5,6 +5,13 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-04)
+- v1.46.1 (`be16844`) is LIVE on blue CT133. STANDBY green CT135 is synced. Phone icon and launch image are centered.
+- Apple team is Cloudigan IT Solutions LLC (`S42AL6JZDB`). App ID registration is in progress: description LDC Tools, explicit bundle ID `com.ldctools.mobile`.
+- Associated Domains stays off. The app has no universal links.
+- iOS build still needs an interactive `eas build --platform ios --profile production` after the App ID exists.
+- Open urgent feedback: no new items in this session. Hub dates stay paused.
+
 ### Mid-day (2026-11-03, evening)
 - Shipped v1.45.1 (`216e247`). LIVE blue CT133. STANDBY green CT135 is `17ddbd4` (chat composer above the keyboard). `main` is `3b66c0d` (Android version code only).
 - qa-01 directory gate plus generated chat tests passed before the switch.
