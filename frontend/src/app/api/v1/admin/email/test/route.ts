@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';;
+import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
-import bcrypt from 'bcryptjs';
+import { decryptPassword } from '@/lib/email-crypto';
 
 
 // POST /api/v1/admin/email/test - Send test email
@@ -26,25 +26,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let emailConfig;
-    
-    if (config) {
-      // Use provided config for testing (before saving)
-      emailConfig = config;
-    } else {
-      // Use saved config from database
-      const savedConfig = await prisma.emailConfiguration.findFirst({
-        where: { isActive: true }
-      });
+    const savedConfig = await prisma.emailConfiguration.findFirst({
+      where: { isActive: true }
+    });
 
-      if (!savedConfig) {
-        return NextResponse.json(
-          { success: false, message: 'No email configuration found. Please configure email settings first.' },
-          { status: 404 }
-        );
-      }
+    if (!savedConfig && !config?.password) {
+      return NextResponse.json(
+        { success: false, message: 'No email configuration found. Please configure email settings first.' },
+        { status: 404 }
+      );
+    }
 
-      emailConfig = savedConfig;
+    const typedPassword = typeof config?.password === 'string' ? config.password.replace(/\s+/g, '') : '';
+    const password = typedPassword || (savedConfig?.appPasswordEncrypted
+      ? decryptPassword(savedConfig.appPasswordEncrypted).replace(/\s+/g, '')
+      : '');
+
+    const emailConfig = {
+      ...(savedConfig || {}),
+      ...(config || {}),
+      smtpHost: config?.smtpHost || savedConfig?.smtpHost,
+      smtpPort: config?.smtpPort || savedConfig?.smtpPort,
+      encryption: config?.encryption || savedConfig?.encryption || 'tls',
+      username: config?.username || savedConfig?.username,
+      fromEmail: config?.fromEmail || savedConfig?.fromEmail,
+      fromName: config?.fromName || savedConfig?.fromName,
+      provider: config?.provider || savedConfig?.provider,
+      id: savedConfig?.id
+    };
+
+    if (!emailConfig.username || !password) {
+      return NextResponse.json(
+        { success: false, message: 'SMTP username or app password is missing. Save the app password, then test again.' },
+        { status: 400 }
+      );
     }
 
     // Create transporter based on configuration
@@ -54,7 +69,7 @@ export async function POST(request: NextRequest) {
       secure: emailConfig.encryption === 'ssl', // true for 465, false for other ports
       auth: {
         user: emailConfig.username,
-        pass: config ? emailConfig.password : await decryptPassword(emailConfig.appPasswordEncrypted)
+        pass: password
       }
     };
 
@@ -185,12 +200,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Helper function to decrypt password (placeholder - implement proper decryption)
-async function decryptPassword(hashedPassword: string): Promise<string> {
-  // In a real implementation, you'd decrypt the password here
-  // For now, we'll assume the password is stored as-is for testing
-  // This is a security concern that should be addressed in production
-  return hashedPassword;
 }

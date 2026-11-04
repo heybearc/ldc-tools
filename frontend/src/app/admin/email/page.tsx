@@ -81,7 +81,7 @@ export default function EmailConfigurationPage() {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        setConfig(data.config);
+        setConfig(prev => ({ ...prev, ...data.config, password: prev.password }));
         setStatus({ type: 'success', message: 'Email configuration saved successfully!' });
       } else {
         setStatus({ type: 'error', message: data.message || 'Failed to save configuration' });
