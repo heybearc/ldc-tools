@@ -1,5 +1,14 @@
 # LDC Tools Release Notes
 
+## v1.46.1 - The phone icon is centered
+
+**Release Date:** November 4, 2026
+
+### 🐛 Bug Fixes
+
+- The LDC Tools icon on the phone is the full badge, centered
+- The image shown while the app opens is centered
+
 ## v1.46.0 - Projects you can edit, and Projects in the phone app
 
 **Release Date:** November 3, 2026
