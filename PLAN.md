@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-04  
+**Last updated:** 2026-11-05  
 **Current phase:** Region work queue  
-**Status:** v1.46.2 (`333704c`) is LIVE on blue (CT133). STANDBY green (CT135) is synced. Hub dates are paused. Password emails use the saved mailbox password. iOS 1.0.3 build 2 is submitted to App Store Connect (`6830767824`).
+**Status:** v1.47.0 (`b9733db`) is LIVE on green (CT135) and synced to blue (CT133). Hub dates are paused. iOS 1.0.3 build 2 is submitted to App Store Connect (`6830767824`).
 
 ---
 

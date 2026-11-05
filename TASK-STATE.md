@@ -1,18 +1,19 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-04  
+**Last updated:** 2026-11-05  
 **Current branch:** main  
-**Working on:** v1.46.2 (`333704c`) is LIVE on blue (CT133). Password emails use the saved mailbox password. iOS 1.0.3 build 2 is submitted.
+**Working on:** v1.47.0 (`b9733db`) is LIVE on green (CT135). iOS 1.0.3 build 2 is submitted.
 
 ---
 
 ## Current Task
-v1.46.2 (`333704c`) is LIVE on blue (CT133) and synced to green (CT135). Password reset and the mailbox test use the saved app password. Send Matt Hirsch’s reset again. iOS 1.0.3 build 2 is in App Store Connect. Hub dates stay paused.
+v1.47.0 (`b9733db`) is LIVE on green (CT135). Privacy and support are public. The phone app can delete a sign-in, report a chat message, and block a person. iOS 1.0.3 build 2 is in App Store Connect and does not include this phone UI yet. Hub dates stay paused.
 
 ### What I'm doing right now
 Send Matt Hirsch’s password reset again, then confirm the iOS build in TestFlight. Hub dates stay paused.
 
 ### Recent completions
+- ✅ Shipped v1.47.0 (`b9733db`). Public privacy and support, account deletion, chat report and block. qa-01 full suite (88) plus the generated store-review test. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.46.2 (`333704c`). Password emails use the saved mailbox password. qa-01 admin gate plus the generated email test. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.46.1 (`be16844`). The phone icon and launch image are centered. qa-01 directory gate plus the generated app-icon test. LIVE was green CT135, then blue before this ship.
 - ✅ Shipped v1.46.0 (`f91ed69`). Edit a project, calendar by day week or month, and Projects in the phone app. qa-01 directory gate plus the generated projects and mobile tests. LIVE was green CT135.

@@ -5,6 +5,11 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Morning (2026-11-05)
+- Shipped v1.47.0 (`b9733db`). LIVE green CT135. STANDBY blue CT133. qa-01 full suite 88 passed, plus the generated store-review test.
+- https://ldctools.com/privacy and https://ldctools.com/support are public.
+- iOS 1.0.3 build 2 in App Store Connect does not include the new phone screens. A new store build is still required.
+
 ### Mid-day (2026-11-04, afternoon)
 - Shipped v1.46.2 (`333704c`). LIVE blue CT133. STANDBY green CT135 is synced. qa-01 admin gate plus the generated email test passed.
 - Gmail rejected the old app password. The new password is saved. The test was sending a blank password after save. That is fixed.
