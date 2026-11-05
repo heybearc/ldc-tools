@@ -30,6 +30,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAuthPage = pathname?.startsWith('/auth');
+  const isPublicPage = pathname === '/privacy' || pathname === '/support';
   const isHelpPage = pathname?.startsWith('/help') || pathname?.startsWith('/release-notes');
 
   // Close dropdown when clicking outside
@@ -43,7 +44,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
 
   // Fetch user's last seen release version
   useEffect(() => {
-    if (session?.user?.email && !isAuthPage && !isHelpPage) {
+    if (session?.user?.email && !isAuthPage && !isPublicPage && !isHelpPage) {
       fetch('/api/v1/user/profile')
         .then(res => res.ok ? res.json() : null)
         .then(data => {
@@ -55,9 +56,9 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
           // Silently fail - banner just won't show
         });
     }
-  }, [session?.user?.email, isAuthPage, isHelpPage]);
+  }, [session?.user?.email, isAuthPage, isPublicPage, isHelpPage]);
 
-  if (isAuthPage || isHelpPage) {
+  if (isAuthPage || isPublicPage || isHelpPage) {
     return <>{children}</>;
   }
 

@@ -7,6 +7,8 @@ export function middleware(request: NextRequest) {
   // Allow access to auth pages and API routes
   if (
     pathname.startsWith('/auth/') ||
+    pathname === '/privacy' ||
+    pathname === '/support' ||
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/favicon.ico')

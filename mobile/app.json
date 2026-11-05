@@ -18,10 +18,16 @@
           "mailto",
           "sms"
         ]
-      }
+      },
+      "buildNumber": "2"
     },
     "android": {
       "package": "com.ldctools.mobile",
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#1e40af",

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireMobileActor } from '@/lib/mobile-actor';
-import { channelForMember, notifyChannel } from '@/lib/chat';
+import { blockedUserIds, channelForMember, notifyChannel } from '@/lib/chat';
 
 export async function GET(
   request: NextRequest,
@@ -15,9 +15,11 @@ export async function GET(
     if (!channel) return NextResponse.json({ error: 'Chat not found' }, { status: 404 });
 
     const after = request.nextUrl.searchParams.get('after');
+    const blocked = await blockedUserIds(actor.id);
     const messages = await prisma.chatMessage.findMany({
       where: {
         channelId: channel.id,
+        ...(blocked.length ? { authorId: { notIn: blocked } } : {}),
         ...(after ? { createdAt: { gt: new Date(after) } } : {}),
       },
       orderBy: { createdAt: 'asc' },

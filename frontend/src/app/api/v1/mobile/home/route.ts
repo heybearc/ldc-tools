@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { loadDirectoryGroups } from '@/lib/directory-groups';
 import { directorySections, personFromAssignment } from '@/lib/mobile-directory';
 import { readMobileToken } from '@/lib/mobile-session';
+import { mobileGateResponse } from '@/lib/mobile-actor';
 import { timingLabel } from '@/lib/work-items';
 
 const ROLE_LABEL: Record<string, string> = {
@@ -33,8 +34,9 @@ export async function GET(request: NextRequest) {
       where: { id: token.id },
       select: { id: true, name: true, email: true, constructionGroupId: true, status: true },
     });
-    if (!user || user.status === 'INACTIVE' || !user.constructionGroupId) {
-      return NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
+    const denied = mobileGateResponse(user);
+    if (denied || !user?.constructionGroupId) {
+      return denied ?? NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
     }
 
     const groupId = user.constructionGroupId;

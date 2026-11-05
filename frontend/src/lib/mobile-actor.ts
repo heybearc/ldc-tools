@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { readMobileToken } from '@/lib/mobile-session';
+import { closedMobileAccount, readMobileToken } from '@/lib/mobile-session';
 import type { CGScope } from '@/lib/cg-scope';
 
 export type MobileActor = {
@@ -26,6 +26,16 @@ export function scopeForActor(actor: MobileActor): CGScope {
   };
 }
 
+export function mobileGateResponse(user: { status: string; constructionGroupId: string | null } | null) {
+  if (!user || closedMobileAccount(user.status)) {
+    return NextResponse.json({ error: 'Sign in again. This session is no longer valid.' }, { status: 401 });
+  }
+  if (!user.constructionGroupId) {
+    return NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
+  }
+  return null;
+}
+
 export async function requireMobileActor(request: NextRequest): Promise<
   { actor: MobileActor } | { error: NextResponse }
 > {
@@ -37,8 +47,9 @@ export async function requireMobileActor(request: NextRequest): Promise<
     where: { id: token.id },
     select: { id: true, name: true, email: true, role: true, status: true, constructionGroupId: true },
   });
-  if (!user || user.status === 'INACTIVE' || !user.constructionGroupId) {
-    return { error: NextResponse.json({ error: 'No construction group assigned' }, { status: 403 }) };
+  const denied = mobileGateResponse(user);
+  if (denied || !user?.constructionGroupId) {
+    return { error: denied || NextResponse.json({ error: 'No construction group assigned' }, { status: 403 }) };
   }
   return {
     actor: {

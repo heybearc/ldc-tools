@@ -29,6 +29,14 @@ export async function groupUserIds(constructionGroupId: string) {
   return users.map((user) => user.id);
 }
 
+export async function blockedUserIds(userId: string) {
+  const rows = await prisma.chatBlock.findMany({
+    where: { userId },
+    select: { blockedUserId: true },
+  });
+  return rows.map((row) => row.blockedUserId);
+}
+
 export async function notifyChannel(input: {
   channelId: string;
   constructionGroupId: string;
@@ -43,6 +51,14 @@ export async function notifyChannel(input: {
     userIds = await groupUserIds(input.constructionGroupId);
   } else {
     userIds = input.directKey.split(':').filter(Boolean);
+  }
+  if (userIds.length > 0) {
+    const blocks = await prisma.chatBlock.findMany({
+      where: { blockedUserId: input.authorId, userId: { in: userIds } },
+      select: { userId: true },
+    });
+    const blocked = new Set(blocks.map((row) => row.userId));
+    userIds = userIds.filter((id) => !blocked.has(id));
   }
   await sendChatPush({
     userIds,

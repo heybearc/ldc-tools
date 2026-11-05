@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { AccountFooter } from '@/components/AccountFooter';
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { fetchHome, type Home } from '@/lib/home';
@@ -59,9 +60,7 @@ export function MyWorkPane() {
           {item.detail ? <Text style={styles.detail}>{item.detail}</Text> : null}
         </Pressable>
       ))}
-      <Pressable onPress={() => void signOut()} style={styles.signOut}>
-        <Text style={styles.signOutText}>Sign out</Text>
-      </Pressable>
+      <AccountFooter />
     </ScrollView>
   );
 }
@@ -76,6 +75,4 @@ const styles = StyleSheet.create({
   title: { fontSize: 17, fontWeight: '700', color: '#111827' },
   timing: { color: '#1e40af', fontSize: 13, fontWeight: '600' },
   detail: { color: '#4b5563', fontSize: 15 },
-  signOut: { marginTop: 12, minHeight: 44, justifyContent: 'center' },
-  signOutText: { color: '#1e40af', fontWeight: '600' },
 });

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   AppState,
   FlatList,
   Keyboard,
@@ -40,6 +41,7 @@ export function ChatPane() {
   const [teammates, setTeammates] = useState<Person[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [blocked, setBlocked] = useState<Person[]>([]);
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
@@ -68,6 +70,11 @@ export function ChatPane() {
       });
       setChannels(body.channels || []);
       setTeammates(body.teammates || []);
+      const blocks = await apiRequest<{ blocks: Person[] }>(apiBase, '/api/v1/mobile/chat/blocks', {
+        token,
+        action: 'Could not load blocked people',
+      });
+      setBlocked(blocks.blocks || []);
     } catch (err) {
       await fail(err, 'Could not load chat. Try again in a moment.');
     }
@@ -182,6 +189,73 @@ export function ChatPane() {
     }
   }
 
+  async function reportMessage(message: Message) {
+    if (!token || !selectedId) return;
+    Alert.alert('Report this message?', 'An administrator will review it.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Report',
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            try {
+              await apiRequest(apiBase, `/api/v1/mobile/chat/channels/${selectedId}/messages/${message.id}/report`, {
+                method: 'POST',
+                token,
+                action: 'Could not send the report',
+              });
+              Alert.alert('Report sent', 'An administrator will review this message.');
+            } catch (err) {
+              await fail(err, 'Could not send the report. Try again in a moment.');
+            }
+          })();
+        },
+      },
+    ]);
+  }
+
+  async function blockPerson(person: Person) {
+    if (!token) return;
+    Alert.alert(`Block ${personName(person)}?`, 'Their messages will be hidden, and you will not get their chat notifications.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Block',
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            try {
+              await apiRequest(apiBase, '/api/v1/mobile/chat/blocks', {
+                method: 'POST',
+                token,
+                body: { userId: person.id },
+                action: 'Could not block that person',
+              });
+              await loadChannels();
+              if (selectedId) await loadMessages(selectedId);
+            } catch (err) {
+              await fail(err, 'Could not block that person. Try again in a moment.');
+            }
+          })();
+        },
+      },
+    ]);
+  }
+
+  async function unblockPerson(person: Person) {
+    if (!token) return;
+    try {
+      await apiRequest(apiBase, '/api/v1/mobile/chat/blocks', {
+        method: 'DELETE',
+        token,
+        body: { userId: person.id },
+        action: 'Could not unblock that person',
+      });
+      await loadChannels();
+    } catch (err) {
+      await fail(err, 'Could not unblock that person. Try again in a moment.');
+    }
+  }
+
   async function openDirect(userId: string) {
     if (!token) return;
     setError('');
@@ -217,6 +291,13 @@ export function ChatPane() {
                   <Text style={styles.personText}>{personName(person)}</Text>
                 </Pressable>
               ))}
+              {blocked.length > 0 ? <Text style={styles.heading}>Blocked</Text> : null}
+              {blocked.map((person) => (
+                <Pressable key={person.id} onPress={() => void unblockPerson(person)} style={styles.person}>
+                  <Text style={styles.personText}>{personName(person)}</Text>
+                  <Text style={styles.unblock}>Unblock</Text>
+                </Pressable>
+              ))}
             </View>
           )}
           renderItem={({ item }) => (
@@ -249,6 +330,16 @@ export function ChatPane() {
               <View style={[styles.bubble, item.mine ? styles.mine : styles.theirs]}>
                 {!item.mine ? <Text style={styles.author}>{personName(item.author)}</Text> : null}
                 <Text style={[styles.body, item.mine && styles.mineText]}>{item.body}</Text>
+                {!item.mine ? (
+                  <View style={styles.actions}>
+                    <Pressable onPress={() => void reportMessage(item)}>
+                      <Text style={styles.action}>Report</Text>
+                    </Pressable>
+                    <Pressable onPress={() => void blockPerson(item.author)}>
+                      <Text style={styles.action}>Block</Text>
+                    </Pressable>
+                  </View>
+                ) : null}
               </View>
             )}
           />
@@ -277,6 +368,9 @@ const styles = StyleSheet.create({
   people: { padding: 16, gap: 8 },
   person: { backgroundColor: '#fff', borderRadius: 10, minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
   personText: { color: '#111827', fontWeight: '600' },
+  unblock: { color: '#1e40af', fontWeight: '600', marginTop: 2 },
+  actions: { flexDirection: 'row', gap: 12, marginTop: 6 },
+  action: { color: '#1e3a8a', fontSize: 12, fontWeight: '700' },
   channel: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
   channelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   channelTitle: { fontSize: 16, fontWeight: '700', color: '#111827', flex: 1 },

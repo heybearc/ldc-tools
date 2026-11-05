@@ -43,10 +43,14 @@ export function readMobileToken(header: string | null): MobilePayload | null {
   }
 }
 
+export function closedMobileAccount(status: string | null | undefined) {
+  return status === 'INACTIVE' || status === 'SUSPENDED';
+}
+
 export async function signInForMobile(email: string, password: string) {
   const normalized = email.trim().toLowerCase();
   const user = await prisma.user.findUnique({ where: { email: normalized } });
-  if (!user?.passwordHash || user.status === 'INACTIVE') return null;
+  if (!user?.passwordHash || closedMobileAccount(user.status)) return null;
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) return null;
 

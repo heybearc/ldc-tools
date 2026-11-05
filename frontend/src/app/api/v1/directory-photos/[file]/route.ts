@@ -4,7 +4,7 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
-import { readMobileToken } from '@/lib/mobile-session';
+import { closedMobileAccount, readMobileToken } from '@/lib/mobile-session';
 
 const PHOTO_DIR = process.env.DIRECTORY_PHOTOS_DIR || '/var/lib/ldc-tools/directory-photos';
 
@@ -22,7 +22,7 @@ export async function GET(
       where: { id: mobile.id },
       select: { status: true, constructionGroupId: true },
     });
-    if (!user || user.status === 'INACTIVE' || !user.constructionGroupId) {
+    if (!user || closedMobileAccount(user.status) || !user.constructionGroupId) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
   }

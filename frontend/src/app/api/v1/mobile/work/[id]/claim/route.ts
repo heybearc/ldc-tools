@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { readMobileToken } from '@/lib/mobile-session';
+import { mobileGateResponse } from '@/lib/mobile-actor';
 import { activeUserInGroup } from '@/lib/work-item-access';
 
 export async function POST(
@@ -15,8 +16,9 @@ export async function POST(
       where: { id: token.id },
       select: { id: true, status: true, constructionGroupId: true },
     });
-    if (!user || user.status === 'INACTIVE' || !user.constructionGroupId) {
-      return NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
+    const denied = mobileGateResponse(user);
+    if (denied || !user?.constructionGroupId) {
+      return denied ?? NextResponse.json({ error: 'No construction group assigned' }, { status: 403 });
     }
 
     const item = await prisma.workItem.findUnique({

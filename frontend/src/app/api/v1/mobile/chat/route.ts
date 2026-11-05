@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireMobileActor } from '@/lib/mobile-actor';
-import { ensureTeamChannel } from '@/lib/chat';
+import { blockedUserIds, ensureTeamChannel } from '@/lib/chat';
 import { userInGroupWhere } from '@/lib/work-item-access';
 
 export async function GET(request: NextRequest) {
@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const groupId = actor.constructionGroupId;
 
     await ensureTeamChannel(groupId);
+    const blocked = new Set(await blockedUserIds(actor.id));
     const [channels, teammates, reads] = await Promise.all([
       prisma.chatChannel.findMany({
         where: { constructionGroupId: groupId },
@@ -25,7 +26,10 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'asc' },
       }),
       prisma.user.findMany({
-        where: { ...userInGroupWhere(groupId), id: { not: actor.id } },
+        where: {
+          ...userInGroupWhere(groupId),
+          id: { notIn: [actor.id, ...Array.from(blocked)] },
+        },
         select: { id: true, name: true, email: true },
         orderBy: [{ name: 'asc' }, { email: 'asc' }],
       }),
@@ -58,16 +62,17 @@ export async function GET(request: NextRequest) {
           : null;
         const other = teammates.find((person) => person.id === otherId) || null;
         const latest = channel.messages[0] || null;
+        const latestVisible = latest && !blocked.has(latest.authorId) ? latest : null;
         return {
           id: channel.id,
           kind: channel.kind,
           title: channel.kind === 'TEAM' ? 'Team' : (other?.name || other?.email || 'Direct message'),
           otherUserId: otherId,
           unread: unreadCounts[index] || 0,
-          latest: latest ? {
-            body: latest.body,
-            createdAt: latest.createdAt.toISOString(),
-            authorName: latest.author.name || latest.author.email,
+          latest: latestVisible ? {
+            body: latestVisible.body,
+            createdAt: latestVisible.createdAt.toISOString(),
+            authorName: latestVisible.author.name || latestVisible.author.email,
           } : null,
         };
       }),

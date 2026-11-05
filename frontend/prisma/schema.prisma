@@ -87,6 +87,8 @@ model User {
   chatMessages        ChatMessage[]
   chatReads           ChatRead[]
   chatPushSubscriptions ChatPushSubscription[]
+  chatBlocksMade      ChatBlock[] @relation("ChatBlocksMade")
+  chatBlocksReceived  ChatBlock[] @relation("ChatBlocksReceived")
 }
 
 model VerificationToken {
@@ -1216,6 +1218,20 @@ model ChatRead {
 
   @@unique([channelId, userId])
   @@map("chat_reads")
+}
+
+model ChatBlock {
+  id            String   @id @default(cuid())
+  userId        String
+  blockedUserId String
+  createdAt     DateTime @default(now())
+
+  user    User @relation("ChatBlocksMade", fields: [userId], references: [id], onDelete: Cascade)
+  blocked User @relation("ChatBlocksReceived", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, blockedUserId])
+  @@index([blockedUserId])
+  @@map("chat_blocks")
 }
 
 model ChatPushSubscription {

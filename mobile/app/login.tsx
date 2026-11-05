@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -11,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import { useAuth } from '@/lib/auth';
+import { PRIVACY_URL, SUPPORT_URL } from '@/lib/support';
 import { useWideLayout } from '@/lib/useWideLayout';
 
 export default function LoginScreen() {
@@ -20,6 +22,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [showServer, setShowServer] = useState(false);
 
   async function submit() {
     setBusy(true);
@@ -40,18 +43,23 @@ export default function LoginScreen() {
         <Text style={styles.kicker}>LDC Tools</Text>
         <Text style={styles.title}>Sign in</Text>
         <Text style={styles.help}>
-          Use the email and password for this construction group. The server is the LDC Tools site.
+          This app is invite-only. Sign in with the email and password your construction group gave you.
+          Downloading the app does not create an account.
         </Text>
 
-        <Text style={styles.label}>Server</Text>
-        <TextInput
-          value={apiBase}
-          onChangeText={setApiBase}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-          style={styles.input}
-        />
+        <Pressable onPress={() => setShowServer((open) => !open)} style={styles.serverToggle}>
+          <Text style={styles.serverToggleText}>{showServer ? 'Hide server' : 'Server'}</Text>
+        </Pressable>
+        {showServer ? (
+          <TextInput
+            value={apiBase}
+            onChangeText={setApiBase}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+            style={styles.input}
+          />
+        ) : null}
 
         <Text style={styles.label}>Email</Text>
         <TextInput
@@ -76,6 +84,15 @@ export default function LoginScreen() {
         <Pressable onPress={submit} disabled={busy || !apiBase.trim() || !email.trim() || !password} style={styles.button}>
           {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
         </Pressable>
+
+        <View style={styles.links}>
+          <Pressable onPress={() => void Linking.openURL(SUPPORT_URL)}>
+            <Text style={styles.link}>Request access</Text>
+          </Pressable>
+          <Pressable onPress={() => void Linking.openURL(PRIVACY_URL)}>
+            <Text style={styles.link}>Privacy policy</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -87,7 +104,11 @@ const styles = StyleSheet.create({
   wideContent: { maxWidth: 480, width: '100%', alignSelf: 'center' },
   kicker: { color: '#1e40af', fontWeight: '700', letterSpacing: 0.4 },
   title: { fontSize: 32, fontWeight: '700', color: '#111827', marginBottom: 8 },
-  help: { color: '#4b5563', marginBottom: 16, lineHeight: 20 },
+  help: { color: '#4b5563', marginBottom: 8, lineHeight: 20 },
+  serverToggle: { minHeight: 44, justifyContent: 'center' },
+  serverToggleText: { color: '#1e40af', fontWeight: '600' },
+  links: { marginTop: 16, gap: 4 },
+  link: { color: '#1e40af', fontWeight: '600', paddingVertical: 8 },
   label: { color: '#374151', fontWeight: '600', marginTop: 8 },
   input: {
     borderWidth: 1,
