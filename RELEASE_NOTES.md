@@ -1,5 +1,15 @@
 # LDC Tools Release Notes
 
+## v1.47.0 - Invite-only access, privacy, and chat controls
+
+**Release Date:** November 5, 2026
+
+### ✨ New Features
+
+- The privacy policy and support page are public, and say the app is invite-only
+- Delete your sign-in from My Work in the phone app
+- Report a chat message or block a person
+
 ## v1.46.1 - The phone icon is centered
 
 **Release Date:** November 4, 2026
