@@ -26,7 +26,6 @@ export default function LoginScreen() {
     setBusy(true);
     setError('');
     try {
-      await setApiBase(apiBase);
       await signIn(email, password);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not sign in');
