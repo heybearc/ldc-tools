@@ -1,5 +1,19 @@
 # LDC Tools Release Notes
 
+## v1.48.1 - Clearer sign-in, accounts, and chat
+
+**Release Date:** November 8, 2026
+
+### ✨ New Features
+
+- Mark a chat unread or read, and see the unread count on Chat
+
+### 🐛 Bug Fixes
+
+- Sign-in shows the LDC Tools logo and does not ask you to pick a server
+- Admin Accounts lists people who can sign in, and leaves directory contacts in the directory
+- Saving a project confirms the name and status, including cancelled
+
 ## v1.48.0 - Phone alerts and the day's work in the app
 
 **Release Date:** November 8, 2026

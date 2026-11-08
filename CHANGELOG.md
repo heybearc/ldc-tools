@@ -5,6 +5,16 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.48.1] - 2026-11-08
+
+### Added
+- A chat can be marked unread or read, and Chat shows the unread count
+
+### Fixed
+- Sign-in uses the LDC Tools logo and no longer offers a server choice
+- Admin Accounts lists sign-in accounts for the construction group
+- Saving a project confirms the name and status, and a project can be cancelled
+
 ## [1.48.0] - 2026-11-08
 
 ### Added
