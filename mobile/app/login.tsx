@@ -51,6 +51,7 @@ export default function LoginScreen() {
 
         <Text style={styles.label}>Email</Text>
         <TextInput
+          testID="sign-in-email"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -61,6 +62,7 @@ export default function LoginScreen() {
 
         <Text style={styles.label}>Password</Text>
         <TextInput
+          testID="sign-in-password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -69,7 +71,7 @@ export default function LoginScreen() {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Pressable onPress={submit} disabled={busy || !apiBase.trim() || !email.trim() || !password} style={styles.button}>
+        <Pressable testID="sign-in-submit" onPress={submit} disabled={busy || !apiBase.trim() || !email.trim() || !password} style={styles.button}>
           {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
         </Pressable>
 
