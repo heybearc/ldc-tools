@@ -2,15 +2,15 @@
 
 **Last updated:** 2026-11-08  
 **Current branch:** main  
-**Working on:** Phone tools and alerts on STANDBY (`93497af`). LIVE is still v1.47.0 on green (CT135).
+**Working on:** Phone tools on STANDBY (`5614175`). Android 1.1.0 (15) is on the Play internal track. LIVE is still v1.47.0 on green (CT135).
 
 ---
 
 ## Current Task
-Phone day-to-day tools and chat/announcement alerts are on STANDBY blue CT133 (`93497af`). LIVE is still green CT135 at v1.47.0. iOS 1.1.0 build 5 is queued for the badge and lock screen. Hub dates stay paused.
+Phone day-to-day tools and chat/announcement alerts are on STANDBY blue CT133 (`5614175`). LIVE is still green CT135 at v1.47.0. Android 1.1.0 version code 15 is on the Play internal track. iOS 1.1.0 build 5 still needs to be attached. Hub dates stay paused.
 
 ### What I'm doing right now
-Waiting on Apple to process iOS build 5, then attach it to version 1.1.0. Android store build waits until 2026-12-01 or a paid Expo plan. Do not switch live until asked. Hub dates stay paused.
+Install Xcode, then attach iOS build 5 to version 1.1.0. Do not switch live until asked. Hub dates stay paused.
 
 ### Recent completions
 - ✅ Shipped v1.47.0 (`b9733db`). Public privacy and support, account deletion, chat report and block. qa-01 full suite (88) plus the generated store-review test. LIVE green CT135, STANDBY blue CT133.
@@ -45,12 +45,13 @@ Waiting on Apple to process iOS build 5, then attach it to version 1.1.0. Androi
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-After Apple processes build 5, attach it to App Store version 1.1.0. Hub assignment dates stay paused until the persons list has start and end dates.
+Install Xcode, then attach iOS 1.1.0 build 5 in App Store Connect. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
 ## Known Issues
-- Android Expo free-plan builds are used up until 2026-12-01. iOS build 5 is queued (`135cc6b2`).
+- Xcode is not installed, so the local iOS lane has not signed or uploaded. iOS build 5 is queued (`135cc6b2`).
+- Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
 - Phone create-team and create-project allow fewer roles than the website. Bugbot only; not fixed.
 - 37 open crew requests have completion email turned off.
 - Play internal test 1.0.1 (8) is Available to internal testers. Download test app still returns Item not found. Opt-in works for corylallen@gmail.com. Countries column is blank and not editable on this track.
@@ -62,4 +63,4 @@ After Apple processes build 5, attach it to App Store version 1.1.0. Hub assignm
 ---
 
 ## Exact Next Command
-Attach iOS 1.1.0 build 5 in App Store Connect after it finishes processing. Hub assignment dates stay paused until the persons list has start and end dates.
+Install Xcode, then attach iOS 1.1.0 build 5 in App Store Connect. Hub assignment dates stay paused until the persons list has start and end dates.

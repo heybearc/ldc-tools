@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-08  
 **Current phase:** Region work queue  
-**Status:** v1.47.0 is LIVE on green (CT135). STANDBY blue (CT133) is `93497af` (phone tools and alerts). Hub dates are paused. iOS 1.1.0 build 5 is queued.
+**Status:** v1.47.0 is LIVE on green (CT135). STANDBY blue (CT133) is `5614175`. Android 1.1.0 (15) is on the Play internal track. Hub dates are paused. iOS 1.1.0 build 5 is queued. Xcode is not installed.
 
 ---
 
