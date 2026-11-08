@@ -1,16 +1,16 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-07  
+**Last updated:** 2026-11-08  
 **Current branch:** main  
-**Working on:** v1.47.0 (`b9733db`) is LIVE on green (CT135). iOS 1.0.3 build 2 is submitted.
+**Working on:** Phone tools and alerts on STANDBY (`93497af`). LIVE is still v1.47.0 on green (CT135).
 
 ---
 
 ## Current Task
-v1.47.0 (`b9733db`) is LIVE on green (CT135). Privacy and support are public. The phone app can delete a sign-in, report a chat message, and block a person. iOS 1.0.3 build 2 is in App Store Connect and does not include this phone UI yet. Hub dates stay paused.
+Phone day-to-day tools and chat/announcement alerts are on STANDBY blue CT133 (`93497af`). LIVE is still green CT135 at v1.47.0. iOS 1.1.0 build 5 is queued for the badge and lock screen. Hub dates stay paused.
 
 ### What I'm doing right now
-No new code since v1.47.0. Next is a store build that includes delete-account, report, and block. Send Matt Hirsch’s password reset if it still has not gone out. Hub dates stay paused.
+Waiting on Apple to process iOS build 5, then attach it to version 1.1.0. Android store build waits until 2026-12-01 or a paid Expo plan. Do not switch live until asked. Hub dates stay paused.
 
 ### Recent completions
 - ✅ Shipped v1.47.0 (`b9733db`). Public privacy and support, account deletion, chat report and block. qa-01 full suite (88) plus the generated store-review test. LIVE green CT135, STANDBY blue CT133.
@@ -45,12 +45,14 @@ No new code since v1.47.0. Next is a store build that includes delete-account, r
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Run eas build --platform ios --profile production in an interactive terminal so the Apple distribution certificate can be created. Hub assignment dates stay paused until the persons list has start and end dates.
+After Apple processes build 5, attach it to App Store version 1.1.0. Hub assignment dates stay paused until the persons list has start and end dates.
 
 ---
 
 ## Known Issues
-- Apple Developer enrollment is in process. Expo account `corya92` still has no Apple team, so the iOS EAS build cannot sign.
+- Android Expo free-plan builds are used up until 2026-12-01. iOS build 5 is queued (`135cc6b2`).
+- Phone create-team and create-project allow fewer roles than the website. Bugbot only; not fixed.
+- 37 open crew requests have completion email turned off.
 - Play internal test 1.0.1 (8) is Available to internal testers. Download test app still returns Item not found. Opt-in works for corylallen@gmail.com. Countries column is blank and not editable on this track.
 - Play bundle: `/Users/cory/Downloads/ldc-tools-1.0.1-version-code-8.aab`. Emulator APK is 1.0.1 version code 7.
 - Hart + Miller-Sieving parked on trade team TBD until a real trade is known
@@ -60,4 +62,4 @@ Run eas build --platform ios --profile production in an interactive terminal so 
 ---
 
 ## Exact Next Command
-Run eas build --platform ios --profile production in an interactive terminal so the Apple distribution certificate can be created. Hub assignment dates stay paused until the persons list has start and end dates.
+Attach iOS 1.1.0 build 5 in App Store Connect after it finishes processing. Hub assignment dates stay paused until the persons list has start and end dates.

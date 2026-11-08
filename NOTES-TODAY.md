@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-08)
+- Phone day-to-day tools and alerts are on `main` (`93497af`). STANDBY blue CT133 http://10.92.3.34:3001. LIVE stays green CT135. Not switched.
+- iOS 1.1.0 build 4 is in App Store Connect. Build 5 (badge and lock screen) is queued: `135cc6b2`, submission `d7c6ba9a`. Android Expo builds are used up until 2026-12-01.
+- Gmail send works. Completion mail now says when it fails. 37 open crew requests still have the email box off.
+- Bugbot: phone create-team and create-project are narrower than the website. Not fixed.
+- Directory photo save skips the role limit when the placement is unchanged. Siding still has two active TCOs.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: attach iOS build 5 after Apple processes it. New session before the next slice.
+
 ### Mid-day (2026-11-07)
 - No code changes since v1.47.0 (`b9733db`). LIVE green CT135. STANDBY blue CT133 is synced.
 - Open urgent feedback: 0. Hub dates stay paused.

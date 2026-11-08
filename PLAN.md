@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-07  
+**Last updated:** 2026-11-08  
 **Current phase:** Region work queue  
-**Status:** v1.47.0 (`b9733db`) is LIVE on green (CT135) and synced to blue (CT133). Hub dates are paused. iOS 1.0.3 build 2 is submitted to App Store Connect (`6830767824`).
+**Status:** v1.47.0 is LIVE on green (CT135). STANDBY blue (CT133) is `93497af` (phone tools and alerts). Hub dates are paused. iOS 1.1.0 build 5 is queued.
 
 ---
 
@@ -145,4 +145,4 @@ Projects and crew-change requests stay. The schedule is dated work on the work l
 
 - HAProxy ACL: `is_ldc` → LIVE backend; `is_ldc_blue` / `is_ldc_green` for color hosts
 - DB: `postgresql://…@10.92.3.23:5432/ldc_tools` (RW VIP)
-- LIVE is blue (CT133) at `9f368a3`. STANDBY is green (CT135) at `8b8291c` (work follow-on and chat, not shipped).
+- LIVE is green (CT135) at v1.47.0. STANDBY is blue (CT133) at `93497af`. Not switched.
