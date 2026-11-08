@@ -35,6 +35,7 @@ export function ProjectsPane() {
 
   return (
     <ScrollView
+      testID="screen-projects"
       style={styles.screen}
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => {

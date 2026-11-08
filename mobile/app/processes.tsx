@@ -94,7 +94,7 @@ export default function ProcessesScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <ScrollView testID="screen-processes" style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {canManage ? (
         <View style={styles.card}>

@@ -340,7 +340,7 @@ export function ChatPane() {
   const showThread = Boolean(selectedId);
 
   return (
-    <View ref={screenRef} style={[styles.screen, { paddingBottom: keyboardInset }]}>
+    <View ref={screenRef} testID="screen-chat" style={[styles.screen, { paddingBottom: keyboardInset }]}>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {!showThread ? (
         <FlatList

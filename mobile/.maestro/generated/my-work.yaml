@@ -1,0 +1,6 @@
+appId: com.ldctools.mobile
+---
+- runFlow: ../shared/sign-in.yaml
+- assertVisible: "My Work"
+- assertVisible:
+    id: "screen-my-work"

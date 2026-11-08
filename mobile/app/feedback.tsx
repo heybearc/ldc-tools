@@ -74,7 +74,7 @@ export default function FeedbackScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <ScrollView testID="screen-feedback" style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <View style={styles.card}>
         <Text style={styles.title}>Send feedback</Text>
         <View style={styles.row}>

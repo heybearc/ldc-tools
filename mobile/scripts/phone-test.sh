@@ -1,11 +1,12 @@
 #!/bin/sh
-# Run the phone app on this Mac and walk the feature screens.
-# iOS Simulator cannot run in a Linux container. Android uses the SDK already on this Mac.
+# Build one Maestro flow per phone feature, install the app on this Mac, and run them.
+# iOS Simulator cannot run in a Linux container. Android uses the emulator on this Mac.
 # qa-01 still checks the phone API. It does not drive the phone screen.
 #
 # Usage, from mobile/:
 #   npm run test:phone
 #   npm run test:phone -- android
+#   npm run test:phone -- ios
 #
 # Credentials: mobile/.env.test (see .env.test.example), else frontend/.env.test.
 # PHONE_API_BASE must be the current STANDBY origin.
@@ -14,6 +15,9 @@ set -eu
 
 cd "$(dirname "$0")/.."
 PLATFORM="${1:-ios}"
+ROOT="$(pwd)"
+LOG="${TMPDIR:-/tmp}/ldc-phone-test.log"
+PIDFILE="${TMPDIR:-/tmp}/ldc-phone-test.pid"
 
 if [ -f .env.test ]; then
   set -a
@@ -63,6 +67,34 @@ if ! command -v maestro >/dev/null 2>&1; then
 fi
 
 export EXPO_PUBLIC_API_BASE="$API_BASE"
+node --experimental-strip-types scripts/generate-phone-tests.ts
+
+stop_app() {
+  if [ -f "$PIDFILE" ]; then
+    kill "$(cat "$PIDFILE")" >/dev/null 2>&1 || true
+    rm -f "$PIDFILE"
+  fi
+}
+trap stop_app EXIT
+
+wait_for_app() {
+  i=0
+  while [ "$i" -lt 240 ]; do
+    if grep -q -E "Logs for your project|Opening on|› Opening" "$LOG"; then
+      return 0
+    fi
+    if ! kill -0 "$(cat "$PIDFILE")" >/dev/null 2>&1; then
+      echo "The app build stopped before it was ready." >&2
+      tail -n 40 "$LOG" >&2
+      exit 1
+    fi
+    i=$((i + 1))
+    sleep 5
+  done
+  echo "The app did not finish launching." >&2
+  tail -n 40 "$LOG" >&2
+  exit 1
+}
 
 case "$PLATFORM" in
   ios)
@@ -75,13 +107,41 @@ case "$PLATFORM" in
       echo "  xcodebuild -downloadPlatform iOS" >&2
       exit 1
     fi
-    npx expo run:ios
+    : >"$LOG"
+    npx expo run:ios >"$LOG" 2>&1 &
+    echo $! >"$PIDFILE"
+    wait_for_app
     ;;
   android)
     if [ -z "${ANDROID_HOME:-}" ] && [ -d "$HOME/Library/Android/sdk" ]; then
       export ANDROID_HOME="$HOME/Library/Android/sdk"
     fi
-    npx expo run:android
+    if [ -z "${ANDROID_HOME:-}" ] || [ ! -x "$ANDROID_HOME/emulator/emulator" ]; then
+      echo "The Android SDK emulator is not installed on this Mac." >&2
+      exit 1
+    fi
+    export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH"
+    if ! adb devices | grep emulator | grep -q 'device$'; then
+      AVD="$(emulator -list-avds | head -n 1)"
+      if [ -z "$AVD" ]; then
+        echo "No Android emulator image is installed." >&2
+        exit 1
+      fi
+      emulator -avd "$AVD" -netdelay none -netspeed full >/dev/null 2>&1 &
+      adb wait-for-device
+      booted=0
+      while [ "$booted" -lt 90 ]; do
+        if adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' | grep -q '^1$'; then
+          break
+        fi
+        booted=$((booted + 1))
+        sleep 2
+      done
+    fi
+    : >"$LOG"
+    npx expo run:android >"$LOG" 2>&1 &
+    echo $! >"$PIDFILE"
+    wait_for_app
     ;;
   *)
     echo "Use ios or android." >&2
@@ -89,4 +149,4 @@ case "$PLATFORM" in
     ;;
 esac
 
-exec maestro test -e EMAIL="$EMAIL" -e PASSWORD="$PASSWORD" .maestro/features.yaml
+maestro test -e EMAIL="$EMAIL" -e PASSWORD="$PASSWORD" .maestro/generated

@@ -1,0 +1,7 @@
+appId: com.ldctools.mobile
+---
+- runFlow: ../shared/sign-in.yaml
+- tapOn: "Available"
+- assertVisible: "Claimable work that no one has taken yet."
+- assertVisible:
+    id: "screen-available"

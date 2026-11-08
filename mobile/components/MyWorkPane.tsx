@@ -39,6 +39,7 @@ export function MyWorkPane() {
 
   return (
     <ScrollView
+      testID="screen-my-work"
       style={styles.screen}
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => {

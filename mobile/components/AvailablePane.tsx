@@ -57,6 +57,7 @@ export function AvailablePane() {
 
   return (
     <ScrollView
+      testID="screen-available"
       style={styles.screen}
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => {

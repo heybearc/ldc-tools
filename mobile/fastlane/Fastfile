@@ -117,16 +117,23 @@ def ensure_android_release_signing!
   path = File.join(PROJECT, "android/app/build.gradle")
   UI.user_error!("Missing #{path}. Run expo prebuild before signing.") unless File.exist?(path)
   contents = File.read(path)
-  return if contents.include?("ANDROID_KEYSTORE_FILE")
-
   release_config = <<~GRADLE
         release {
-            storeFile file(System.getenv("ANDROID_KEYSTORE_FILE"))
-            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            keyAlias System.getenv("ANDROID_KEY_ALIAS")
-            keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            def keystorePath = System.getenv("ANDROID_KEYSTORE_FILE")
+            if (keystorePath) {
+                storeFile file(keystorePath)
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            }
         }
   GRADLE
+  if contents.include?('storeFile file(System.getenv("ANDROID_KEYSTORE_FILE"))')
+    updated = contents.sub(/release \{\n\s*storeFile file\(System\.getenv\("ANDROID_KEYSTORE_FILE"\)\)\n\s*storePassword System\.getenv\("ANDROID_KEYSTORE_PASSWORD"\)\n\s*keyAlias System\.getenv\("ANDROID_KEY_ALIAS"\)\n\s*keyPassword System\.getenv\("ANDROID_KEY_PASSWORD"\)\n\s*\}/m, release_config.rstrip)
+    File.write(path, updated)
+    return
+  end
+  return if contents.include?("keystorePath")
   updated = contents.sub(/signingConfigs \{\n        debug \{.*?\n        \}\n    \}/m) do |block|
     block.sub(/\n    \}\z/, "\n#{release_config}    }")
   end

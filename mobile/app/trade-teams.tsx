@@ -88,7 +88,7 @@ export default function TradeTeamsScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <ScrollView testID="screen-trade-teams" style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {teams.map((team) => (
         <View key={team.id} style={styles.card}>

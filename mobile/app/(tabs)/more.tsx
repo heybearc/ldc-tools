@@ -50,6 +50,7 @@ export default function MoreScreen() {
 
   return (
     <ScrollView
+      testID="screen-more"
       style={styles.screen}
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => {
@@ -68,12 +69,12 @@ export default function MoreScreen() {
         </View>
       ))}
       {items.map((item) => (
-        <Pressable key={item.href} onPress={() => router.push(item.href as '/processes')} style={styles.card}>
+        <Pressable key={item.href} testID={`link-${item.href.slice(1)}`} onPress={() => router.push(item.href as '/processes')} style={styles.card}>
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.detail}>{item.detail}</Text>
         </Pressable>
       ))}
-      <Pressable onPress={() => router.push('/help')} style={styles.card}>
+      <Pressable testID="link-help" onPress={() => router.push('/help')} style={styles.card}>
         <Text style={styles.title}>Help</Text>
         <Text style={styles.detail}>Guides in the app</Text>
       </Pressable>

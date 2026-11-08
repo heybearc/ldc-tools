@@ -29,7 +29,7 @@ const GUIDES = [
 
 export default function HelpScreen() {
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <ScrollView testID="screen-help" style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.intro}>These guides stay in the app. You do not need to sign in on the website.</Text>
       {GUIDES.map((guide) => (
         <View key={guide.title} style={styles.card}>

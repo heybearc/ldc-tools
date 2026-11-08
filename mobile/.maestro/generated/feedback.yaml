@@ -1,0 +1,9 @@
+appId: com.ldctools.mobile
+---
+- runFlow: ../shared/sign-in.yaml
+- tapOn: "More"
+- tapOn:
+    id: "link-feedback"
+- assertVisible: "Send feedback"
+- assertVisible:
+    id: "screen-feedback"

@@ -1,0 +1,8 @@
+appId: com.ldctools.mobile
+---
+- runFlow: ../shared/sign-in.yaml
+- tapOn: "Chat"
+- assertVisible: "Chats"
+- assertVisible: "Message one person"
+- assertVisible:
+    id: "screen-chat"

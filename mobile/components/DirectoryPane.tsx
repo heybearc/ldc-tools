@@ -67,6 +67,7 @@ export function DirectoryPane() {
 
   return (
     <ScrollView
+      testID="screen-directory"
       style={styles.screen}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
