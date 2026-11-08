@@ -1,5 +1,14 @@
 # LDC Tools Release Notes
 
+## v1.48.3 - Each phone screen is checked before release
+
+**Release Date:** November 8, 2026
+
+### 🐛 Bug Fixes
+
+- My Work, Available, Projects, Directory, Chat, Processes, Trade teams, Feedback, and Help are each checked before this version goes out
+- How you use the site and the phone is unchanged
+
 ## v1.48.2 - Mail stays with real addresses, and the phone matches the website
 
 **Release Date:** November 8, 2026
