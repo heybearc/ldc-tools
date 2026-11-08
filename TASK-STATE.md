@@ -2,15 +2,15 @@
 
 **Last updated:** 2026-11-08  
 **Current branch:** main  
-**Working on:** Site fixes on STANDBY green (CT135, `0e45f7f`). Phone store builds for that mobile diff are not started. LIVE was blue (CT133). Not switched.
+**Working on:** v1.48.2 is LIVE on blue (CT133). STANDBY is green (CT135). Phone feature tests run on this Mac. Hub dates stay paused.
 
 ---
 
 ## Current Task
-Sign-in branding, admin accounts, chat read state, and project save are on STANDBY green CT135 (`0e45f7f`, http://10.92.3.25:3001). LIVE stays blue CT133. D-069 says the next `/ship` builds iOS then Android because `mobile/` changed. Hub dates stay paused.
+v1.48.2 (`9d35d12`) is LIVE on blue CT133. STANDBY green CT135 has `b2dfbab` (phone feature tests). iOS 1.1.0 build 8 and Android version code 16 are uploaded. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress. Next ship runs both phone store lanes on this Mac. Do not switch live until asked.
+Nothing in progress. Phone UI tests wait on `mobile/.env.test`, then `npm run test:phone`.
 
 ### Recent completions
 - ✅ D-069 recorded. `/ship` classifies site vs phone and builds both store binaries when `mobile/` changed.
@@ -47,14 +47,14 @@ Nothing in progress. Next ship runs both phone store lanes on this Mac. Do not s
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Store builds for this phone diff are uploaded. Hub assignment dates stay paused until the persons list has start and end dates. Do not switch live until asked.
+Copy `mobile/.env.test.example` to `mobile/.env.test`, then `npm run test:phone`. Hub assignment dates stay paused.
 
 ---
 
 ## Known Issues
 - Xcode 27.2 is installed. iOS 1.1.0 build 8 is uploaded to App Store Connect. Android 1.1.0 version code 16 is on the Play internal track.
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
-- Phone create-team and create-project now allow the same roles as the website. The change is not on LIVE until the next ship.
+- Phone create permissions shipped in v1.48.2. iOS Simulator 27.2 is installed. No Android emulator image yet.
 - 37 open crew requests have completion email turned off.
 - Play internal test 1.0.1 (8) is Available to internal testers. Download test app still returns Item not found. Opt-in works for corylallen@gmail.com. Countries column is blank and not editable on this track.
 - Play bundle: `/Users/cory/Downloads/ldc-tools-1.0.1-version-code-8.aab`. Emulator APK is 1.0.1 version code 7.
@@ -65,4 +65,4 @@ Store builds for this phone diff are uploaded. Hub assignment dates stay paused 
 ---
 
 ## Exact Next Command
-Store builds for this phone diff are uploaded. Hub assignment dates stay paused until the persons list has start and end dates. Do not switch live until asked.
+Copy `mobile/.env.test.example` to `mobile/.env.test`, then `npm run test:phone`. Hub assignment dates stay paused.

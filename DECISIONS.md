@@ -98,6 +98,11 @@ For shared architectural decisions that apply to all apps, see `.cloudy-work/_cl
 - **Decision:** The persons list names current trade roles. A role that includes the trade and crew is current. A role with no crew does not end any assignment. The list has no start or end dates, so no end date is written.
 - **Why:** Ending a crew from an incomplete line would drop the wrong person.
 
+## D-LDC-017: Phone screen tests run on this Mac
+- **Date:** 2026-11-08
+- **Decision:** Maestro drives the iOS Simulator, and later an Android emulator, on this Mac. The test build points at STANDBY. No new container. qa-01 keeps the phone API checks.
+- **Why:** The iOS Simulator cannot run on qa-01.
+
 ## D-LDC-016: Store builds run on this Mac
 - **Date:** 2026-11-08
 - **Decision:** Fastlane builds and uploads the phone app locally. Android uses the existing Expo upload key and the TheoShift Play service account. A paid Expo plan is not required for that upload.

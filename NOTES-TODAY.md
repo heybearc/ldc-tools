@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-08, ship and phone tests)
+- Shipped v1.48.2 (`9d35d12`). LIVE blue CT133. STANDBY green CT135. qa-01 directory and admin gate passed, plus the mail and phone-create tests.
+- Undeliverable addresses are not mailed. Phone create permissions match the website.
+- iOS 1.1.0 build 8 is in App Store Connect. Android 1.1.0 version code 16 is on the Play internal track. Those lanes were not run again at ship.
+- Phone UI tests use Maestro on this Mac (`b2dfbab`). Deployed to STANDBY green CT135. No new container. qa-01 still checks the phone API only.
+- iOS Simulator 27.2 is installed. No Android emulator image yet. `mobile/.env.test` is still missing.
+- Urgent feedback was not rechecked. Last note: 1 (FB-004, resolved, not closed). Hub dates stay paused.
+- Next: `npm run test:phone` after `mobile/.env.test`. New session before the next slice.
+
 ### Mid-day (2026-11-08, governance)
 - Promoted D-069. `/ship` classifies site, phone, phone API, or docs. A `mobile/` change builds iOS then Android on this Mac. The site still goes to standby.
 - Cloudy-Work is `e85b8fa`. The command files were already on `f47d2d4`.
