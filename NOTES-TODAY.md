@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-08, governance)
+- Promoted D-069. `/ship` classifies site, phone, phone API, or docs. A `mobile/` change builds iOS then Android on this Mac. The site still goes to standby.
+- Cloudy-Work is `e85b8fa`. The command files were already on `f47d2d4`.
+- STANDBY green CT135 has the site fixes (`0e45f7f`, http://10.92.3.25:3001). LIVE stays blue CT133. Not switched.
+- No phone binary was built for that mobile diff. Next `/ship` runs both store lanes.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: `/ship` when ready. New session before the next slice.
+
 ### Mid-day (2026-11-08, later)
 - Local Fastlane is on `main` (`5614175`). STANDBY blue CT133 http://10.92.3.34:3001. LIVE stays green CT135. Not switched.
 - Android 1.1.0 version code 15 is on the Play internal track. Signed with the existing upload key. Same Play service account as TheoShift.

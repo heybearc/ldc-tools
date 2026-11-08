@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-08  
 **Current phase:** Region work queue  
-**Status:** v1.47.0 is LIVE on green (CT135). STANDBY blue (CT133) is `5614175`. Android 1.1.0 (15) is on the Play internal track. Hub dates are paused. iOS 1.1.0 build 5 is queued. Xcode is not installed.
+**Status:** v1.47.0 is LIVE on blue (CT133). STANDBY green (CT135) has the site fixes (`0e45f7f`). Phone store builds for that mobile diff are not started. Hub dates are paused.
 
 ---
 
@@ -32,6 +32,7 @@
 - [x] Resend Invitation; `/ship` v1.38.1
 - [x] Slice 6 — crew-request spreadsheet import onto the work list
 - [x] Slice 8 — directory contacts are not sign-in accounts
+- [x] D-069 — `/ship` classifies site vs phone and builds iOS then Android when `mobile/` changed
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

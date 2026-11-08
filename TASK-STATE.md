@@ -2,17 +2,19 @@
 
 **Last updated:** 2026-11-08  
 **Current branch:** main  
-**Working on:** Phone tools on STANDBY (`5614175`). Android 1.1.0 (15) is on the Play internal track. LIVE is still v1.47.0 on green (CT135).
+**Working on:** Site fixes on STANDBY green (CT135, `0e45f7f`). Phone store builds for that mobile diff are not started. LIVE was blue (CT133). Not switched.
 
 ---
 
 ## Current Task
-Phone day-to-day tools and chat/announcement alerts are on STANDBY blue CT133 (`5614175`). LIVE is still green CT135 at v1.47.0. Android 1.1.0 version code 15 is on the Play internal track. iOS 1.1.0 build 5 still needs to be attached. Hub dates stay paused.
+Sign-in branding, admin accounts, chat read state, and project save are on STANDBY green CT135 (`0e45f7f`, http://10.92.3.25:3001). LIVE stays blue CT133. D-069 says the next `/ship` builds iOS then Android because `mobile/` changed. Hub dates stay paused.
 
 ### What I'm doing right now
-Install Xcode, then attach iOS build 5 to version 1.1.0. Do not switch live until asked. Hub dates stay paused.
+Nothing in progress. Next ship runs both phone store lanes on this Mac. Do not switch live until asked.
 
 ### Recent completions
+- ✅ D-069 recorded. `/ship` classifies site vs phone and builds both store binaries when `mobile/` changed.
+- ✅ Site standby deploy of `0e45f7f` succeeded on green CT135. Main later moved for governance only (`7f43079`).
 - ✅ Shipped v1.47.0 (`b9733db`). Public privacy and support, account deletion, chat report and block. qa-01 full suite (88) plus the generated store-review test. LIVE green CT135, STANDBY blue CT133.
 - ✅ Shipped v1.46.2 (`333704c`). Password emails use the saved mailbox password. qa-01 admin gate plus the generated email test. LIVE blue CT133, STANDBY green CT135.
 - ✅ Shipped v1.46.1 (`be16844`). The phone icon and launch image are centered. qa-01 directory gate plus the generated app-icon test. LIVE was green CT135, then blue before this ship.
@@ -45,12 +47,12 @@ Install Xcode, then attach iOS build 5 to version 1.1.0. Do not switch live unti
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Install Xcode, then attach iOS 1.1.0 build 5 in App Store Connect. Hub assignment dates stay paused until the persons list has start and end dates.
+On the next `/ship`, run the iOS lane then the Android lane for the `mobile/` diff. Do not switch live until asked. Hub assignment dates stay paused.
 
 ---
 
 ## Known Issues
-- Xcode is not installed, so the local iOS lane has not signed or uploaded. iOS build 5 is queued (`135cc6b2`).
+- The latest `mobile/` diff has no new iOS or Android upload yet. Lanes run on this Mac at `/ship` (D-069).
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
 - Phone create-team and create-project allow fewer roles than the website. Bugbot only; not fixed.
 - 37 open crew requests have completion email turned off.
@@ -63,4 +65,4 @@ Install Xcode, then attach iOS 1.1.0 build 5 in App Store Connect. Hub assignmen
 ---
 
 ## Exact Next Command
-Install Xcode, then attach iOS 1.1.0 build 5 in App Store Connect. Hub assignment dates stay paused until the persons list has start and end dates.
+On the next `/ship`, run the iOS lane then the Android lane for the `mobile/` diff. Do not switch live until asked. Hub assignment dates stay paused.
