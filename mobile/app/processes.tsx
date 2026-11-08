@@ -96,6 +96,15 @@ export default function ProcessesScreen() {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {canManage ? (
+        <View style={styles.card}>
+          <Text style={styles.title}>New process</Text>
+          <Field label="Name" value={name} onChangeText={setName} />
+          <Field label="Step" value={stepTitle} onChangeText={setStepTitle} />
+          <Field label="Detail" value={stepDetail} onChangeText={setStepDetail} multiline />
+          <PrimaryButton label={busy === 'create' ? 'Saving…' : 'Add process'} onPress={() => void create()} disabled={Boolean(busy)} />
+        </View>
+      ) : null}
       {templates.length === 0 && !error ? <Text style={styles.empty}>No processes yet.</Text> : null}
       {canManage && projects.length > 0 ? (
         <View style={styles.row}>
@@ -115,16 +124,7 @@ export default function ProcessesScreen() {
           ) : null}
         </View>
       ))}
-      {canManage ? (
-        <View style={styles.card}>
-          <Text style={styles.title}>New process</Text>
-          <Field label="Name" value={name} onChangeText={setName} />
-          <Field label="Step" value={stepTitle} onChangeText={setStepTitle} />
-          <Field label="Detail" value={stepDetail} onChangeText={setStepDetail} multiline />
-          <PrimaryButton label={busy === 'create' ? 'Saving…' : 'Add process'} onPress={() => void create()} disabled={Boolean(busy)} />
-        </View>
-      ) : null}
-    </ScrollView>
+      </ScrollView>
   );
 }
 

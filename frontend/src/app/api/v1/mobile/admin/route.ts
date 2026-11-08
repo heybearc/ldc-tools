@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isMobileAdmin, requireMobileActor } from '@/lib/mobile-actor';
+import { mobileSignInAccountWhere } from '@/lib/personnel-accounts';
 import { notifyGroupPhones } from '@/lib/expo-push';
 import { sendEmail, generateFeedbackStatusChangeEmail } from '@/lib/email';
 
@@ -14,9 +15,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Admin access is required' }, { status: 403 });
     }
     const groupId = access.actor.constructionGroupId;
+    const accounts = mobileSignInAccountWhere(groupId);
     const [users, announcements, feedback, audit, userCount] = await Promise.all([
       prisma.user.findMany({
-        where: { constructionGroupId: groupId },
+        where: accounts,
         orderBy: { name: 'asc' },
         take: 200,
         select: { id: true, name: true, email: true, role: true, status: true },
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
           user: { select: { name: true, email: true } },
         },
       }),
-      prisma.user.count({ where: { constructionGroupId: groupId, status: 'ACTIVE' } }),
+      prisma.user.count({ where: { AND: [accounts, { status: 'ACTIVE' }] } }),
     ]);
     return NextResponse.json({
       activeUsers: userCount,
@@ -135,7 +137,7 @@ async function changeRole(
     : ['ADMIN', 'USER', 'READ_ONLY'];
   if (!allowed.includes(role)) return NextResponse.json({ error: 'Choose a role you can assign' }, { status: 400 });
   const user = await prisma.user.findFirst({
-    where: { id: userId, constructionGroupId: actor.constructionGroupId },
+    where: { AND: [{ id: userId }, mobileSignInAccountWhere(actor.constructionGroupId)] },
     select: { id: true },
   });
   if (!user) return NextResponse.json({ error: 'That account is not in this construction group' }, { status: 404 });

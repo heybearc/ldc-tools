@@ -283,7 +283,18 @@ export function ChatPane() {
         <FlatList
           data={channels}
           keyExtractor={(item) => item.id}
-          ListHeaderComponent={(
+          ListHeaderComponent={<Text style={styles.listTitle}>Chats</Text>}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => setSelectedId(item.id)} style={styles.channel}>
+              <View style={styles.channelRow}>
+                <Text style={styles.channelTitle}>{item.title}</Text>
+                {item.unread > 0 ? <Text style={styles.unread}>{item.unread}</Text> : null}
+              </View>
+              {item.latest ? <Text style={styles.preview} numberOfLines={1}>{item.latest.body}</Text> : null}
+            </Pressable>
+          )}
+          ListEmptyComponent={<Text style={styles.empty}>No chats yet.</Text>}
+          ListFooterComponent={(
             <View style={styles.people}>
               <Text style={styles.heading}>Message one person</Text>
               {teammates.map((person) => (
@@ -300,25 +311,13 @@ export function ChatPane() {
               ))}
             </View>
           )}
-          renderItem={({ item }) => (
-            <Pressable onPress={() => setSelectedId(item.id)} style={styles.channel}>
-              <View style={styles.channelRow}>
-                <Text style={styles.channelTitle}>{item.title}</Text>
-                {item.unread > 0 ? <Text style={styles.unread}>{item.unread}</Text> : null}
-              </View>
-              {item.latest ? <Text style={styles.preview} numberOfLines={1}>{item.latest.body}</Text> : null}
-            </Pressable>
-          )}
-          ListEmptyComponent={<Text style={styles.empty}>No chats yet.</Text>}
         />
       ) : (
         <View style={styles.thread}>
-          <View style={styles.threadHeader}>
-            <Pressable onPress={() => setSelectedId(null)} style={styles.back}>
-              <Text style={styles.backText}>Chats</Text>
-            </Pressable>
+          <Pressable onPress={() => setSelectedId(null)} style={styles.backBar}>
+            <Text style={styles.backText}>‹ All chats</Text>
             <Text style={styles.channelTitle} numberOfLines={1}>{selected?.title || 'Chat'}</Text>
-          </View>
+          </Pressable>
           <FlatList
             ref={listRef}
             style={styles.messageList}
@@ -364,6 +363,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#f9fafb' },
   error: { color: '#b91c1c', padding: 12 },
   empty: { color: '#6b7280', padding: 16 },
+  listTitle: { fontSize: 13, fontWeight: '700', color: '#6b7280', paddingHorizontal: 16, paddingTop: 16 },
   heading: { fontSize: 13, fontWeight: '700', color: '#6b7280', marginBottom: 8 },
   people: { padding: 16, gap: 8 },
   person: { backgroundColor: '#fff', borderRadius: 10, minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
@@ -378,9 +378,8 @@ const styles = StyleSheet.create({
   preview: { color: '#6b7280', marginTop: 2 },
   thread: { flex: 1 },
   messageList: { flex: 1 },
-  threadHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, backgroundColor: '#fff' },
-  back: { minHeight: 44, justifyContent: 'center' },
-  backText: { color: '#1e40af', fontWeight: '700' },
+  backBar: { minHeight: 52, justifyContent: 'center', paddingHorizontal: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb', gap: 2 },
+  backText: { color: '#1e40af', fontWeight: '700', fontSize: 17 },
   messages: { padding: 12, gap: 8 },
   bubble: { maxWidth: '80%', borderRadius: 12, padding: 10 },
   mine: { alignSelf: 'flex-end', backgroundColor: '#1e40af' },

@@ -1,11 +1,10 @@
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { Choice, Field, PrimaryButton } from '@/components/fields';
 
-type UserRow = { id: string; name: string | null; email: string; role: string; status: string };
 type Notice = { id: string; title: string; message: string; type: string; isActive: boolean };
 type FeedbackRow = {
   id: string;
@@ -18,11 +17,9 @@ type FeedbackRow = {
 };
 type AuditRow = { id: string; action: string; resource: string; at: string; who: string };
 
-const ROLES = ['ADMIN', 'USER', 'READ_ONLY'];
-
 export default function AdminScreen() {
   const { apiBase, token, signOut } = useAuth();
-  const [users, setUsers] = useState<UserRow[]>([]);
+  const router = useRouter();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [feedback, setFeedback] = useState<FeedbackRow[]>([]);
   const [audit, setAudit] = useState<AuditRow[]>([]);
@@ -39,13 +36,11 @@ export default function AdminScreen() {
     try {
       const body = await apiRequest<{
         activeUsers: number;
-        users: UserRow[];
         announcements: Notice[];
         feedback: FeedbackRow[];
         audit: AuditRow[];
       }>(apiBase, '/api/v1/mobile/admin', { token, action: 'Could not load admin tools' });
       setActiveUsers(body.activeUsers);
-      setUsers(body.users || []);
       setNotices(body.announcements || []);
       setFeedback(body.feedback || []);
       setAudit(body.audit || []);
@@ -81,8 +76,11 @@ export default function AdminScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-      <Text style={styles.detail}>{activeUsers} active accounts</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      <Pressable onPress={() => router.push('/accounts')} style={styles.card}>
+        <Text style={styles.title}>Accounts</Text>
+        <Text style={styles.detail}>{activeUsers} personnel and admin sign-ins. Trade and crew contacts stay in the directory.</Text>
+      </Pressable>
       <View style={styles.card}>
         <Text style={styles.title}>Announcement</Text>
         <Field label="Title" value={title} onChangeText={setTitle} />
@@ -107,24 +105,6 @@ export default function AdminScreen() {
             <View style={styles.row}>
               <Choice label="In progress" selected={false} onPress={() => void post({ action: 'feedback', feedbackId: item.id, status: 'IN_PROGRESS' }, 'Could not update feedback')} />
               <Choice label="Resolved" selected={false} onPress={() => void post({ action: 'feedback', feedbackId: item.id, status: 'RESOLVED', resolutionComment: note }, 'Could not update feedback')} />
-            </View>
-          </View>
-        ))}
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.title}>Accounts</Text>
-        {users.map((user) => (
-          <View key={user.id} style={styles.block}>
-            <Text style={styles.detail}>{user.name || user.email} · {user.role} · {user.status}</Text>
-            <View style={styles.row}>
-              {ROLES.map((role) => (
-                <Choice
-                  key={role}
-                  label={role === 'READ_ONLY' ? 'Read only' : role === 'ADMIN' ? 'Admin' : 'User'}
-                  selected={user.role === role}
-                  onPress={() => void post({ action: 'role', userId: user.id, role }, 'Could not change the role')}
-                />
-              ))}
             </View>
           </View>
         ))}

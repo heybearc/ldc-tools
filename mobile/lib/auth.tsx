@@ -35,13 +35,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [storedToken, storedUser, storedBase] = await Promise.all([
+      const [storedToken, storedUser] = await Promise.all([
         SecureStore.getItemAsync(TOKEN_KEY),
         SecureStore.getItemAsync(USER_KEY),
-        SecureStore.getItemAsync(API_BASE_KEY),
       ]);
       if (cancelled) return;
-      if (storedBase) setApiBaseState(normalizeApiBase(storedBase));
+      await SecureStore.deleteItemAsync(API_BASE_KEY).catch(() => undefined);
       if (storedToken) setToken(storedToken);
       if (storedUser) {
         try {

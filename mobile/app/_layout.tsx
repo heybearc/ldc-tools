@@ -35,16 +35,18 @@ function RootNavigator() {
   }
 
   return (
-    <Stack>
+    <Stack screenOptions={{ headerBackTitle: 'Back' }}>
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="person" options={{ title: 'Profile', headerBackTitle: 'Directory' }} />
       <Stack.Screen name="work/[id]" options={{ title: 'Work', headerBackTitle: 'Back' }} />
-      <Stack.Screen name="processes" options={{ title: 'Processes' }} />
-      <Stack.Screen name="trade-teams" options={{ title: 'Trade teams' }} />
-      <Stack.Screen name="feedback" options={{ title: 'Feedback' }} />
-      <Stack.Screen name="admin" options={{ title: 'Admin' }} />
-      <Stack.Screen name="project/[id]" options={{ title: 'Project' }} />
+      <Stack.Screen name="processes" options={{ title: 'Processes', headerBackTitle: 'More' }} />
+      <Stack.Screen name="trade-teams" options={{ title: 'Trade teams', headerBackTitle: 'More' }} />
+      <Stack.Screen name="feedback" options={{ title: 'Feedback', headerBackTitle: 'More' }} />
+      <Stack.Screen name="help" options={{ title: 'Help', headerBackTitle: 'More' }} />
+      <Stack.Screen name="admin" options={{ title: 'Admin', headerBackTitle: 'More' }} />
+      <Stack.Screen name="accounts" options={{ title: 'Accounts', headerBackTitle: 'Admin' }} />
+      <Stack.Screen name="project/[id]" options={{ title: 'Project', headerBackTitle: 'Projects' }} />
     </Stack>
   );
 }

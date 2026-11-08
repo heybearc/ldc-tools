@@ -73,18 +73,18 @@ export default function MoreScreen() {
           <Text style={styles.detail}>{item.detail}</Text>
         </Pressable>
       ))}
-      <Pressable onPress={() => void Linking.openURL('https://ldctools.com/help')} style={styles.card}>
+      <Pressable onPress={() => router.push('/help')} style={styles.card}>
         <Text style={styles.title}>Help</Text>
-        <Text style={styles.detail}>Guides from the website</Text>
-      </Pressable>
-      <Pressable onPress={() => void Linking.openURL('https://ldctools.com/release-notes')} style={styles.card}>
-        <Text style={styles.title}>Release notes</Text>
+        <Text style={styles.detail}>Guides in the app</Text>
       </Pressable>
       <Pressable onPress={() => void Linking.openURL(SUPPORT_URL)} style={styles.card}>
         <Text style={styles.title}>Support</Text>
       </Pressable>
       <Pressable onPress={() => void Linking.openURL(PRIVACY_URL)} style={styles.card}>
         <Text style={styles.title}>Privacy policy</Text>
+      </Pressable>
+      <Pressable onPress={() => void signOut()} style={styles.card}>
+        <Text style={styles.title}>Sign out</Text>
       </Pressable>
     </ScrollView>
   );

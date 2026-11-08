@@ -16,14 +16,12 @@ import { PRIVACY_URL, SUPPORT_URL } from '@/lib/support';
 import { useWideLayout } from '@/lib/useWideLayout';
 
 export default function LoginScreen() {
-  const { apiBase, setApiBase, signIn } = useAuth();
+  const { apiBase, signIn } = useAuth();
   const wide = useWideLayout();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [showServer, setShowServer] = useState(false);
-
   async function submit() {
     setBusy(true);
     setError('');
@@ -46,20 +44,6 @@ export default function LoginScreen() {
           This app is invite-only. Sign in with the email and password your construction group gave you.
           Downloading the app does not create an account.
         </Text>
-
-        <Pressable onPress={() => setShowServer((open) => !open)} style={styles.serverToggle}>
-          <Text style={styles.serverToggleText}>{showServer ? 'Hide server' : 'Server'}</Text>
-        </Pressable>
-        {showServer ? (
-          <TextInput
-            value={apiBase}
-            onChangeText={setApiBase}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-            style={styles.input}
-          />
-        ) : null}
 
         <Text style={styles.label}>Email</Text>
         <TextInput
@@ -105,8 +89,6 @@ const styles = StyleSheet.create({
   kicker: { color: '#1e40af', fontWeight: '700', letterSpacing: 0.4 },
   title: { fontSize: 32, fontWeight: '700', color: '#111827', marginBottom: 8 },
   help: { color: '#4b5563', marginBottom: 8, lineHeight: 20 },
-  serverToggle: { minHeight: 44, justifyContent: 'center' },
-  serverToggleText: { color: '#1e40af', fontWeight: '600' },
   links: { marginTop: 16, gap: 4 },
   link: { color: '#1e40af', fontWeight: '600', paddingVertical: 8 },
   label: { color: '#374151', fontWeight: '600', marginTop: 8 },
