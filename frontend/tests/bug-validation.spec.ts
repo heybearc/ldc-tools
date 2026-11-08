@@ -73,8 +73,8 @@ test.describe('Bug Validation Suite', () => {
     if (await userEndpoint.isVisible()) {
       // Check status indicator
       const parentRow = userEndpoint.locator('..').locator('..');
-      const warningIndicator = parentRow.locator('.text-yellow-600, .text-orange-600, text=warning');
-      const errorIndicator = parentRow.locator('.text-red-600, text=error');
+      const warningIndicator = parentRow.locator('.text-yellow-600, .text-orange-600');
+      const errorIndicator = parentRow.locator('.text-red-600');
       
       const hasWarning = await warningIndicator.count() > 0;
       const hasError = await errorIndicator.count() > 0;
@@ -97,7 +97,7 @@ test.describe('Bug Validation Suite', () => {
     
     if (await emailEndpoint.isVisible()) {
       const parentRow = emailEndpoint.locator('..').locator('..');
-      const errorIndicator = parentRow.locator('.text-red-600, text=error');
+      const errorIndicator = parentRow.locator('.text-red-600');
       
       const hasError = await errorIndicator.count() > 0;
       console.log(`BUG-017: Email Test API has error: ${hasError}`);
@@ -176,7 +176,7 @@ test.describe('Bug Validation Suite', () => {
     
     if (await emailService.isVisible()) {
       const parentSection = emailService.locator('..').locator('..');
-      const healthyIndicator = parentSection.locator('.text-green-600, text=/healthy|connected/i');
+      const healthyIndicator = parentSection.locator('.text-green-600');
       
       const showsHealthy = await healthyIndicator.count() > 0;
       console.log(`BUG-013: Email service shows healthy: ${showsHealthy}`);
