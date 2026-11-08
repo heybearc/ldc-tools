@@ -5,6 +5,13 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-07)
+- No code changes since v1.47.0 (`b9733db`). LIVE green CT135. STANDBY blue CT133 is synced.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: a new store build. App Store Connect still has iOS 1.0.3 build 2, which predates delete-account, report, and block.
+- `mobile/android/` is a local prebuild and stays untracked. It includes a debug keystore.
+- Matt Hirsch’s password reset from Nov 4 is still the open mail follow-up.
+
 ### Morning (2026-11-05)
 - Shipped v1.47.0 (`b9733db`). LIVE green CT135. STANDBY blue CT133. qa-01 full suite 88 passed, plus the generated store-review test.
 - https://ldctools.com/privacy and https://ldctools.com/support are public.

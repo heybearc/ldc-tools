@@ -1,6 +1,6 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-05  
+**Last updated:** 2026-11-07  
 **Current phase:** Region work queue  
 **Status:** v1.47.0 (`b9733db`) is LIVE on green (CT135) and synced to blue (CT133). Hub dates are paused. iOS 1.0.3 build 2 is submitted to App Store Connect (`6830767824`).
 

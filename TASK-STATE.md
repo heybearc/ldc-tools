@@ -1,6 +1,6 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-05  
+**Last updated:** 2026-11-07  
 **Current branch:** main  
 **Working on:** v1.47.0 (`b9733db`) is LIVE on green (CT135). iOS 1.0.3 build 2 is submitted.
 
@@ -10,7 +10,7 @@
 v1.47.0 (`b9733db`) is LIVE on green (CT135). Privacy and support are public. The phone app can delete a sign-in, report a chat message, and block a person. iOS 1.0.3 build 2 is in App Store Connect and does not include this phone UI yet. Hub dates stay paused.
 
 ### What I'm doing right now
-Send Matt Hirsch’s password reset again, then confirm the iOS build in TestFlight. Hub dates stay paused.
+No new code since v1.47.0. Next is a store build that includes delete-account, report, and block. Send Matt Hirsch’s password reset if it still has not gone out. Hub dates stay paused.
 
 ### Recent completions
 - ✅ Shipped v1.47.0 (`b9733db`). Public privacy and support, account deletion, chat report and block. qa-01 full suite (88) plus the generated store-review test. LIVE green CT135, STANDBY blue CT133.
