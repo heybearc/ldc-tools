@@ -1,5 +1,14 @@
 # LDC Tools Release Notes
 
+## v1.48.2 - Mail stays with real addresses, and the phone matches the website
+
+**Release Date:** November 8, 2026
+
+### 🐛 Bug Fixes
+
+- A completion or test message is not sent to an address that cannot receive mail
+- On the phone, the people who can add a project or a trade team are the same people who can do that on the website
+
 ## v1.48.1 - Clearer sign-in, accounts, and chat
 
 **Release Date:** November 8, 2026
