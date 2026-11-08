@@ -29,6 +29,38 @@ export async function groupUserIds(constructionGroupId: string) {
   return users.map((user) => user.id);
 }
 
+export async function setChannelRead(channelId: string, userId: string, unread: boolean) {
+  if (!unread) {
+    await prisma.chatRead.upsert({
+      where: { channelId_userId: { channelId, userId } },
+      create: { channelId, userId },
+      update: { readAt: new Date() },
+    });
+    return 0;
+  }
+
+  const latest = await prisma.chatMessage.findFirst({
+    where: { channelId, authorId: { not: userId } },
+    orderBy: { createdAt: 'desc' },
+    select: { createdAt: true },
+  });
+  if (!latest) return 0;
+
+  const readAt = new Date(latest.createdAt.getTime() - 1);
+  await prisma.chatRead.upsert({
+    where: { channelId_userId: { channelId, userId } },
+    create: { channelId, userId, readAt },
+    update: { readAt },
+  });
+  return prisma.chatMessage.count({
+    where: {
+      channelId,
+      authorId: { not: userId },
+      createdAt: { gt: readAt },
+    },
+  });
+}
+
 export async function blockedUserIds(userId: string) {
   const rows = await prisma.chatBlock.findMany({
     where: { userId },

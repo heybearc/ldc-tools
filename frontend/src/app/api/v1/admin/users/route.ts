@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { isAdmin } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
-import { personnelAccountWhere } from '@/lib/personnel-accounts';
+import { adminSignInAccountWhere } from '@/lib/personnel-accounts';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,9 +27,8 @@ export async function GET(request: NextRequest) {
     const role = searchParams.get('role') || '';
     const status = searchParams.get('status') || '';
     
-    // Personnel team for the signed-in region. Other directory contacts are not accounts to manage here.
     const where: any = {
-      AND: [personnelAccountWhere(cgScope?.regionId || null)],
+      AND: [adminSignInAccountWhere(cgScope)],
     };
 
     if (search) {

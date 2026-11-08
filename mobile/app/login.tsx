@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -37,7 +38,11 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={[styles.content, wide && styles.wideContent]} keyboardShouldPersistTaps="handled">
-        <Text style={styles.kicker}>LDC Tools</Text>
+        <View style={styles.brand}>
+          <Image source={require('../assets/images/icon.png')} style={styles.logo} accessibilityLabel="LDC Tools" />
+          <Text style={styles.kicker}>LDC Tools</Text>
+          <Text style={styles.tagline}>Work, projects, and directory for your construction group</Text>
+        </View>
         <Text style={styles.title}>Sign in</Text>
         <Text style={styles.help}>
           This app is invite-only. Sign in with the email and password your construction group gave you.
@@ -83,9 +88,12 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#f9fafb' },
-  content: { padding: 24, paddingTop: 72, gap: 8 },
+  content: { padding: 24, paddingTop: 48, gap: 8 },
   wideContent: { maxWidth: 480, width: '100%', alignSelf: 'center' },
-  kicker: { color: '#1e40af', fontWeight: '700', letterSpacing: 0.4 },
+  brand: { alignItems: 'center', gap: 8, marginBottom: 12 },
+  logo: { width: 96, height: 96, borderRadius: 22 },
+  kicker: { color: '#1e3a8a', fontWeight: '800', fontSize: 22, letterSpacing: 0.3 },
+  tagline: { color: '#4b5563', textAlign: 'center', lineHeight: 20 },
   title: { fontSize: 32, fontWeight: '700', color: '#111827', marginBottom: 8 },
   help: { color: '#4b5563', marginBottom: 8, lineHeight: 20 },
   links: { marginTop: 16, gap: 4 },

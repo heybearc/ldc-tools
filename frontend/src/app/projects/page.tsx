@@ -92,6 +92,7 @@ export default function ProjectsPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: '', number: '', location: '' });
+  const [notice, setNotice] = useState('');
 
   const loadGeneration = useRef(0);
 
@@ -206,6 +207,7 @@ export default function ProjectsPage() {
   const canCreate = canAssign || canAddDate || canEdit;
 
   function beginEdit(project: ProjectRow) {
+    setNotice('');
     setEditingId(project.id);
     setEditForm({
       name: project.name,
@@ -242,7 +244,12 @@ export default function ProjectsPage() {
         setError(userError(response.status, body.error, 'Could not save the project'));
         return;
       }
+      const savedName = editForm.name.trim();
+      const savedStatus = STATUS_LABELS[editForm.status] || editForm.status;
       setEditingId(null);
+      setView('list');
+      setNotice(`${savedName} saved. Status is ${savedStatus}.`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       await load();
     } finally {
       setBusyId(null);
@@ -379,6 +386,7 @@ export default function ProjectsPage() {
       </div>
 
       {error && <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>}
+      {notice && <p className="rounded-md bg-green-50 text-green-800 px-4 py-3 text-sm">{notice}</p>}
 
       {loading ? (
         <p className="text-gray-500">Loading projects…</p>
@@ -489,7 +497,7 @@ export default function ProjectsPage() {
                       disabled={busyId === project.id}
                       className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
                     >
-                      {busyId === project.id ? 'Saving…' : 'Save changes'}
+                      {busyId === project.id ? 'Saving…' : 'Save project'}
                     </button>
                   </div>
                 </form>

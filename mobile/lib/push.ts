@@ -42,5 +42,9 @@ export async function registerPhoneNotifications(apiBase: string, token: string)
 }
 
 export async function setAppBadge(count: number) {
-  await Notifications.setBadgeCountAsync(count);
+  try {
+    await Notifications.setBadgeCountAsync(count);
+  } catch {
+    // This device does not show an app icon badge.
+  }
 }

@@ -1,5 +1,7 @@
 import { PERSONNEL_ROLE_CODES } from '@/lib/work-items';
 
+const SIGN_IN_ADMIN_ROLES: Array<'ADMIN' | 'SUPER_ADMIN'> = ['ADMIN', 'SUPER_ADMIN'];
+
 /**
  * Users who serve on the Personnel team (Contact, Assistant, or Support)
  * for a region. Directory contacts without one of those roles stay off this list.
@@ -31,11 +33,56 @@ export function mobileSignInAccountWhere(constructionGroupId: string) {
           },
         },
       },
-      { role: { in: ['ADMIN', 'SUPER_ADMIN'] as const } },
+      { role: { in: SIGN_IN_ADMIN_ROLES } },
       {
         invitedBy: { not: null },
         tradeTeamOversight: { none: { isActive: true, endDate: null } },
         tradeCrewOversight: { none: { isActive: true, endDate: null } },
+      },
+    ],
+  };
+}
+
+/** Sign-in accounts an admin can manage: personnel, admins, and invited people who are not trade or crew contacts. */
+export function adminSignInAccountWhere(scope: { constructionGroupId: string | null; regionId: string | null } | null) {
+  if (scope?.constructionGroupId) return mobileSignInAccountWhere(scope.constructionGroupId);
+
+  const regionId = scope?.regionId || null;
+  const inScope = regionId ? { constructionGroup: { regionId } } : {};
+  return {
+    AND: [
+      inScope,
+      {
+        OR: [
+          {
+            volunteer: {
+              isActive: true,
+              ...inScope,
+              roles: {
+                some: {
+                  isActive: true,
+                  endDate: null,
+                  roleCode: { in: [...PERSONNEL_ROLE_CODES] },
+                },
+              },
+            },
+          },
+          {
+            personnelContacts: {
+              some: {
+                isActive: true,
+                endDate: null,
+                ...inScope,
+              },
+            },
+          },
+          { role: { in: SIGN_IN_ADMIN_ROLES } },
+          {
+            invitedBy: { not: null },
+            tradeTeamOversight: { none: { isActive: true, endDate: null } },
+            tradeCrewOversight: { none: { isActive: true, endDate: null } },
+          },
+        ],
       },
     ],
   };

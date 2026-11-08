@@ -41,7 +41,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const adminModules = useMemo(() => [
-    { name: 'User Management', href: '/admin/users', icon: Users, color: 'blue' },
+    { name: 'Accounts', href: '/admin/users', icon: Users, color: 'blue' },
     { name: 'Email Config', href: '/admin/email', icon: Mail, color: 'green' },
     { name: 'Health Monitor', href: '/admin/health', icon: Activity, color: 'emerald' },
     { name: 'API Status', href: '/admin/api', icon: BarChart, color: 'purple' },
@@ -172,7 +172,7 @@ export default function AdminDashboardPage() {
         <Link href="/admin/users" className="bg-white rounded-lg border border-gray-200 p-4 sm:p-5 hover:shadow-md transition-shadow active:bg-gray-50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-500">Total Users</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-500">Accounts</p>
               <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stats?.users.total || 0}</p>
             </div>
             <div className="p-2 sm:p-3 bg-blue-100 rounded-full flex-shrink-0">

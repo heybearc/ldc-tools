@@ -47,7 +47,7 @@ export default async function ProjectsHelpPage() {
 
           <h2>Edit a project</h2>
           <p>
-            Personnel and oversight can choose Edit project. Change the name, number, location, status, start, end, or Builder Assistant link, then choose Save changes.
+            Personnel and oversight can choose Edit project. Change the name, number, location, status, start, end, or Builder Assistant link, then choose Save project. The list shows the new status.
             Choose Remove to take the project off this list. Dated work stays on the work list.
           </p>
 

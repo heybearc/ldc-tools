@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { AccountList } from '@/components/AccountList';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { Choice, Field, PrimaryButton } from '@/components/fields';
@@ -19,7 +20,6 @@ type AuditRow = { id: string; action: string; resource: string; at: string; who:
 
 export default function AdminScreen() {
   const { apiBase, token, signOut } = useAuth();
-  const router = useRouter();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [feedback, setFeedback] = useState<FeedbackRow[]>([]);
   const [audit, setAudit] = useState<AuditRow[]>([]);
@@ -77,10 +77,11 @@ export default function AdminScreen() {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Pressable onPress={() => router.push('/accounts')} style={styles.card}>
+      <View style={styles.block}>
         <Text style={styles.title}>Accounts</Text>
-        <Text style={styles.detail}>{activeUsers} personnel and admin sign-ins. Trade and crew contacts stay in the directory.</Text>
-      </Pressable>
+        <Text style={styles.detail}>{activeUsers} personnel and admin sign-ins. Change a role here.</Text>
+        <AccountList />
+      </View>
       <View style={styles.card}>
         <Text style={styles.title}>Announcement</Text>
         <Field label="Title" value={title} onChangeText={setTitle} />

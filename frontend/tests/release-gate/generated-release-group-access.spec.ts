@@ -38,7 +38,7 @@ test('a super admin stays in a construction group and can add work or a project'
   await expect(page.getByRole('heading', { name: 'Admin Control Center' })).toBeVisible();
 
   await page.goto('/admin/users');
-  await expect(page.getByText('Personnel team for this region')).toBeVisible();
+  await expect(page.getByText('Sign-in accounts for this construction group')).toBeVisible();
   const actions = page.getByRole('columnheader', { name: 'Actions' });
   await expect(actions).toBeVisible();
   const box = await actions.boundingBox();

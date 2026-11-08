@@ -88,7 +88,8 @@ export default function ProjectScreen() {
           body,
           action: 'Could not save the project',
         });
-        await load();
+        if (router.canGoBack()) router.back();
+        else router.replace('/projects');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save the project');

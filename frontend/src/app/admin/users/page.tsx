@@ -374,10 +374,10 @@ export default function UserManagementPage() {
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
             <Users className="mr-3 h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
-            User Management
+            Accounts
           </h2>
           <p className="text-sm sm:text-base text-gray-600 mt-1">
-            Personnel team for this region. Contact, Assistant, and Support.
+            Sign-in accounts for this construction group. Personnel, admins, and people you invited. Directory contacts stay in the directory.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { isAdmin } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
-import { personnelAccountWhere } from '@/lib/personnel-accounts';
+import { adminSignInAccountWhere } from '@/lib/personnel-accounts';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,20 +19,20 @@ export async function GET(request: NextRequest) {
     }
     
     const cgScope = await getCGScope();
-    const personnel = personnelAccountWhere(cgScope?.regionId || null);
+    const accounts = adminSignInAccountWhere(cgScope);
 
-    const totalUsers = await prisma.user.count({ where: personnel });
+    const totalUsers = await prisma.user.count({ where: accounts });
 
     const activeUsers = await prisma.user.count({
-      where: { AND: [personnel, { emailVerified: { not: null }, status: { not: 'INACTIVE' } }] },
+      where: { AND: [accounts, { emailVerified: { not: null }, status: { not: 'INACTIVE' } }] },
     });
 
     const invitedUsers = await prisma.user.count({
-      where: { AND: [personnel, { emailVerified: null, status: { notIn: ['INACTIVE', 'SUSPENDED'] } }] },
+      where: { AND: [accounts, { emailVerified: null, status: { notIn: ['INACTIVE', 'SUSPENDED'] } }] },
     });
 
     const inactiveUsers = await prisma.user.count({
-      where: { AND: [personnel, { status: { in: ['INACTIVE', 'SUSPENDED'] } }] },
+      where: { AND: [accounts, { status: { in: ['INACTIVE', 'SUSPENDED'] } }] },
     });
     
     const stats = {

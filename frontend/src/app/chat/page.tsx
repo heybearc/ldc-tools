@@ -31,6 +31,11 @@ function personName(person: { name: string | null; email: string }) {
   return person.name || person.email;
 }
 
+function publishUnread(channels: Channel[]) {
+  const total = channels.reduce((sum, channel) => sum + channel.unread, 0);
+  window.dispatchEvent(new CustomEvent('ldc-chat-unread', { detail: total }));
+}
+
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -65,6 +70,8 @@ function ChatScreen() {
   const bottom = useRef<HTMLDivElement>(null);
   const newest = useRef<string | null>(null);
   const messageRequest = useRef(0);
+  const holdUnread = useRef<string | null>(null);
+  const readGeneration = useRef(0);
 
   const loadChannels = useCallback(async () => {
     try {
@@ -74,7 +81,9 @@ function ChatScreen() {
         setError(userError(response.status, body.error, 'Could not load chat'));
         return;
       }
-      setChannels(body.channels || []);
+      const nextChannels: Channel[] = body.channels || [];
+      setChannels(nextChannels);
+      publishUnread(nextChannels);
       setTeammates(body.teammates || []);
       setVapid(body.vapidPublicKey || null);
       const wide = window.matchMedia('(min-width: 1024px)').matches;
@@ -108,7 +117,25 @@ function ChatScreen() {
     });
     if (requestId !== messageRequest.current) return;
     if (incoming.length > 0) newest.current = incoming[incoming.length - 1].createdAt;
-    await fetch(`/api/v1/chat/channels/${channelId}/read`, { method: 'POST' });
+    if (holdUnread.current === channelId) return;
+    const generation = readGeneration.current;
+    const readResponse = await fetch(`/api/v1/chat/channels/${channelId}/read`, { method: 'POST' });
+    if (holdUnread.current === channelId || generation !== readGeneration.current) {
+      if (holdUnread.current === channelId) {
+        await fetch(`/api/v1/chat/channels/${channelId}/read`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ unread: true }),
+        });
+      }
+      return;
+    }
+    if (!readResponse.ok || requestId !== messageRequest.current) return;
+    setChannels((current) => {
+      const next = current.map((channel) => channel.id === channelId ? { ...channel, unread: 0 } : channel);
+      publishUnread(next);
+      return next;
+    });
   }, []);
 
   useEffect(() => {
@@ -174,6 +201,42 @@ function ChatScreen() {
       loadChannels();
     } finally {
       setSending(false);
+    }
+  }
+
+  function openChannel(channelId: string) {
+    if (holdUnread.current === channelId) holdUnread.current = null;
+    setSelectedId(channelId);
+  }
+
+  async function setReadState(channelId: string, unread: boolean) {
+    setError('');
+    readGeneration.current += 1;
+    const previousHold = holdUnread.current;
+    holdUnread.current = unread ? channelId : (previousHold === channelId ? null : previousHold);
+    try {
+      const response = await fetch(`/api/v1/chat/channels/${channelId}/read`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unread }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        holdUnread.current = previousHold;
+        setError(userError(response.status, body.error, 'Could not update the chat'));
+        return;
+      }
+      if (unread && selectedId === channelId) setSelectedId(null);
+      setChannels((current) => {
+        const next = current.map((channel) => (
+          channel.id === channelId ? { ...channel, unread: Number(body.unread) || 0 } : channel
+        ));
+        publishUnread(next);
+        return next;
+      });
+    } catch {
+      holdUnread.current = previousHold;
+      setError(userError(0, '', 'Could not update the chat'));
     }
   }
 
@@ -308,11 +371,11 @@ function ChatScreen() {
           </div>
           <ul className="space-y-1">
             {channels.map((channel) => (
-              <li key={channel.id}>
+              <li key={channel.id} className="flex items-stretch gap-1">
                 <button
                   type="button"
-                  onClick={() => setSelectedId(channel.id)}
-                  className={`w-full text-left rounded-md px-3 py-2 min-h-[44px] ${selectedId === channel.id ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                  onClick={() => openChannel(channel.id)}
+                  className={`flex-1 text-left rounded-md px-3 py-2 min-h-[44px] ${selectedId === channel.id ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="font-medium text-gray-900">{channel.title}</span>
@@ -321,6 +384,13 @@ function ChatScreen() {
                     )}
                   </span>
                   {channel.latest && <span className="block text-xs text-gray-500 truncate">{channel.latest.body}</span>}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void setReadState(channel.id, channel.unread === 0)}
+                  className="px-2 min-h-[44px] rounded-md text-xs font-semibold text-blue-800 hover:bg-gray-50"
+                >
+                  {channel.unread > 0 ? 'Mark read' : 'Mark unread'}
                 </button>
               </li>
             ))}

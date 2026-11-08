@@ -52,7 +52,7 @@ export default function SignInForm() {
           type="email"
           required
           placeholder="Enter your email"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-blue-800"
           disabled={isPending}
         />
       </div>
@@ -67,7 +67,7 @@ export default function SignInForm() {
           type="password"
           required
           placeholder="Enter your password"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-blue-800"
           disabled={isPending}
         />
       </div>
@@ -81,10 +81,10 @@ export default function SignInForm() {
       <button
         type="submit"
         disabled={isPending}
-        className={`w-full py-2 px-4 rounded-md text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors ${
+        className={`w-full min-h-[44px] py-2 px-4 rounded-md text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-800 transition-colors ${
           isPending 
             ? 'bg-gray-400 cursor-not-allowed' 
-            : 'bg-indigo-600 hover:bg-indigo-700'
+            : 'bg-[#1e40af] hover:bg-[#1e3a8a]'
         }`}
       >
         {isPending ? 'Signing in...' : 'Sign in'}

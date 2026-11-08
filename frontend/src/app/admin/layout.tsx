@@ -37,10 +37,10 @@ export default function AdminLayout({
       description: 'Admin overview and quick actions'
     },
     {
-      name: 'User Management',
+      name: 'Accounts',
       href: '/admin/users',
       icon: Users,
-      description: 'Manage users, roles, and invitations'
+      description: 'Sign-in accounts, roles, and invitations'
     },
     {
       name: 'Email Configuration',

@@ -29,6 +29,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
   const [userLastSeenVersion, setUserLastSeenVersion] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chatUnread, setChatUnread] = useState(0);
   const isAuthPage = pathname?.startsWith('/auth');
   const isPublicPage = pathname === '/privacy' || pathname === '/support';
   const isHelpPage = pathname?.startsWith('/help') || pathname?.startsWith('/release-notes');
@@ -41,6 +42,37 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [openDropdown]);
+
+  useEffect(() => {
+    if (!session?.user || isAuthPage || isPublicPage) return;
+    let cancelled = false;
+    async function loadUnread() {
+      try {
+        const response = await fetch('/api/v1/chat', { cache: 'no-store' });
+        if (!response.ok) return;
+        const body = await response.json();
+        const total = (body.channels || []).reduce(
+          (sum: number, channel: { unread?: number }) => sum + (channel.unread || 0),
+          0,
+        );
+        if (!cancelled) setChatUnread(total);
+      } catch {
+        if (!cancelled) setChatUnread(0);
+      }
+    }
+    void loadUnread();
+    const onUnread = (event: Event) => {
+      const total = (event as CustomEvent<number>).detail;
+      if (typeof total === 'number') setChatUnread(total);
+    };
+    window.addEventListener('ldc-chat-unread', onUnread);
+    const timer = window.setInterval(loadUnread, 20000);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('ldc-chat-unread', onUnread);
+      window.clearInterval(timer);
+    };
+  }, [session?.user?.email, isAuthPage, isPublicPage]);
 
   // Fetch user's last seen release version
   useEffect(() => {
@@ -107,7 +139,12 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                   Work
                 </Link>
                 <Link href="/chat" className={navClass(pathname === '/chat')}>
-                  Chat
+                  <span className="inline-flex items-center gap-1.5">
+                    Chat
+                    {chatUnread > 0 ? (
+                      <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-amber-100 px-1.5 text-xs font-semibold text-amber-900">{chatUnread}</span>
+                    ) : null}
+                  </span>
                 </Link>
                 <Link href="/projects" className={navClass(pathname === '/projects')}>
                   Projects
@@ -218,10 +255,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
               </Link>
               <Link
                 href="/chat"
-                className="block px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
+                className="flex items-center justify-between px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Chat
+                <span>Chat</span>
+                {chatUnread > 0 ? (
+                  <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-amber-100 px-1.5 text-xs font-semibold text-amber-900">{chatUnread}</span>
+                ) : null}
               </Link>
               <Link
                 href="/projects"
@@ -257,6 +297,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Admin Control Center
+                  </Link>
+                  <Link
+                    href="/admin/users"
+                    className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Accounts
                   </Link>
                 </div>
               )}

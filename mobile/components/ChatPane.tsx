@@ -16,6 +16,8 @@ import {
 import { useFocusEffect } from 'expo-router';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { publishChatUnread, unreadTotal } from '@/lib/chat-badge';
+import { setAppBadge } from '@/lib/push';
 
 type Person = { id: string; name: string | null; email: string };
 type Channel = {
@@ -49,6 +51,8 @@ export function ChatPane() {
   const [keyboardInset, setKeyboardInset] = useState(0);
   const newest = useRef<string | null>(null);
   const messageRequest = useRef(0);
+  const holdUnread = useRef<string | null>(null);
+  const readGeneration = useRef(0);
   const listRef = useRef<FlatList<Message>>(null);
   const screenRef = useRef<View>(null);
   const keyboardInsetRef = useRef(0);
@@ -68,7 +72,11 @@ export function ChatPane() {
         token,
         action: 'Could not load chat',
       });
-      setChannels(body.channels || []);
+      const nextChannels = body.channels || [];
+      setChannels(nextChannels);
+      const total = unreadTotal(nextChannels);
+      publishChatUnread(total);
+      void setAppBadge(total);
       setTeammates(body.teammates || []);
       const blocks = await apiRequest<{ blocks: Person[] }>(apiBase, '/api/v1/mobile/chat/blocks', {
         token,
@@ -99,10 +107,31 @@ export function ChatPane() {
       });
       if (requestId !== messageRequest.current) return;
       if (incoming.length > 0) newest.current = incoming[incoming.length - 1].createdAt;
+      if (holdUnread.current === channelId) return;
+      const generation = readGeneration.current;
       await apiRequest(apiBase, `/api/v1/mobile/chat/channels/${channelId}/read`, {
         method: 'POST',
         token,
         action: 'Could not update the chat',
+      });
+      if (holdUnread.current === channelId || generation !== readGeneration.current) {
+        if (holdUnread.current === channelId) {
+          await apiRequest(apiBase, `/api/v1/mobile/chat/channels/${channelId}/read`, {
+            method: 'POST',
+            token,
+            body: { unread: true },
+            action: 'Could not update the chat',
+          });
+        }
+        return;
+      }
+      if (requestId !== messageRequest.current) return;
+      setChannels((current) => {
+        const next = current.map((channel) => channel.id === channelId ? { ...channel, unread: 0 } : channel);
+        const total = unreadTotal(next);
+        publishChatUnread(total);
+        void setAppBadge(total);
+        return next;
       });
     } catch (err) {
       if (requestId !== messageRequest.current) return;
@@ -256,6 +285,40 @@ export function ChatPane() {
     }
   }
 
+  function openChannel(channelId: string) {
+    if (holdUnread.current === channelId) holdUnread.current = null;
+    setSelectedId(channelId);
+  }
+
+  async function setReadState(channelId: string, unread: boolean) {
+    if (!token) return;
+    setError('');
+    readGeneration.current += 1;
+    const previousHold = holdUnread.current;
+    holdUnread.current = unread ? channelId : (previousHold === channelId ? null : previousHold);
+    try {
+      const body = await apiRequest<{ unread?: number }>(apiBase, `/api/v1/mobile/chat/channels/${channelId}/read`, {
+        method: 'POST',
+        token,
+        body: { unread },
+        action: 'Could not update the chat',
+      });
+      if (unread) setSelectedId((current) => current === channelId ? null : current);
+      setChannels((current) => {
+        const next = current.map((channel) => (
+          channel.id === channelId ? { ...channel, unread: body.unread || 0 } : channel
+        ));
+        const total = unreadTotal(next);
+        publishChatUnread(total);
+        void setAppBadge(total);
+        return next;
+      });
+    } catch (err) {
+      holdUnread.current = previousHold;
+      await fail(err, 'Could not update the chat. Try again in a moment.');
+    }
+  }
+
   async function openDirect(userId: string) {
     if (!token) return;
     setError('');
@@ -285,13 +348,18 @@ export function ChatPane() {
           keyExtractor={(item) => item.id}
           ListHeaderComponent={<Text style={styles.listTitle}>Chats</Text>}
           renderItem={({ item }) => (
-            <Pressable onPress={() => setSelectedId(item.id)} style={styles.channel}>
-              <View style={styles.channelRow}>
-                <Text style={styles.channelTitle}>{item.title}</Text>
-                {item.unread > 0 ? <Text style={styles.unread}>{item.unread}</Text> : null}
-              </View>
-              {item.latest ? <Text style={styles.preview} numberOfLines={1}>{item.latest.body}</Text> : null}
-            </Pressable>
+            <View style={styles.channel}>
+              <Pressable onPress={() => openChannel(item.id)} style={styles.channelMain}>
+                <View style={styles.channelRow}>
+                  <Text style={styles.channelTitle}>{item.title}</Text>
+                  {item.unread > 0 ? <Text style={styles.unread}>{item.unread}</Text> : null}
+                </View>
+                {item.latest ? <Text style={styles.preview} numberOfLines={1}>{item.latest.body}</Text> : null}
+              </Pressable>
+              <Pressable onPress={() => void setReadState(item.id, item.unread === 0)} style={styles.readToggle}>
+                <Text style={styles.readToggleText}>{item.unread > 0 ? 'Mark read' : 'Mark unread'}</Text>
+              </Pressable>
+            </View>
           )}
           ListEmptyComponent={<Text style={styles.empty}>No chats yet.</Text>}
           ListFooterComponent={(
@@ -371,7 +439,10 @@ const styles = StyleSheet.create({
   unblock: { color: '#1e40af', fontWeight: '600', marginTop: 2 },
   actions: { flexDirection: 'row', gap: 12, marginTop: 6 },
   action: { color: '#1e3a8a', fontSize: 12, fontWeight: '700' },
-  channel: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
+  channel: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#f3f4f6', flexDirection: 'row', alignItems: 'center', gap: 8 },
+  channelMain: { flex: 1, paddingVertical: 4 },
+  readToggle: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 },
+  readToggleText: { color: '#1e40af', fontSize: 12, fontWeight: '700' },
   channelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   channelTitle: { fontSize: 16, fontWeight: '700', color: '#111827', flex: 1 },
   unread: { backgroundColor: '#fef3c7', color: '#92400e', overflow: 'hidden', borderRadius: 10, paddingHorizontal: 8, fontWeight: '700' },

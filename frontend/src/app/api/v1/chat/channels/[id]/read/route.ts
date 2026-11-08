@@ -3,9 +3,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
+import { setChannelRead } from '@/lib/chat';
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: { id: string } },
 ) {
   try {
@@ -20,12 +21,9 @@ export async function POST(
     if (channel.kind === 'DIRECT' && !channel.directKey.split(':').includes(session.user.id)) {
       return NextResponse.json({ error: 'Chat not found' }, { status: 404 });
     }
-    await prisma.chatRead.upsert({
-      where: { channelId_userId: { channelId: channel.id, userId: session.user.id } },
-      create: { channelId: channel.id, userId: session.user.id },
-      update: { readAt: new Date() },
-    });
-    return NextResponse.json({ ok: true });
+    const body = await request.json().catch(() => ({}));
+    const unread = await setChannelRead(channel.id, session.user.id, Boolean(body.unread));
+    return NextResponse.json({ ok: true, unread });
   } catch (error) {
     console.error('Mark chat read error:', error);
     return NextResponse.json({ error: 'Failed to update the chat' }, { status: 500 });

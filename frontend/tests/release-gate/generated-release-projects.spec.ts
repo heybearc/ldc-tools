@@ -67,7 +67,7 @@ test('oversight can list construction-group projects and assign Personnel', asyn
   if (list.canEdit && project) {
     const editor = page.locator('article').filter({ hasText: project.name });
     await editor.getByRole('button', { name: 'Edit project' }).click();
-    await expect(editor.getByRole('button', { name: 'Save changes' })).toBeVisible();
+    await expect(editor.getByRole('button', { name: 'Save project' })).toBeVisible();
     await editor.getByRole('button', { name: 'Close' }).click();
   }
   const person = (list.personnel || []).find(
