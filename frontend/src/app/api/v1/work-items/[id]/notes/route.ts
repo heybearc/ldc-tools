@@ -65,7 +65,7 @@ export async function POST(
     });
 
     let notified = 0;
-    if (!parentId && kind === 'HELP') {
+    if (!parentId && kind === 'HELP' && body.email !== false) {
       try {
         const [contacts, volunteers] = await Promise.all([
           prisma.personnelContact.findMany({

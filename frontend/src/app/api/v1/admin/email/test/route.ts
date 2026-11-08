@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 import { decryptPassword } from '@/lib/email-crypto';
+import { isDeliverableEmail } from '@/lib/reachable-email';
 
 
 // POST /api/v1/admin/email/test - Send test email
@@ -91,6 +92,13 @@ export async function POST(request: NextRequest) {
         { success: false, message: 'SMTP configuration verification failed. Please check your settings.' },
         { status: 400 }
       );
+    }
+
+    if (!isDeliverableEmail(testEmail)) {
+      return NextResponse.json({
+        success: true,
+        message: `SMTP sign-in worked. Nothing was sent because ${testEmail} cannot receive mail.`,
+      });
     }
 
     // Send test email

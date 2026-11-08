@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { prisma } from './prisma';
 import { decryptPassword } from './email-crypto';
+import { isDeliverableEmail } from './reachable-email';
 
 export interface EmailOptions {
   to: string | string[];
@@ -32,9 +33,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
     const transporter = nodemailer.createTransport(transportConfig);
 
+    const recipients = (Array.isArray(options.to) ? options.to : [options.to]).filter((email) => isDeliverableEmail(email));
+    if (recipients.length === 0) {
+      return false;
+    }
+
     const mailOptions = {
       from: options.from || `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
-      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+      to: recipients.join(', '),
       subject: options.subject,
       html: options.html
     };

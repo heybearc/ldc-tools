@@ -70,11 +70,12 @@ test('team chat, a help reply, and finishing several tasks', async ({ page }) =>
   }
 
   const help = await page.request.post(`/api/v1/work-items/${createdIds[0]}/notes`, {
-    data: { kind: 'HELP', body: `QA help ${stamp}` },
+    data: { kind: 'HELP', body: `QA help ${stamp}`, email: false },
   });
   expect(help.status()).toBe(201);
   const helpNote = await help.json();
   expect(helpNote.kind).toBe('HELP');
+  expect(helpNote.notified).toBe(0);
 
   const reply = await page.request.post(`/api/v1/work-items/${createdIds[0]}/notes`, {
     data: { kind: 'NOTE', parentId: helpNote.id, body: `QA reply ${stamp}` },

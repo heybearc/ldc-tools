@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { decryptPassword } from '@/lib/email-crypto';
 import nodemailer from 'nodemailer';
-import { canEmailAddress } from '@/lib/reachable-email';
+import { canEmailAddress, isDeliverableEmail } from '@/lib/reachable-email';
 
 // GET - Get single request
 export async function GET(
@@ -218,7 +218,7 @@ async function sendCompletionEmail(
   resolutionNotes: string | null,
   completedByName: string
 ): Promise<boolean> {
-  if (!canEmailAddress(request.requestorEmail)) {
+  if (!canEmailAddress(request.requestorEmail) || !isDeliverableEmail(request.requestorEmail)) {
     return false;
   }
   // Get email configuration

@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { prisma } from '@/lib/prisma';
 import { decryptPassword } from '@/lib/email-crypto';
+import { isDeliverableEmail } from '@/lib/reachable-email';
 
 function escapeHtml(value: string): string {
   return value
@@ -21,6 +22,9 @@ export async function sendWorkCompletionEmail(input: {
     where: { isActive: true },
   });
   if (!emailConfig?.fromEmail || !emailConfig.smtpHost) {
+    return false;
+  }
+  if (!isDeliverableEmail(input.requestorEmail)) {
     return false;
   }
 
@@ -78,7 +82,8 @@ export async function sendWorkHelpEmail(input: {
   message: string;
   askedByName: string;
 }): Promise<number> {
-  if (input.to.length === 0) return 0;
+  const recipients = input.to.filter((email) => isDeliverableEmail(email));
+  if (recipients.length === 0) return 0;
   const emailConfig = await prisma.emailConfiguration.findFirst({
     where: { isActive: true },
   });
@@ -100,7 +105,7 @@ export async function sendWorkHelpEmail(input: {
 
   await transporter.sendMail({
     from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
-    to: input.to.join(', '),
+    to: recipients.join(', '),
     subject: `Help requested — ${input.title}`,
     text: [
       `${input.askedByName} asked for help on a work item.`,
@@ -117,5 +122,5 @@ export async function sendWorkHelpEmail(input: {
       <p style="white-space: pre-wrap;">${escapeHtml(input.message)}</p>
     `,
   });
-  return input.to.length;
+  return recipients.length;
 }
