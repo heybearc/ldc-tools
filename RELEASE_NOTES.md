@@ -1,5 +1,18 @@
 # LDC Tools Release Notes
 
+## v1.48.0 - Phone alerts and the day's work in the app
+
+**Release Date:** November 8, 2026
+
+### ✨ New Features
+
+- The phone app alerts for a chat message or an announcement
+- The phone app can start a process, open a project, and list trade teams
+
+### 🔧 Improvements
+
+- Marking a task done says whether the completion email was sent
+
 ## v1.47.0 - Invite-only access, privacy, and chat controls
 
 **Release Date:** November 5, 2026

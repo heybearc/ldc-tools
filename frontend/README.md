@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.47.0**
+Current: **1.48.0**
 
 ## Version History
+- **v1.48.0** (2026-11-08) - Phone alerts, and processes, projects, and trade teams in the phone app
 - **v1.47.0** (2026-11-05) - Invite-only privacy and support pages, account deletion, and chat report and block
 - **v1.46.2** (2026-11-04) - Password reset and test emails send with the saved mailbox password
 - **v1.46.1** (2026-11-04) - The phone app icon and launch image are centered

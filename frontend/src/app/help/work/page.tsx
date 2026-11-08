@@ -55,7 +55,7 @@ export default async function WorkHelpPage() {
 
           <h2>Finish a task</h2>
           <p>
-            The assignee, or Personnel, can mark the task Done. Done tasks stay in a collapsed Done section, with the date they were finished.
+            The assignee, or Personnel, can mark the task Done. The page says whether the completion email was sent. Done tasks stay in a collapsed Done section, with the date they were finished.
             A process is listed as available. Claiming it keeps every step inside that process. Finishing the process marks that one work item done.
             Anyone on the work list can add a note or ask for help on a task. A help request is listed at the top of Work.
             If email is already configured, the Personnel Contact and Assistant are told. Support is not.

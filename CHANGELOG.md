@@ -5,6 +5,15 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.48.0] - 2026-11-08
+
+### Added
+- The phone app alerts for a chat message or an announcement
+- The phone app can open processes, a project, and trade teams
+
+### Changed
+- Marking work done says whether the completion email was sent
+
 ## [1.47.0] - 2026-11-05
 
 ### Added

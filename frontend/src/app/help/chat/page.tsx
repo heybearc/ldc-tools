@@ -34,7 +34,7 @@ export default async function ChatHelpPage() {
 
           <h2>Team chat</h2>
           <p>
-            Open Chat. The Team conversation is there for everyone in this group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send.
+            Open Chat. The Team conversation is there for everyone in this group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send. The phone app can also show an alert, a badge, and a sound for a new chat message or an announcement. Allow alerts when the phone asks.
           </p>
 
           <h2>A direct message</h2>
