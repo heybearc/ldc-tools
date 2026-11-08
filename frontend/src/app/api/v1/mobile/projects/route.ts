@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { canManageGroup, requireMobileActor, scopeForActor } from '@/lib/mobile-actor';
+import { canCreateProject, canManageGroup, requireMobileActor, scopeForActor } from '@/lib/mobile-actor';
 import { canAssignProjectPersonnel, personnelInGroup } from '@/lib/project-personnel';
 import { formatCalendarDate } from '@/lib/work-items';
 
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const { actor } = access;
     const groupId = actor.constructionGroupId;
     const scope = scopeForActor(actor);
-    const [projects, dates, canManage, canAssign, personnelChoices] = await Promise.all([
+    const [projects, dates, canManage, canCreate, canAssign, personnelChoices] = await Promise.all([
       prisma.project.findMany({
         where: { constructionGroupId: groupId, isActive: true },
         select: {
@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
         orderBy: [{ status: 'asc' }, { dueOn: 'asc' }],
       }),
       canManageGroup(actor),
+      canCreateProject(actor),
       canAssignProjectPersonnel(actor.id, scope),
       personnelInGroup(groupId),
     ]);
@@ -57,6 +58,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       canManage,
+      canCreate,
       canAssign,
       personnel: personnelChoices.map((person) => ({
         id: person.id,
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
     const access = await requireMobileActor(request);
     if ('error' in access) return access.error;
     const { actor } = access;
-    if (!(await canManageGroup(actor))) {
+    if (!(await canCreateProject(actor))) {
       return NextResponse.json({ error: 'Personnel can add a project' }, { status: 403 });
     }
     const body = await request.json().catch(() => ({}));

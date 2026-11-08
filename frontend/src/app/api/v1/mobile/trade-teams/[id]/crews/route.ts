@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { canManageGroup, requireMobileActor } from '@/lib/mobile-actor';
+import { canCreateTradeTeam, requireMobileActor } from '@/lib/mobile-actor';
 
 export async function POST(
   request: NextRequest,
@@ -10,7 +10,7 @@ export async function POST(
     const access = await requireMobileActor(request);
     if ('error' in access) return access.error;
     const { actor } = access;
-    if (!(await canManageGroup(actor))) {
+    if (!(await canCreateTradeTeam(actor))) {
       return NextResponse.json({ error: 'Personnel can add a crew' }, { status: 403 });
     }
     const team = await prisma.tradeTeam.findFirst({

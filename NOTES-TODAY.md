@@ -16,9 +16,9 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 ### Mid-day (2026-11-08, later)
 - Local Fastlane is on `main` (`5614175`). STANDBY blue CT133 http://10.92.3.34:3001. LIVE stays green CT135. Not switched.
 - Android 1.1.0 version code 15 is on the Play internal track. Signed with the existing upload key. Same Play service account as TheoShift.
-- iOS local signing is blocked: Xcode is not installed. App Store build 5 is still the one to attach.
+- Xcode 27.2 is installed. iOS signing is no longer blocked on a missing Xcode.
 - Open urgent feedback: 1 (FB-004, resolved, not closed). Hub dates stay paused.
-- Next: install Xcode, then attach iOS build 5. New session before the next slice.
+- iOS 1.1.0 build 8 is in App Store Connect. Android 1.1.0 version code 16 is on the Play internal track.
 
 ### Mid-day (2026-11-08)
 - Phone day-to-day tools and alerts are on `main` (`93497af`). STANDBY blue CT133 http://10.92.3.34:3001. LIVE stays green CT135. Not switched.

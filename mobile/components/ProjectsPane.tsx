@@ -19,7 +19,7 @@ export function ProjectsPane() {
     try {
       const body = await fetchProjects(apiBase, token);
       setProjects(body.projects || []);
-      setCanManage(Boolean(body.canManage));
+      setCanManage(Boolean(body.canCreate ?? body.canManage));
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         await signOut();

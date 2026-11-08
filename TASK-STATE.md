@@ -47,14 +47,14 @@ Nothing in progress. Next ship runs both phone store lanes on this Mac. Do not s
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-On the next `/ship`, run the iOS lane then the Android lane for the `mobile/` diff. Do not switch live until asked. Hub assignment dates stay paused.
+Store builds for this phone diff are uploaded. Hub assignment dates stay paused until the persons list has start and end dates. Do not switch live until asked.
 
 ---
 
 ## Known Issues
-- The latest `mobile/` diff has no new iOS or Android upload yet. Lanes run on this Mac at `/ship` (D-069).
+- Xcode 27.2 is installed. iOS 1.1.0 build 8 is uploaded to App Store Connect. Android 1.1.0 version code 16 is on the Play internal track.
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
-- Phone create-team and create-project allow fewer roles than the website. Bugbot only; not fixed.
+- Phone create-team and create-project now allow the same roles as the website. The change is not on LIVE until the next ship.
 - 37 open crew requests have completion email turned off.
 - Play internal test 1.0.1 (8) is Available to internal testers. Download test app still returns Item not found. Opt-in works for corylallen@gmail.com. Countries column is blank and not editable on this track.
 - Play bundle: `/Users/cory/Downloads/ldc-tools-1.0.1-version-code-8.aab`. Emulator APK is 1.0.1 version code 7.
@@ -65,4 +65,4 @@ On the next `/ship`, run the iOS lane then the Android lane for the `mobile/` di
 ---
 
 ## Exact Next Command
-On the next `/ship`, run the iOS lane then the Android lane for the `mobile/` diff. Do not switch live until asked. Hub assignment dates stay paused.
+Store builds for this phone diff are uploaded. Hub assignment dates stay paused until the persons list has start and end dates. Do not switch live until asked.

@@ -9,6 +9,7 @@ export type PersonnelChoice = { id: string; name: string };
 export type ProjectList = {
   projects: Project[];
   canManage?: boolean;
+  canCreate?: boolean;
   canAssign?: boolean;
   personnel?: PersonnelChoice[];
 };
