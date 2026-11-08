@@ -516,7 +516,17 @@ export async function PATCH(request: NextRequest) {
       : await prisma.tradeTeamOversight.findUnique({ where: { id }, include: { user: true, contact: true } });
     if (!current) return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
 
-    if (isActive) {
+    const currentRecord = current as { role: string; isActive: boolean; crewId?: string; tradeTeamId?: string };
+    const samePlacement =
+      isActive &&
+      currentRecord.isActive &&
+      String(currentRecord.role) === role &&
+      originScope === destScope &&
+      (destScope === 'crew'
+        ? crewId === (currentRecord.crewId || null)
+        : tradeTeamId === (currentRecord.tradeTeamId || ''));
+
+    if (isActive && !samePlacement) {
       const currentCount = destScope === 'crew'
         ? await prisma.tradeCrewOversight.count({
             where: {

@@ -18,6 +18,10 @@ function asPerson(person: Partial<Person> & { name: string; email: string; role:
     role: person.role,
     place: person.place,
     photo: person.photo || null,
+    assignmentId: person.assignmentId || null,
+    roleCode: person.roleCode || null,
+    teamId: person.teamId || null,
+    crewId: person.crewId || null,
   };
 }
 

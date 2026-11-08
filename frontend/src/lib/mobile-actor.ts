@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { closedMobileAccount, readMobileToken } from '@/lib/mobile-session';
 import type { CGScope } from '@/lib/cg-scope';
+import { canPostWork } from '@/lib/work-item-access';
 
 export type MobileActor = {
   id: string;
@@ -10,6 +11,14 @@ export type MobileActor = {
   role: string;
   constructionGroupId: string;
 };
+
+export function isMobileAdmin(role: string) {
+  return role === 'ADMIN' || role === 'SUPER_ADMIN';
+}
+
+export async function canManageGroup(actor: MobileActor) {
+  return canPostWork(actor.id, scopeForActor(actor));
+}
 
 export function scopeForActor(actor: MobileActor): CGScope {
   return {

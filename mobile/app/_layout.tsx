@@ -40,6 +40,11 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="person" options={{ title: 'Profile', headerBackTitle: 'Directory' }} />
       <Stack.Screen name="work/[id]" options={{ title: 'Work', headerBackTitle: 'Back' }} />
+      <Stack.Screen name="processes" options={{ title: 'Processes' }} />
+      <Stack.Screen name="trade-teams" options={{ title: 'Trade teams' }} />
+      <Stack.Screen name="feedback" options={{ title: 'Feedback' }} />
+      <Stack.Screen name="admin" options={{ title: 'Admin' }} />
+      <Stack.Screen name="project/[id]" options={{ title: 'Project' }} />
     </Stack>
   );
 }

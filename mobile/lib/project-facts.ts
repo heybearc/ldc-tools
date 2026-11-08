@@ -17,8 +17,11 @@ export type Project = {
   number: string | null;
   location: string | null;
   status: string;
+  statusCode?: string;
   start: string | null;
   end: string | null;
+  startDate?: string;
+  endDate?: string;
   personnel: ProjectPerson[];
   schedule: ProjectDate[];
 };

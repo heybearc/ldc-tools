@@ -8,6 +8,10 @@ export type Person = {
   role: string;
   place: string;
   photo: string | null;
+  assignmentId?: string | null;
+  roleCode?: string | null;
+  teamId?: string | null;
+  crewId?: string | null;
 };
 
 export type Crew = {

@@ -25,6 +25,10 @@ export type MobilePerson = {
   role: string;
   place: string;
   photo: string | null;
+  assignmentId?: string | null;
+  roleCode?: string | null;
+  teamId?: string | null;
+  crewId?: string | null;
 };
 
 export type MobileCrew = {
@@ -125,7 +129,12 @@ export function directorySections(groups: {
   };
 }
 
-export function personFromAssignment(row: Assignment, place: string, role: string): MobilePerson {
+export function personFromAssignment(
+  row: Assignment,
+  place: string,
+  role: string,
+  slot?: { teamId?: string | null; crewId?: string | null },
+): MobilePerson {
   const contact = row.contact;
   const account = row.user;
   const named = account ? `${account.firstName || ''} ${account.lastName || ''}`.trim() : '';
@@ -139,5 +148,9 @@ export function personFromAssignment(row: Assignment, place: string, role: strin
     role,
     place,
     photo: clean(contact?.image) || clean(account?.image),
+    assignmentId: row.id,
+    roleCode: row.role,
+    teamId: slot?.teamId || null,
+    crewId: slot?.crewId || null,
   };
 }

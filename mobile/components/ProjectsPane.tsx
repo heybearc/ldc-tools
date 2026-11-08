@@ -1,13 +1,15 @@
 import { useCallback, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { fetchProjects, projectFacts, type Project } from '@/lib/projects';
 
 export function ProjectsPane() {
   const { apiBase, token, signOut } = useAuth();
+  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [canManage, setCanManage] = useState(false);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -17,6 +19,7 @@ export function ProjectsPane() {
     try {
       const body = await fetchProjects(apiBase, token);
       setProjects(body.projects || []);
+      setCanManage(Boolean(body.canManage));
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         await signOut();
@@ -41,13 +44,18 @@ export function ProjectsPane() {
       }} />}
     >
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {canManage ? (
+        <Pressable onPress={() => router.push('/project/new')} style={styles.add}>
+          <Text style={styles.addText}>Add project</Text>
+        </Pressable>
+      ) : null}
       {projects.length === 0 && !error ? (
         <Text style={styles.empty}>No projects for this construction group.</Text>
       ) : null}
       {projects.map((project) => {
         const facts = projectFacts(project);
         return (
-          <View key={project.id} style={styles.card}>
+          <Pressable key={project.id} onPress={() => router.push(`/project/${project.id}`)} style={styles.card}>
             <View style={styles.titleRow}>
               <Text style={styles.title}>{project.name}</Text>
               <Text style={styles.status}>{project.status}</Text>
@@ -66,7 +74,7 @@ export function ProjectsPane() {
                 {item.detail ? `\n${item.detail}` : ''}
               </Text>
             ))}
-          </View>
+          </Pressable>
         );
       })}
     </ScrollView>
@@ -78,6 +86,8 @@ const styles = StyleSheet.create({
   content: { padding: 16, gap: 12 },
   empty: { color: '#6b7280' },
   error: { color: '#b91c1c' },
+  add: { backgroundColor: '#1e40af', minHeight: 44, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  addText: { color: '#fff', fontWeight: '700' },
   card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, gap: 6 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: { flex: 1, fontSize: 17, fontWeight: '700', color: '#111827' },

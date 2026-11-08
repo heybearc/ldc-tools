@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
           ? { ...row.user, phone: row.user.volunteer?.phone || null }
           : null,
         contact: row.contact,
-      }, team.name, ROLE_LABEL[row.role] || row.role)),
+      }, team.name, ROLE_LABEL[row.role] || row.role, { teamId: team.id })),
       crews: team.crews.map((crew) => ({
         id: crew.id,
         name: crew.name,
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
             ? { ...row.user, phone: row.user.volunteer?.phone || null }
             : null,
           contact: row.contact,
-        }, `${team.name} · ${crew.name}`, ROLE_LABEL[row.role] || row.role)),
+        }, `${team.name} · ${crew.name}`, ROLE_LABEL[row.role] || row.role, { teamId: team.id, crewId: crew.id })),
       })),
     }));
     const people = [
