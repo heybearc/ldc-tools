@@ -1,5 +1,6 @@
 import webpush from 'web-push';
 import { prisma } from '@/lib/prisma';
+import { sendExpoPush } from '@/lib/expo-push';
 
 let configuredKey: string | null = null;
 
@@ -32,6 +33,7 @@ export async function sendChatPush(input: {
   title: string;
   body: string;
   url: string;
+  constructionGroupId?: string;
 }) {
   const targets = input.userIds.filter((id) => id && id !== input.excludeUserId);
   if (targets.length === 0) return;
@@ -59,4 +61,11 @@ export async function sendChatPush(input: {
       }
     }
   }));
+  await sendExpoPush({
+    userIds: targets,
+    title: input.title,
+    body: input.body,
+    constructionGroupId: input.constructionGroupId,
+    data: { url: input.url, kind: 'chat' },
+  });
 }

@@ -121,12 +121,15 @@ export async function PATCH(
     });
 
     // Send completion email if requested
-    if (status === 'COMPLETED' && send_completion_email && currentRequest.notifyRequestor !== false) {
+    let emailSent = false;
+    let emailError = '';
+    if (status === 'COMPLETED' && send_completion_email) {
       try {
-        await sendCompletionEmail(currentRequest, resolution_notes, user.name || 'Personnel Team');
-      } catch (emailError) {
-        console.error('Failed to send completion email:', emailError);
-        // Don't fail the request if email fails
+        emailSent = await sendCompletionEmail(currentRequest, resolution_notes, user.name || 'Personnel Team');
+        if (!emailSent) emailError = 'The completion email was not sent. Check the email setup.';
+      } catch (emailErrorValue) {
+        console.error('Failed to send completion email:', emailErrorValue);
+        emailError = 'The completion email was not sent.';
       }
     }
 
@@ -147,6 +150,8 @@ export async function PATCH(
       completed_by: updated.completedBy,
       created_at: updated.createdAt.toISOString(),
       updated_at: updated.updatedAt.toISOString(),
+      email_sent: emailSent,
+      email_error: emailError,
     });
   } catch (error) {
     console.error('Update crew request error:', error);
@@ -212,9 +217,9 @@ async function sendCompletionEmail(
   request: any,
   resolutionNotes: string | null,
   completedByName: string
-) {
-  if (!canEmailAddress(request.requestorEmail, request.notifyRequestor !== false)) {
-    return;
+): Promise<boolean> {
+  if (!canEmailAddress(request.requestorEmail)) {
+    return false;
   }
   // Get email configuration
   const emailConfig = await prisma.emailConfiguration.findFirst({
@@ -223,7 +228,7 @@ async function sendCompletionEmail(
 
   if (!emailConfig) {
     console.log('No email configuration found, skipping notification');
-    return;
+    return false;
   }
 
   const REQUEST_TYPE_LABELS: Record<string, string> = {
@@ -242,8 +247,8 @@ async function sendCompletionEmail(
     }
   };
 
-  if (emailConfig.encryption === 'tls') {
-    transportConfig.tls = { ciphers: 'SSLv3' };
+  if (emailConfig.encryption !== 'ssl') {
+    transportConfig.requireTLS = true;
   }
 
   const transporter = nodemailer.createTransport(transportConfig);
@@ -326,5 +331,5 @@ async function sendCompletionEmail(
   };
 
   await transporter.sendMail(mailOptions);
-  console.log(`Completion email sent to ${request.requestorEmail}`);
+  return true;
 }

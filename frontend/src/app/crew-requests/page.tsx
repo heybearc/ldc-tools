@@ -197,7 +197,11 @@ export default function CrewRequestsPage() {
           send_completion_email: sendEmail
         }),
       });
+      const body = await response.json().catch(() => ({}));
       if (response.ok) {
+        if (sendEmail && body.email_sent === false) {
+          window.alert(body.email_error || 'The request is complete, but the email was not sent.');
+        }
         fetchRequests();
         setSelectedRequest(null);
       }
@@ -826,15 +830,13 @@ export default function CrewRequestsPage() {
                   type="checkbox"
                   id="send-email"
                   defaultChecked={selectedRequest.notify_requestor !== false && !isAirgappedEmail(selectedRequest.requestor_email)}
-                  disabled={isAirgappedEmail(selectedRequest.requestor_email) || selectedRequest.notify_requestor === false}
+                  disabled={isAirgappedEmail(selectedRequest.requestor_email)}
                   className="h-4 w-4 text-blue-600 rounded"
                 />
                 <span className="ml-2 text-sm text-blue-800">
                   {isAirgappedEmail(selectedRequest.requestor_email)
                     ? `${selectedRequest.requestor_email} is on the Bethel network and cannot be emailed`
-                    : selectedRequest.notify_requestor === false
-                      ? 'Email notifications are off for this request'
-                      : `Send completion notification email to ${selectedRequest.requestor_email}`}
+                    : `Send completion notification email to ${selectedRequest.requestor_email}`}
                 </span>
               </label>
             </div>

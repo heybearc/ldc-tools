@@ -1,11 +1,17 @@
+import { useCallback, useState } from 'react';
 import { SymbolView } from 'expo-symbols';
 import { Tabs } from 'expo-router';
+import { PhoneAlerts } from '@/components/PhoneAlerts';
 import { useWideLayout } from '@/lib/useWideLayout';
 
 export default function TabLayout() {
   const wide = useWideLayout();
+  const [unread, setUnread] = useState(0);
+  const onUnread = useCallback((count: number) => setUnread(count), []);
 
   return (
+    <>
+    <PhoneAlerts onUnread={onUnread} />
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#1e40af',
@@ -64,11 +70,13 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: 'Chat',
+          tabBarBadge: unread > 0 ? unread : undefined,
           tabBarIcon: ({ color }) => (
             <SymbolView name={{ ios: 'bubble.left.and.bubble.right', android: 'chat', web: 'chat' }} tintColor={color} size={24} />
           ),
         }}
       />
     </Tabs>
+    </>
   );
 }

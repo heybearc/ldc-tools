@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
     });
 
     let emailed = 0;
+    let emailFailed = 0;
     for (const item of openItems) {
       if (!item.requestorEmail || !canEmailAddress(item.requestorEmail, item.notifyRequestor)) continue;
       try {
@@ -64,7 +65,9 @@ export async function POST(request: NextRequest) {
           completedByName: session.user.name || 'Personnel',
         });
         if (sent) emailed += 1;
+        else emailFailed += 1;
       } catch (emailError) {
+        emailFailed += 1;
         console.error('Work completion email failed:', emailError);
       }
     }
@@ -72,6 +75,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       completed: openItems.length,
       emailed,
+      emailFailed,
       completedAt: completedAt.toISOString(),
     });
   } catch (error) {

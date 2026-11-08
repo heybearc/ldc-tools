@@ -30,10 +30,6 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       }
     };
 
-    if (emailConfig.encryption === 'tls') {
-      transportConfig.tls = { ciphers: 'SSLv3' };
-    }
-
     const transporter = nodemailer.createTransport(transportConfig);
 
     const mailOptions = {

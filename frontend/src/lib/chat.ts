@@ -66,5 +66,6 @@ export async function notifyChannel(input: {
     title: input.kind === 'TEAM' ? 'Team chat' : input.authorName,
     body: `${input.authorName}: ${input.body}`,
     url: `/chat?channel=${input.channelId}`,
+    constructionGroupId: input.constructionGroupId,
   });
 }

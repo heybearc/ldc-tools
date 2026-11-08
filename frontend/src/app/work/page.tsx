@@ -331,7 +331,15 @@ export default function WorkPage() {
         setError(userError(response.status, body.error, 'Could not mark the work done'));
         return;
       }
-      setNotice(`Marked ${body.completed} done.`);
+      const mailed = Number(body.emailed || 0);
+      const failed = Number(body.emailFailed || 0);
+      const mailNote = mailed > 0
+        ? ` Sent ${mailed} completion email${mailed === 1 ? '' : 's'}.`
+        : '';
+      const failNote = failed > 0
+        ? ` ${failed} completion email${failed === 1 ? '' : 's'} did not send.`
+        : '';
+      setNotice(`Marked ${body.completed} done.${mailNote}${failNote}`);
       setSelectedIds([]);
       setLastSelectedIndex(null);
       await load();
@@ -353,6 +361,11 @@ export default function WorkPage() {
       if (!response.ok) {
         setError(userError(response.status, body.error, 'Could not update the work'));
         return;
+      }
+      if (status === 'DONE' && body.emailSent === false && body.requestorEmail) {
+        setNotice('Marked done. The completion email was not sent.');
+      } else if (status === 'DONE' && body.emailSent) {
+        setNotice(`Marked done. Emailed ${body.requestorEmail}.`);
       }
       await load();
     } finally {

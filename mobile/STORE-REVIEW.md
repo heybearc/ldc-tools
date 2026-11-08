@@ -28,7 +28,9 @@ and removes the password. Group records the organization already keeps stay
 with the group.
 
 The app can open the photo library to replace a directory profile photo.
-It does not use the camera, location, device contacts, ads, or tracking.
+It asks to show alerts, a badge count, and a sound for chat messages and
+announcements. It does not use the camera, location, device contacts, ads,
+or tracking.
 Encryption is only standard HTTPS.
 ```
 

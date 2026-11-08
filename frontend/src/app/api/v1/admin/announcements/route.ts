@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { isAdmin } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
+import { notifyGroupPhones } from '@/lib/expo-push';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -118,6 +119,15 @@ export async function POST(request: NextRequest) {
         }
       }
     });
+
+    if (announcement.constructionGroupId) {
+      notifyGroupPhones({
+        constructionGroupId: announcement.constructionGroupId,
+        excludeUserId: user.id,
+        title: announcement.title,
+        body: announcement.message,
+      }).catch((error) => console.error('Announcement push failed:', error));
+    }
 
     return NextResponse.json({
       success: true,

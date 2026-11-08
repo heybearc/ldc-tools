@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isMobileAdmin, requireMobileActor } from '@/lib/mobile-actor';
+import { notifyGroupPhones } from '@/lib/expo-push';
 import { sendEmail, generateFeedbackStatusChangeEmail } from '@/lib/email';
 
 const STATUSES = new Set(['NEW', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']);
@@ -114,6 +115,12 @@ async function createAnnouncement(
     },
     select: { id: true },
   });
+  notifyGroupPhones({
+    constructionGroupId: actor.constructionGroupId,
+    excludeUserId: actor.id,
+    title,
+    body: message,
+  }).catch((error) => console.error('Announcement push failed:', error));
   return NextResponse.json(created, { status: 201 });
 }
 

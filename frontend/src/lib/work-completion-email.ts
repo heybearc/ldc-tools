@@ -30,7 +30,7 @@ export async function sendWorkCompletionEmail(input: {
     port: number;
     secure: boolean;
     auth: { user: string; pass: string };
-    tls?: { ciphers: string };
+    requireTLS?: boolean;
   } = {
     host: emailConfig.smtpHost,
     port: emailConfig.smtpPort || 587,
@@ -40,8 +40,8 @@ export async function sendWorkCompletionEmail(input: {
       pass: password,
     },
   };
-  if (emailConfig.encryption === 'tls') {
-    transportConfig.tls = { ciphers: 'SSLv3' };
+  if (emailConfig.encryption !== 'ssl') {
+    transportConfig.requireTLS = true;
   }
 
   const greeting = input.requestorName || 'Hello';
@@ -95,7 +95,7 @@ export async function sendWorkHelpEmail(input: {
       user: emailConfig.username || '',
       pass: password,
     },
-    ...(emailConfig.encryption === 'tls' ? { tls: { ciphers: 'SSLv3' } } : {}),
+    ...(emailConfig.encryption === 'ssl' ? {} : { requireTLS: true }),
   });
 
   await transporter.sendMail({

@@ -50,6 +50,12 @@
       ],
       "expo-secure-store",
       [
+        "expo-notifications",
+        {
+          "color": "#1e40af"
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "Choose a profile photo for someone in your construction group directory."

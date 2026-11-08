@@ -87,6 +87,7 @@ model User {
   chatMessages        ChatMessage[]
   chatReads           ChatRead[]
   chatPushSubscriptions ChatPushSubscription[]
+  expoPushTokens        ExpoPushToken[]
   chatBlocksMade      ChatBlock[] @relation("ChatBlocksMade")
   chatBlocksReceived  ChatBlock[] @relation("ChatBlocksReceived")
 }
@@ -1246,6 +1247,18 @@ model ChatPushSubscription {
 
   @@index([userId])
   @@map("chat_push_subscriptions")
+}
+
+model ExpoPushToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("expo_push_tokens")
 }
 
 model ChatPushConfig {
