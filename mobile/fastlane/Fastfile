@@ -94,7 +94,7 @@ def sign_ios!(api_key)
     app_identifier: BUNDLE_ID,
     team_id: TEAM_ID,
     platform: "ios",
-    force: false
+    force: true
   )
 end
 
@@ -159,7 +159,7 @@ platform :ios do
       workspace: workspace,
       scheme: scheme,
       configuration: "Release",
-      export_method: "app-store-connect",
+      export_method: "app-store",
       output_directory: File.dirname(ipa),
       output_name: IPA_NAME,
       clean: true,

@@ -8,6 +8,8 @@ build/
 *.ipa
 *.aab
 *.p8
+*.cer
+*.certSigningRequest
 *.mobileprovision
 *.jks
 *.keystore
