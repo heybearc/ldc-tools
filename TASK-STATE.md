@@ -1,16 +1,16 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-08  
+**Last updated:** 2026-11-09  
 **Current branch:** main  
-**Working on:** v1.48.2 is LIVE on blue (CT133). STANDBY is green (CT135). Phone feature tests run on this Mac. Hub dates stay paused.
+**Working on:** v1.48.3 is LIVE on green (CT135). STANDBY is blue (CT133). Both are `5b47b4c`. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.48.2 (`9d35d12`) is LIVE on blue CT133. STANDBY green CT135 has `b2dfbab` (phone feature tests). iOS 1.1.0 build 8 and Android version code 16 are uploaded. Hub dates stay paused.
+v1.48.3 (`5b47b4c`) is LIVE on green CT135 and synced to blue CT133. Android phone feature flows passed 10/10. iOS 1.1.0 build 10 and Android version code 17 are uploaded. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress. Phone UI tests wait on `mobile/.env.test`, then `npm run test:phone`.
+Nothing in progress.
 
 ### Recent completions
 - ✅ D-069 recorded. `/ship` classifies site vs phone and builds both store binaries when `mobile/` changed.
@@ -47,14 +47,14 @@ Nothing in progress. Phone UI tests wait on `mobile/.env.test`, then `npm run te
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Copy `mobile/.env.test.example` to `mobile/.env.test`, then `npm run test:phone`. Hub assignment dates stay paused.
+Hub assignment dates stay paused. New session before the next slice.
 
 ---
 
 ## Known Issues
-- Xcode 27.2 is installed. iOS 1.1.0 build 8 is uploaded to App Store Connect. Android 1.1.0 version code 16 is on the Play internal track.
+- iOS 1.1.0 build 10 is in App Store Connect. Android 1.1.0 version code 17 is on the Play internal track. The first iOS archive failed on the asset catalog; the retry uploaded. No icon change was made.
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
-- Phone create permissions shipped in v1.48.2. iOS Simulator 27.2 is installed. No Android emulator image yet.
+- Phone feature flows passed 10/10 on the Android emulator. iOS Simulator 27.2 is installed. Those flows were not rerun on iOS.
 - 37 open crew requests have completion email turned off.
 - Play internal test 1.0.1 (8) is Available to internal testers. Download test app still returns Item not found. Opt-in works for corylallen@gmail.com. Countries column is blank and not editable on this track.
 - Play bundle: `/Users/cory/Downloads/ldc-tools-1.0.1-version-code-8.aab`. Emulator APK is 1.0.1 version code 7.
@@ -65,4 +65,4 @@ Copy `mobile/.env.test.example` to `mobile/.env.test`, then `npm run test:phone`
 ---
 
 ## Exact Next Command
-Copy `mobile/.env.test.example` to `mobile/.env.test`, then `npm run test:phone`. Hub assignment dates stay paused.
+Hub assignment dates stay paused. New session before the next slice.

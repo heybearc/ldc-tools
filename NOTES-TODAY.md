@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-09)
+- Shipped v1.48.3 (`5b47b4c`). LIVE green CT135. STANDBY blue CT133, synced. qa-01 directory gate plus the phone-feature API test passed.
+- Each phone feature has its own Maestro flow. Android emulator: 10/10 passed. iOS was not rerun.
+- iOS 1.1.0 build 10 is in App Store Connect. Android version code 17 is on the Play internal track. First iOS archive failed on the asset catalog; the retry uploaded. No icon change.
+- How people use the site and the phone is unchanged.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: new session before the next slice.
+
 ### Mid-day (2026-11-08, ship and phone tests)
 - Shipped v1.48.2 (`9d35d12`). LIVE blue CT133. STANDBY green CT135. qa-01 directory and admin gate passed, plus the mail and phone-create tests.
 - Undeliverable addresses are not mailed. Phone create permissions match the website.

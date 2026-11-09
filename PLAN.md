@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-08  
+**Last updated:** 2026-11-09  
 **Current phase:** Region work queue  
-**Status:** v1.48.2 is LIVE on blue (CT133). STANDBY is green (CT135). Phone UI tests run on this Mac. Hub dates are paused.
+**Status:** v1.48.3 is LIVE on green (CT135). STANDBY is blue (CT133). Both are `5b47b4c`. Hub dates are paused.
 
 ---
 
@@ -146,4 +146,4 @@ Projects and crew-change requests stay. The schedule is dated work on the work l
 
 - HAProxy ACL: `is_ldc` → LIVE backend; `is_ldc_blue` / `is_ldc_green` for color hosts
 - DB: `postgresql://…@10.92.3.23:5432/ldc_tools` (RW VIP)
-- LIVE is blue (CT133) at v1.48.2. STANDBY is green (CT135).
+- LIVE is green (CT135) at v1.48.3. STANDBY is blue (CT133). Both are `5b47b4c`.
