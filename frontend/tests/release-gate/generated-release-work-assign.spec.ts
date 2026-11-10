@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import './cleanup-release-checks';
 
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL || 'admin@test.com',

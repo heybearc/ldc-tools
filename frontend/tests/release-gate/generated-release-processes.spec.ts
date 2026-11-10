@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { removeReleaseChecks } from './cleanup-release-checks';
 
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL || 'admin@test.com',
@@ -91,4 +92,10 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   const finished = await done.json();
   expect(finished.status).toBe('DONE');
   expect(finished.completedAt).toBeTruthy();
+
+  await removeReleaseChecks(page);
+  const after = await page.request.get('/api/v1/processes');
+  expect(after.ok()).toBeTruthy();
+  const names = ((await after.json()).templates || []).map((template: { name: string }) => template.name);
+  expect(names).not.toContain(name);
 });

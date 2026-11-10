@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { removeReleaseChecks } from './cleanup-release-checks';
 
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL || 'admin@test.com',
@@ -106,4 +107,11 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   });
   expect(doneDeadline.ok()).toBeTruthy();
   expect(doneClaim.ok()).toBeTruthy();
+
+  await removeReleaseChecks(page);
+  const after = await page.request.get('/api/v1/work-items');
+  expect(after.ok()).toBeTruthy();
+  const titles = ((await after.json()).items || []).map((item: { title: string }) => item.title);
+  expect(titles).not.toContain(deadlineTitle);
+  expect(titles).not.toContain(claimTitle);
 });
