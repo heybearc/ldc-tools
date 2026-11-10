@@ -5,7 +5,7 @@ export default function SignInPage() {
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-xl">
       <div className="bg-[#1e3a8a] px-8 pb-6 pt-8 text-center text-white">
-        <img src="/logo.svg" alt="" className="mx-auto h-24 w-24 rounded-full bg-white p-1" />
+        <img src="/logo.svg" alt="LDC Tools" className="mx-auto h-24 w-24 rounded-full bg-white p-1" />
         <p className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-blue-100">LDC Tools</p>
         <h1 className="mt-2 text-3xl font-bold">Sign in</h1>
         <p className="mt-2 text-sm text-blue-100">

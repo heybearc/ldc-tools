@@ -1,17 +1,21 @@
 // NextAuth v4 Middleware
 import { NextRequest, NextResponse } from 'next/server'
 
+const PUBLIC_ASSET = /\.(?:svg|png|jpe?g|gif|webp|ico|css|js|map|txt|csv|woff2?)$/i
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Allow access to auth pages and API routes
+  // Allow access to auth pages, API routes, and public files such as /logo.svg.
+  // Signed-out pages request those files with no session cookie.
   if (
     pathname.startsWith('/auth/') ||
     pathname === '/privacy' ||
     pathname === '/support' ||
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
-    pathname.startsWith('/favicon.ico')
+    pathname.startsWith('/favicon.ico') ||
+    PUBLIC_ASSET.test(pathname)
   ) {
     return NextResponse.next()
   }
@@ -74,7 +78,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public assets (logo, favicon.svg, service worker, templates)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt|csv|woff2?)$).*)',
   ],
 };
