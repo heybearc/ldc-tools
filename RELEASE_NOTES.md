@@ -1,5 +1,13 @@
 # LDC Tools Release Notes
 
+## v1.48.4 - The sign-in logo shows again
+
+**Release Date:** November 10, 2026
+
+### 🐛 Bug Fixes
+
+- The LDC Tools logo shows on the sign-in page
+
 ## v1.48.3 - Each phone screen is checked before release
 
 **Release Date:** November 8, 2026
