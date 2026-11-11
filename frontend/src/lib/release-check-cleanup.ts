@@ -1,14 +1,19 @@
 import { prisma } from '@/lib/prisma';
 
 /** Release tests use these titles. They stay out of the work list and the phone app. */
+// A missing requestor email must stay visible. SQL treats
+// NOT (email = 'qa-crew@example.com') as unknown when email is null.
 export const hiddenReleaseCheckWork = {
-  NOT: {
-    OR: [
-      { title: { startsWith: 'QA ' } },
-      { title: { contains: 'QA Volunteer' } },
-      { requestorEmail: 'qa-crew@example.com' },
-    ],
-  },
+  AND: [
+    { NOT: { title: { startsWith: 'QA ' } } },
+    { NOT: { title: { contains: 'QA Volunteer' } } },
+    {
+      OR: [
+        { requestorEmail: null },
+        { NOT: { requestorEmail: 'qa-crew@example.com' } },
+      ],
+    },
+  ],
 };
 
 export const hiddenReleaseCheckProcess = {
