@@ -2,17 +2,20 @@
 
 **Last updated:** 2026-11-11  
 **Current branch:** main  
-**Working on:** v1.48.5 is LIVE on green (CT135). STANDBY blue (CT133) is `ec017c7` (accounts list and Personnel place, not shipped). Hub dates stay paused.
+**Working on:** v1.48.7 is LIVE on green (CT135, `962eeb0`). STANDBY blue (CT133) is `2ca911f` (QA tasks stay off the work list, not shipped). Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.48.5 (`99313b9`) is LIVE on green CT135. Creating an account uses User, Admin, Super Admin, or Read Only. STANDBY blue CT133 is `ec017c7`: created accounts stay on the list, several accounts can be edited or invited, and Add person can choose Personnel or the construction group. Hub dates stay paused.
+v1.48.7 (`962eeb0`) is LIVE on green CT135. Phone numbers show as (555) 555-5555. Accounts from v1.48.6 are included. STANDBY blue CT133 is `2ca911f`: work lists skip titles that start with "QA ". Hub dates stay paused.
 
 ### What I'm doing right now
 Nothing in progress.
 
 ### Recent completions
+- ✅ Shipped v1.48.7 (`962eeb0`). Phone numbers use (555) 555-5555. qa-01 directory and volunteers gate plus the phone-format test. LIVE green CT135. STANDBY blue CT133 was synced, then took `2ca911f`.
+- ✅ Shipped v1.48.6 (`8220ede`). Created accounts stay on the list, several can be invited, and Add person can choose Personnel. LIVE was blue CT133.
+- ✅ Deleted the three QA work items and three QA process templates from the shared database. The hide rule is on STANDBY only (`2ca911f`).
 - ✅ Shipped v1.48.5 (`99313b9`). Account create uses platform access. qa-01 full suite 95 plus the create-user test. LIVE green CT135. STANDBY was synced, then blue CT133 took later commits.
 - ✅ Created accounts with a password show on Accounts. Add person Place includes Personnel and Construction group (`ec017c7`) on STANDBY blue CT133. Not shipped.
 - ✅ Bulk edit and send invitation for accounts that were created without an email (`86cce95`) on STANDBY. Not shipped.
@@ -53,7 +56,7 @@ Nothing in progress.
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-`/ship` the accounts list and Personnel place (`ec017c7`). Hub assignment dates stay paused. New session before the next slice.
+`/ship` the QA-task hide (`2ca911f`). Hub assignment dates stay paused. New session before the next slice.
 
 ---
 
@@ -71,4 +74,4 @@ Nothing in progress.
 ---
 
 ## Exact Next Command
-`/ship` the accounts list and Personnel place (`ec017c7`). Hub assignment dates stay paused. New session before the next slice.
+`/ship` the QA-task hide (`2ca911f`). Hub assignment dates stay paused. New session before the next slice.

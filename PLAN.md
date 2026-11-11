@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-11  
 **Current phase:** Region work queue  
-**Status:** v1.48.5 is LIVE on green (CT135, `99313b9`). STANDBY blue (CT133) is `ec017c7`. Hub dates are paused.
+**Status:** v1.48.7 is LIVE on green (CT135, `962eeb0`). STANDBY blue (CT133) is `2ca911f`. Hub dates are paused.
 
 ---
 
@@ -35,7 +35,9 @@
 - [x] D-069 — `/ship` classifies site vs phone and builds iOS then Android when `mobile/` changed
 - [x] Sign-in logo; `/ship` v1.48.4
 - [x] Account create uses platform access; `/ship` v1.48.5
-- [ ] Created accounts stay on the list, and Add person can choose Personnel (`ec017c7` on STANDBY). Ship so live matches.
+- [x] Created accounts stay on the list, and Add person can choose Personnel; `/ship` v1.48.6
+- [x] Phone numbers use (555) 555-5555; `/ship` v1.48.7
+- [ ] Work lists skip QA test tasks (`2ca911f` on STANDBY). Ship so live matches.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

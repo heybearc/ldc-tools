@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-11, phone format and QA tasks)
+- Shipped v1.48.6 (`8220ede`) then v1.48.7 (`962eeb0`). LIVE green CT135. STANDBY blue CT133 is `2ca911f`.
+- v1.48.6: created accounts stay listed, several can be invited, Add person includes Personnel. v1.48.7: phone numbers show as (555) 555-5555 and a partial number is rejected.
+- Invitations send by SMTP as LDC Tools `<no-reply.ldctools@gmail.com>` through `corya1992@gmail.com`. Gmail Sent does not keep a copy. `mecoj@hotmail.com` has an expired invitation and was never sent.
+- Deleted 3 QA work items and 3 QA process templates. Lists that skip a "QA " title are on STANDBY only.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: `/ship` the QA-task hide. New session before the next slice.
+
 ### Mid-day (2026-11-11, accounts)
 - Shipped v1.48.5 (`99313b9`). LIVE green CT135. STANDBY was synced to blue, then blue CT133 took `ec017c7`. qa-01 full suite 95 passed, plus the create-user test.
 - Create User was sending organizational roles. Prisma rejected them. The form now offers User, Admin, Super Admin, or Read Only.
