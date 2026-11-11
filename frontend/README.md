@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.48.7**
+Current: **1.48.8**
 
 ## Version History
+- **v1.48.8** (2026-11-11) - Completion email follows the selection, chat lists everyone, and project assignment lists every Personnel person
 - **v1.48.7** (2026-11-11) - Phone numbers use one format, (555) 555-5555
 - **v1.48.6** (2026-11-11) - Select several accounts, invite someone who has not finished setup, and add a person to Personnel
 - **v1.48.5** (2026-11-11) - Creating an account uses platform access

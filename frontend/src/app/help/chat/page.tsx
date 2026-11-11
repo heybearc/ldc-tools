@@ -39,7 +39,7 @@ export default async function ChatHelpPage() {
 
           <h2>A direct message</h2>
           <p>
-            Find a person under Message one person and choose that name. It stays between the two of you.
+            Everyone signed in to this group is listed under Message one person. Choose a name to open a conversation that stays between the two of you. Turn on notifications in the browser when you want this computer to be told about a new message. Each phone and computer does this once.
           </p>
         </div>
       </div>

@@ -59,7 +59,7 @@ export default async function ProjectsHelpPage() {
 
           <h2>Assign Personnel</h2>
           <p>
-            Construction group oversight can add Personnel to a project. Find the person, then choose Assign next to that name.
+            Construction group oversight can add Personnel to a project. The list includes every Personnel person in this construction group. Find the person, then choose Assign next to that name.
             Choose the × next to a name to remove that person. Crews, budget, and congregations are not on this list.
           </p>
         </div>

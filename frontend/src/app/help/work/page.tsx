@@ -36,7 +36,7 @@ export default async function WorkHelpPage() {
           <p>
             Personnel Contact, Assistant, and Support can add work. Open Work, choose Add work, and enter a title and detail.
             Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable.
-            Select all, or select several open tasks including with Shift, then assign them or mark them done. Choose how many tasks to show on a page.
+            Select all, or select several open tasks including with Shift, then assign them, mark them done, or turn the completion email on or off. The requestor checkbox on each selected task matches that choice. Choose how many tasks to show on a page.
           </p>
 
           <h2>Claim a task</h2>
