@@ -52,9 +52,13 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   const name = `QA process ${stamp}`;
   const first = `QA step one ${stamp}`;
   const second = `QA step two ${stamp}`;
+  const projectId = processes.projects?.[0]?.id || null;
   const created = await page.request.post('/api/v1/processes', {
     data: {
       name,
+      purpose: 'Check the drawings before work starts.',
+      appliesTo: projectId ? 'PROJECT' : 'TEAM',
+      cadence: projectId ? 'ONCE' : 'MONTHLY',
       steps: [
         { title: first, detail: 'Open the file.', explanation: 'Use the current drawing.' },
         { title: second, detail: 'Send the note.', explanation: 'Copy the requestor.' },
@@ -64,7 +68,6 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   expect(created.status()).toBe(201);
   const template = await created.json();
 
-  const projectId = processes.projects?.[0]?.id || null;
   const started = await page.request.post(`/api/v1/processes/${template.id}/start`, {
     data: { projectId },
   });
@@ -79,7 +82,7 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   await expect(processRow.getByRole('heading', { name })).toBeVisible();
   await expect(page.getByRole('heading', { name: first })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: second })).toHaveCount(0);
-  const stepsSummary = processRow.locator('summary', { hasText: 'Steps' });
+  const stepsSummary = processRow.locator('summary', { hasText: 'Tasks' });
   if (await stepsSummary.count()) await stepsSummary.click();
   await expect(processRow.getByText(first)).toBeVisible();
   await expect(processRow.getByText('Use the current drawing.')).toBeVisible();

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { canManageGroup, requireMobileActor } from '@/lib/mobile-actor';
 import { createProcessRun } from '@/lib/process-runs';
+import { placementForTemplate } from '@/lib/processes';
 import { projectInGroup } from '@/lib/work-item-access';
 
 export async function POST(
@@ -21,11 +22,15 @@ export async function POST(
     });
     if (!template) return NextResponse.json({ error: 'Process not found' }, { status: 404 });
     if (template.steps.length === 0) {
-      return NextResponse.json({ error: 'This process has no steps' }, { status: 400 });
+      return NextResponse.json({ error: 'This process has no tasks' }, { status: 400 });
     }
     const body = await request.json().catch(() => ({}));
-    const projectId = typeof body.projectId === 'string' && body.projectId ? body.projectId : null;
-    if (projectId && !(await projectInGroup(projectId, actor.constructionGroupId))) {
+    const requestedProjectId = typeof body.projectId === 'string' && body.projectId ? body.projectId : null;
+    const placement = placementForTemplate(template, requestedProjectId);
+    if (!placement.ok) {
+      return NextResponse.json({ error: placement.error }, { status: 400 });
+    }
+    if (placement.projectId && !(await projectInGroup(placement.projectId, actor.constructionGroupId))) {
       return NextResponse.json({ error: 'That project is not in this construction group' }, { status: 400 });
     }
     const item = await createProcessRun({
@@ -33,8 +38,10 @@ export async function POST(
       createdById: actor.id,
       templateId: template.id,
       name: template.name,
+      purpose: template.purpose,
+      cadence: placement.cadence,
       steps: template.steps,
-      projectId,
+      projectId: placement.projectId,
       assigneeId: null,
       claimable: true,
     });

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { activeUserInGroup } from '@/lib/work-item-access';
 import { createProcessRun } from '@/lib/process-runs';
+import { placementForTemplate } from '@/lib/processes';
 
 export async function POST(
   _request: Request,
@@ -29,7 +30,11 @@ export async function POST(
       return NextResponse.json({ error: 'Process not found' }, { status: 404 });
     }
     if (template.steps.length === 0) {
-      return NextResponse.json({ error: 'This process has no steps' }, { status: 400 });
+      return NextResponse.json({ error: 'This process has no tasks' }, { status: 400 });
+    }
+    const placement = placementForTemplate(template, null);
+    if (!placement.ok) {
+      return NextResponse.json({ error: 'Start this process from Processes and choose the project' }, { status: 400 });
     }
 
     const member = await activeUserInGroup(session.user.id, template.constructionGroupId);
@@ -43,6 +48,8 @@ export async function POST(
       createdById: session.user.id,
       templateId: template.id,
       name: template.name,
+      purpose: template.purpose,
+      cadence: placement.cadence,
       steps: template.steps,
       projectId: null,
       assigneeId: session.user.id,

@@ -28,19 +28,21 @@ export default async function ProcessesHelpPage() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
             <h2 className="text-xl font-semibold text-blue-900 mt-0 mb-3">What is a process?</h2>
             <p className="text-blue-800 mb-0">
-              A checklist for the construction group you are signed in to. Another group does not see it.
+              A reusable template for the construction group you are signed in to. Starting it copies the tasks onto one work item. Another group does not see the template.
             </p>
           </div>
 
-          <h2>Save a process</h2>
+          <h2>Save a template</h2>
           <p>
-            Personnel can add a process. Give it a name, then add each step with a title and detail.
-            An explanation and a reference link are optional.
+            Personnel can add a process. Give it a name and a purpose. Each task has a title. Instructions and a reference link are optional.
+            A team process is monthly and is not tied to a project. A project process is once or weekly.
           </p>
 
           <h2>Start a process</h2>
           <p>
-            Choose a project when the process belongs on one, then choose Start. The project stays selected. A confirmation says it started, and Work lists it as one claimable item. The steps stay inside it. Claiming it assigns the whole process. The assignee can check off each step, mark the process Done, or return it to the pool.
+            Add a team process to Work when the group should run it this month. Add a project process after you choose the project.
+            Work lists it as one claimable item. The tasks stay inside it. Claiming it assigns the whole process.
+            The assignee can check off each task, mark the process Done, or return it to the pool.
           </p>
         </div>
       </div>

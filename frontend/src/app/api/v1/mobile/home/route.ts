@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
       title: true,
       detail: true,
       timingKind: true,
+      processCadence: true,
       dueOn: true,
       project: { select: { name: true } },
       steps: {
@@ -149,7 +150,7 @@ export async function GET(request: NextRequest) {
         id: item.id,
         title: item.title,
         detail: item.detail,
-        timing: timingLabel(item.timingKind, dueOn, item.project?.name || null),
+        timing: timingLabel(item.timingKind, dueOn, item.project?.name || null, item.processCadence),
         stepsDone: item.steps.filter((step) => step.done).length,
         stepsTotal: item.steps.length,
       };

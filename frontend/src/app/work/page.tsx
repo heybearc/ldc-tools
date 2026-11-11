@@ -2,7 +2,9 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { ClipboardList, Plus, Upload } from 'lucide-react';
+import Link from 'next/link';
 import { isAirgappedEmail } from '@/lib/reachable-email';
+import { scheduleLabel } from '@/lib/processes';
 import { userError } from '@/lib/user-error';
 
 interface Person {
@@ -53,6 +55,9 @@ export interface WorkItem {
 interface ProcessOffer {
   id: string;
   name: string;
+  purpose: string | null;
+  appliesTo: 'TEAM' | 'PROJECT';
+  cadence: 'ONCE' | 'WEEKLY' | 'MONTHLY';
   steps: Step[];
 }
 
@@ -300,7 +305,7 @@ export default function WorkPage() {
         setError(userError(response.status, body.error, 'Could not claim the process'));
         return;
       }
-      setNotice('Process claimed. The steps stay on that process.');
+      setNotice('Process claimed. The tasks stay on that process.');
       await load();
     } finally {
       setBusyId(null);
@@ -428,7 +433,7 @@ export default function WorkPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Work</h1>
           <p className="mt-2 text-gray-600 max-w-3xl">
-            Tasks for this construction group. A process is one claimable item, and its steps stay inside it. Personnel add and assign work.
+            Tasks for this construction group. A process is one claimable item, and its tasks stay inside it. Personnel add and assign work.
           </p>
         </div>
         {data?.canAssign && (
@@ -653,18 +658,30 @@ export default function WorkPage() {
                         </span>
                       </div>
                       <p className="mt-2 text-sm text-gray-600">
-                        {process.steps.length === 1 ? '1 step' : `${process.steps.length} steps`}. Claiming keeps every step on this process.
+                        {scheduleLabel(process.appliesTo, process.cadence)}
+                        {' · '}
+                        {process.steps.length === 1 ? '1 task' : `${process.steps.length} tasks`}
                       </p>
+                      {process.purpose && <p className="mt-2 text-sm text-gray-700">{process.purpose}</p>}
                       <StepList steps={process.steps} />
                     </div>
-                    <button
-                      type="button"
-                      disabled={busyId === process.id}
-                      onClick={() => claimProcess(process.id)}
-                      className="px-3 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
-                    >
-                      Claim
-                    </button>
+                    {process.appliesTo === 'PROJECT' ? (
+                      <Link
+                        href="/processes"
+                        className="px-3 py-2 min-h-[44px] inline-flex items-center rounded-md border border-gray-300 text-sm font-medium text-gray-900"
+                      >
+                        Choose project
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={busyId === process.id}
+                        onClick={() => claimProcess(process.id)}
+                        className="px-3 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
+                      >
+                        Claim
+                      </button>
+                    )}
                   </div>
                 </article>
               ))}
@@ -935,14 +952,14 @@ function StepList({
   if (onToggle) {
     return (
       <div className="mt-3">
-        <p className="text-sm font-medium text-gray-700">Steps ({doneCount} of {steps.length})</p>
+        <p className="text-sm font-medium text-gray-700">Tasks ({doneCount} of {steps.length})</p>
         {list}
       </div>
     );
   }
   return (
     <details className="mt-3">
-      <summary className="cursor-pointer text-sm font-medium text-gray-700">Steps ({steps.length})</summary>
+      <summary className="cursor-pointer text-sm font-medium text-gray-700">Tasks ({steps.length})</summary>
       {list}
     </details>
   );

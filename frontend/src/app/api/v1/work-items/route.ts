@@ -35,6 +35,7 @@ function serialize(item: {
   claimedAt: Date | null;
   completedAt: Date | null;
   createdAt: Date;
+  processCadence?: 'ONCE' | 'WEEKLY' | 'MONTHLY' | null;
   assignee: { id: string; name: string | null; email: string } | null;
   project: { id: string; name: string } | null;
   steps?: Array<{
@@ -63,7 +64,7 @@ function serialize(item: {
     referenceUrl: item.referenceUrl,
     timingKind: item.timingKind,
     dueOn,
-    timingLabel: timingLabel(item.timingKind, dueOn, item.project?.name || null),
+    timingLabel: timingLabel(item.timingKind, dueOn, item.project?.name || null, item.processCadence),
     project: item.project,
     claimable: item.claimable,
     status: item.status,
@@ -184,6 +185,9 @@ export async function GET() {
       processes: processes.map((process) => ({
         id: process.id,
         name: process.name,
+        purpose: process.purpose,
+        appliesTo: process.appliesTo,
+        cadence: process.cadence,
         steps: process.steps.map((step) => ({
           id: step.id,
           title: step.title,

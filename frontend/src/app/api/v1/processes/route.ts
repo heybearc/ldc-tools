@@ -45,6 +45,9 @@ export async function GET() {
       templates: templates.map((template) => ({
         id: template.id,
         name: template.name,
+        purpose: template.purpose,
+        appliesTo: template.appliesTo,
+        cadence: template.cadence,
         steps: template.steps.map((step) => ({
           id: step.id,
           title: step.title,
@@ -84,6 +87,9 @@ export async function POST(request: NextRequest) {
       data: {
         constructionGroupId: scope.constructionGroupId,
         name: parsed.value.name,
+        purpose: parsed.value.purpose,
+        appliesTo: parsed.value.appliesTo,
+        cadence: parsed.value.cadence,
         createdById: session.user.id,
         steps: {
           create: parsed.value.steps.map((step, index) => ({
@@ -101,6 +107,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       id: created.id,
       name: created.name,
+      purpose: created.purpose,
+      appliesTo: created.appliesTo,
+      cadence: created.cadence,
       steps: created.steps.map((step) => ({
         id: step.id,
         title: step.title,

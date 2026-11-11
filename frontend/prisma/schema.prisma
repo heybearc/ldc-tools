@@ -1042,6 +1042,17 @@ enum WorkStatus {
   DONE
 }
 
+enum ProcessAppliesTo {
+  TEAM
+  PROJECT
+}
+
+enum ProcessCadence {
+  ONCE
+  WEEKLY
+  MONTHLY
+}
+
 enum WorkNoteKind {
   NOTE
   HELP
@@ -1067,6 +1078,7 @@ model WorkItem {
   importKey           String?
   createdById         String
   processTemplateId   String?
+  processCadence      ProcessCadence?
   claimedAt           DateTime?
   completedAt         DateTime?
   createdAt           DateTime       @default(now())
@@ -1141,13 +1153,16 @@ model WorkHelpRead {
 }
 
 model ProcessTemplate {
-  id                  String   @id @default(cuid())
+  id                  String           @id @default(cuid())
   constructionGroupId String
   name                String
-  isActive            Boolean  @default(true)
+  purpose             String?          @db.Text
+  appliesTo           ProcessAppliesTo @default(TEAM)
+  cadence             ProcessCadence   @default(MONTHLY)
+  isActive            Boolean          @default(true)
   createdById         String
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
 
   constructionGroup   ConstructionGroup @relation(fields: [constructionGroupId], references: [id], onDelete: Cascade)
   createdBy           User              @relation("ProcessTemplateCreator", fields: [createdById], references: [id], onDelete: Restrict)

@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { canPostWork, projectInGroup } from '@/lib/work-item-access';
 import { createProcessRun } from '@/lib/process-runs';
+import { placementForTemplate } from '@/lib/processes';
 
 export async function POST(
   request: NextRequest,
@@ -32,13 +33,17 @@ export async function POST(
       return NextResponse.json({ error: 'Process not found' }, { status: 404 });
     }
     if (template.steps.length === 0) {
-      return NextResponse.json({ error: 'This process has no steps' }, { status: 400 });
+      return NextResponse.json({ error: 'This process has no tasks' }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));
-    const projectId = typeof body.projectId === 'string' && body.projectId ? body.projectId : null;
-    if (projectId) {
-      const project = await projectInGroup(projectId, scope.constructionGroupId);
+    const requestedProjectId = typeof body.projectId === 'string' && body.projectId ? body.projectId : null;
+    const placement = placementForTemplate(template, requestedProjectId);
+    if (!placement.ok) {
+      return NextResponse.json({ error: placement.error }, { status: 400 });
+    }
+    if (placement.projectId) {
+      const project = await projectInGroup(placement.projectId, scope.constructionGroupId);
       if (!project) {
         return NextResponse.json({ error: 'That project is not in this construction group' }, { status: 400 });
       }
@@ -49,8 +54,10 @@ export async function POST(
       createdById: session.user.id,
       templateId: template.id,
       name: template.name,
+      purpose: template.purpose,
+      cadence: placement.cadence,
       steps: template.steps,
-      projectId,
+      projectId: placement.projectId,
       assigneeId: null,
       claimable: true,
     });

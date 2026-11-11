@@ -36,10 +36,16 @@ export function timingLabel(
   kind: WorkTimingKind,
   dueOn: string | null,
   projectName: string | null,
+  cadence?: 'ONCE' | 'WEEKLY' | 'MONTHLY' | null,
 ): string {
   if (kind === 'MONTHLY') return 'Monthly';
   if (kind === 'YEARLY') return 'Yearly';
-  if (kind === 'PROCESS') return projectName ? `Process · ${projectName}` : 'Process';
+  if (kind === 'PROCESS') {
+    if (cadence === 'MONTHLY') return 'Monthly';
+    if (cadence === 'WEEKLY') return projectName ? `Weekly · ${projectName}` : 'Weekly';
+    if (cadence === 'ONCE') return projectName ? `Once · ${projectName}` : 'Once';
+    return projectName ? `Process · ${projectName}` : 'Process';
+  }
   if (kind === 'CREW_REQUEST') return 'Crew request';
   if (kind === 'NONE') return 'No deadline';
   const date = formatCalendarDate(dueOn);

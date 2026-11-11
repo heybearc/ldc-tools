@@ -30,6 +30,9 @@ export async function GET(request: NextRequest) {
       templates: templates.map((template) => ({
         id: template.id,
         name: template.name,
+        purpose: template.purpose,
+        appliesTo: template.appliesTo,
+        cadence: template.cadence,
         steps: template.steps.map((step) => ({
           id: step.id,
           title: step.title,
@@ -57,6 +60,9 @@ export async function POST(request: NextRequest) {
       data: {
         constructionGroupId: actor.constructionGroupId,
         name: parsed.value.name,
+        purpose: parsed.value.purpose,
+        appliesTo: parsed.value.appliesTo,
+        cadence: parsed.value.cadence,
         createdById: actor.id,
         steps: {
           create: parsed.value.steps.map((step, index) => ({

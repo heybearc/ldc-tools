@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import type { ProcessCadence } from '@/lib/processes';
 
 export interface ProcessRunStep {
   title: string;
@@ -12,17 +13,20 @@ export async function createProcessRun(input: {
   createdById: string;
   templateId: string;
   name: string;
+  purpose: string | null;
+  cadence: ProcessCadence;
   steps: ProcessRunStep[];
   projectId: string | null;
   assigneeId: string | null;
   claimable: boolean;
 }) {
   const count = input.steps.length;
+  const taskLine = count === 1 ? '1 task' : `${count} tasks`;
   return prisma.workItem.create({
     data: {
       constructionGroupId: input.constructionGroupId,
       title: input.name,
-      detail: count === 1 ? '1 step' : `${count} steps`,
+      detail: input.purpose || taskLine,
       timingKind: 'PROCESS',
       projectId: input.projectId,
       claimable: input.claimable,
@@ -30,6 +34,7 @@ export async function createProcessRun(input: {
       claimedAt: input.assigneeId ? new Date() : null,
       status: 'OPEN',
       processTemplateId: input.templateId,
+      processCadence: input.cadence,
       createdById: input.createdById,
       steps: {
         create: input.steps.map((step, index) => ({
