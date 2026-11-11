@@ -111,3 +111,17 @@ export function autoFormatPhone(
   // Return cleaned input (remove non-digits except + and spaces)
   return value.replace(/[^\d\s+()-]/g, '');
 }
+
+/** Empty stays empty. A real number is stored as E.164 (+15555555555). */
+export function storedPhone(
+  value: unknown,
+  defaultCountry: CountryCode = 'US'
+): { phone: string | null; error?: string } {
+  const raw = typeof value === 'string' ? value.trim() : '';
+  if (!raw) return { phone: null };
+  const check = validateAndFormatPhone(raw, defaultCountry);
+  if (!check.isValid) {
+    return { phone: null, error: 'Enter a phone number like (555) 555-5555' };
+  }
+  return { phone: formatPhoneForStorage(raw, defaultCountry) };
+}

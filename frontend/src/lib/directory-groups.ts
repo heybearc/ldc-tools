@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { formatPhoneForDisplay } from '@/lib/phone-utils';
 import { withCGFilter, type CGScope } from '@/lib/cg-scope';
 
 const PERSONNEL_BUCKET: Record<string, 'contact' | 'assistant' | 'support'> = {
@@ -70,7 +71,7 @@ function contactFromUser(input: {
       image: input.user?.image || null,
       firstName: volunteer?.firstName || input.user?.firstName || null,
       lastName: volunteer?.lastName || input.user?.lastName || null,
-      phone: volunteer && 'phone' in volunteer ? volunteer.phone : null,
+      phone: formatPhoneForDisplay(volunteer && 'phone' in volunteer ? volunteer.phone : null) || null,
       isSister: input.user?.isSister || false,
     },
   };

@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth-config';
 import { parseDirectoryDate } from '@/lib/directory-assignments';
+import { storedPhone } from '@/lib/phone-utils';
 import { getCGScope } from '@/lib/cg-scope';
 import {
   PERSONNEL_CONTACT_CONFIG,
@@ -200,7 +201,9 @@ async function createDirectoryGroupPerson(body: Record<string, unknown>) {
   const firstName = String(body.firstName || '').trim();
   const lastName = String(body.lastName || '').trim();
   const email = String(body.email || '').trim().toLowerCase();
-  const phone = String(body.phone || '').trim() || null;
+  const parsedPhone = storedPhone(body.phone);
+  if (parsedPhone.error) return NextResponse.json({ error: parsedPhone.error }, { status: 400 });
+  const phone = parsedPhone.phone;
   const photo = profileImage(body.image);
   const role = String(body.role || '');
   const isSister = body.isSister === true;
@@ -355,7 +358,9 @@ export async function POST(request: NextRequest) {
     const firstName = String(body.firstName || '').trim();
     const lastName = String(body.lastName || '').trim();
     const email = String(body.email || '').trim().toLowerCase();
-    const phone = String(body.phone || '').trim() || null;
+    const parsedPhone = storedPhone(body.phone);
+    if (parsedPhone.error) return NextResponse.json({ error: parsedPhone.error }, { status: 400 });
+    const phone = parsedPhone.phone;
     const photo = profileImage(body.image);
     const role = String(body.role || '');
     const tradeTeamId = String(body.tradeTeamId || '');
@@ -516,7 +521,9 @@ async function updateGroupProfile(body: Record<string, unknown>) {
   const firstName = String(body.firstName || '').trim();
   const lastName = String(body.lastName || '').trim();
   const email = String(body.email || '').trim().toLowerCase();
-  const phone = String(body.phone || '').trim() || null;
+  const parsedPhone = storedPhone(body.phone);
+  if (parsedPhone.error) return NextResponse.json({ error: parsedPhone.error }, { status: 400 });
+  const phone = parsedPhone.phone;
   const photo = profileImage(body.image);
   const role = String(body.role || '');
   const originRole = String(body.originRole || role);
@@ -632,7 +639,9 @@ export async function PATCH(request: NextRequest) {
     const firstName = String(body.firstName || '').trim();
     const lastName = String(body.lastName || '').trim();
     const email = String(body.email || '').trim().toLowerCase();
-    const phone = String(body.phone || '').trim() || null;
+    const parsedPhone = storedPhone(body.phone);
+    if (parsedPhone.error) return NextResponse.json({ error: parsedPhone.error }, { status: 400 });
+    const phone = parsedPhone.phone;
     const photo = profileImage(body.image);
     const role = String(body.role || '');
     const tradeTeamId = String(body.tradeTeamId || '');

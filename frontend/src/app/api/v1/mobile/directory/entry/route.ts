@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireMobileActor } from '@/lib/mobile-actor';
+import { storedPhone } from '@/lib/phone-utils';
 import {
   TRADE_CREW_OVERSIGHT_CONFIG,
   TRADE_TEAM_OVERSIGHT_CONFIG,
@@ -33,7 +34,9 @@ export async function PATCH(request: NextRequest) {
     const firstName = String(body.firstName || '').trim();
     const lastName = String(body.lastName || '').trim();
     const email = String(body.email || '').trim().toLowerCase();
-    const phone = String(body.phone || '').trim() || null;
+    const parsedPhone = storedPhone(body.phone);
+    if (parsedPhone.error) return NextResponse.json({ error: parsedPhone.error }, { status: 400 });
+    const phone = parsedPhone.phone;
     const photo = profileImage(body.image);
     if (photo.error) return NextResponse.json({ error: photo.error }, { status: 400 });
     if (!firstName || !lastName || !email) {

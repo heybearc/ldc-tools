@@ -5,6 +5,7 @@ import { directorySections, personFromAssignment } from '@/lib/mobile-directory'
 import { readMobileToken } from '@/lib/mobile-session';
 import { mobileGateResponse } from '@/lib/mobile-actor';
 import { timingLabel } from '@/lib/work-items';
+import { formatPhoneForDisplay } from '@/lib/phone-utils';
 
 const ROLE_LABEL: Record<string, string> = {
   TTO: 'Overseer',
@@ -113,9 +114,11 @@ export async function GET(request: NextRequest) {
         id: row.id,
         role: row.role,
         user: row.user
-          ? { ...row.user, phone: row.user.volunteer?.phone || null }
+          ? { ...row.user, phone: formatPhoneForDisplay(row.user.volunteer?.phone) || null }
           : null,
-        contact: row.contact,
+        contact: row.contact
+          ? { ...row.contact, phone: formatPhoneForDisplay(row.contact.phone) || null }
+          : null,
       }, team.name, ROLE_LABEL[row.role] || row.role, { teamId: team.id })),
       crews: team.crews.map((crew) => ({
         id: crew.id,
@@ -124,9 +127,11 @@ export async function GET(request: NextRequest) {
           id: row.id,
           role: row.role,
           user: row.user
-            ? { ...row.user, phone: row.user.volunteer?.phone || null }
+            ? { ...row.user, phone: formatPhoneForDisplay(row.user.volunteer?.phone) || null }
             : null,
-          contact: row.contact,
+          contact: row.contact
+            ? { ...row.contact, phone: formatPhoneForDisplay(row.contact.phone) || null }
+            : null,
         }, `${team.name} · ${crew.name}`, ROLE_LABEL[row.role] || row.role, { teamId: team.id, crewId: crew.id })),
       })),
     }));

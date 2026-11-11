@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth-config';
 import { getCGScope, withCGFilter } from '@/lib/cg-scope';
 import { getUserOrgRoles, checkPermission } from '@/lib/api-permissions';
 import { canManageVolunteers } from '@/lib/permissions';
-import { formatPhoneForStorage, validateAndFormatPhone } from '@/lib/phone-utils';
+import { formatPhoneForDisplay, formatPhoneForStorage, validateAndFormatPhone } from '@/lib/phone-utils';
 
 // GET /api/v1/volunteers - List volunteers with optional filters
 export async function GET(request: NextRequest) {
@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
       last_name: v.lastName,
       ba_id: v.baId,
       role: v.role,
-      phone: v.phone,
+      phone: formatPhoneForDisplay(v.phone) || null,
       email_personal: v.emailPersonal,
       email_jw: v.emailJw,
       email_personal_verified: v.emailPersonalVerified,
@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
       email_jw_bounced: v.emailJwBounced,
       last_email_verified: v.lastEmailVerified?.toISOString() || null,
       emergency_contact_name: v.emergencyContactName,
-      emergency_contact_phone: v.emergencyContactPhone,
+      emergency_contact_phone: formatPhoneForDisplay(v.emergencyContactPhone) || null,
       emergency_contact_relationship: v.emergencyContactRelationship,
       congregation: v.congregation,
       serving_as: v.servingAs,

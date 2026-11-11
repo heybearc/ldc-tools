@@ -6,7 +6,10 @@ export function formatPhoneNumber(value: string): string {
   if (!value) return '';
   
   // Remove all non-numeric characters
-  const phoneNumber = value.replace(/\D/g, '');
+  let phoneNumber = value.replace(/\D/g, '');
+  if (phoneNumber.length === 11 && phoneNumber.startsWith('1')) {
+    phoneNumber = phoneNumber.slice(1);
+  }
   
   // Format based on length
   const phoneNumberLength = phoneNumber.length;

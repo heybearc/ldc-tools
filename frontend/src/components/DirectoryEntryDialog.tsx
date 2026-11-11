@@ -2,6 +2,8 @@
 
 import React, { useMemo, useRef, useState } from 'react';
 import { dateInputValue } from '@/lib/directory-assignments';
+import { formatPhoneNumber } from '@/lib/formatPhone';
+import { formatPhoneForDisplay } from '@/lib/phone-utils';
 import { userError } from '@/lib/user-error';
 import { PhotoPositioner, type PhotoPositionHandle } from '@/components/ProfilePhoto';
 
@@ -130,7 +132,7 @@ export default function DirectoryEntryDialog({
   const [firstName, setFirstName] = useState(initialName.firstName);
   const [lastName, setLastName] = useState(initialName.lastName);
   const [email, setEmail] = useState(entry?.user.email || '');
-  const [phone, setPhone] = useState(entry?.user.phone || '');
+  const [phone, setPhone] = useState(formatPhoneForDisplay(entry?.user.phone || ''));
   const [image, setImage] = useState<string | null>(entry?.user.image || null);
   const [photoAdjusted, setPhotoAdjusted] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
@@ -313,7 +315,7 @@ export default function DirectoryEntryDialog({
           </label>
           <label className="block text-sm text-gray-700">
             Phone
-            <input className="mt-1 w-full rounded border px-2 py-2" value={phone || ''} onChange={(event) => setPhone(event.target.value)} />
+            <input className="mt-1 w-full rounded border px-2 py-2" value={phone || ''} placeholder="(555) 555-5555" onChange={(event) => setPhone(formatPhoneNumber(event.target.value))} />
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input

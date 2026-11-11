@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth-config';
 import { getCGScope, withCGFilter } from '@/lib/cg-scope';
 import { loadDirectoryGroups } from '@/lib/directory-groups';
 import { visibleAssignments } from '@/lib/directory-assignments';
+import { formatPhoneForDisplay } from '@/lib/phone-utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
             image: contact.image,
             firstName: contact.firstName,
             lastName: contact.lastName,
-            phone: contact.phone,
+            phone: formatPhoneForDisplay(contact.phone) || null,
             isSister: contact.isSister,
           }
         : user
@@ -131,7 +132,7 @@ export async function GET(request: NextRequest) {
               image: user.image,
               firstName: user.volunteer?.firstName || user.firstName,
               lastName: user.volunteer?.lastName || user.lastName,
-              phone: user.volunteer?.phone || null,
+              phone: formatPhoneForDisplay(user.volunteer?.phone) || null,
               isSister: user.isSister,
             }
           : null;
