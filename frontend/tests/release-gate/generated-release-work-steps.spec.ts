@@ -76,7 +76,7 @@ test('an assignee can check a step and return the work to the pool', async ({ pa
   const stamp = Date.now();
   const created = await page.request.post('/api/v1/processes', {
     data: {
-      name: `QA pool ${stamp}`,
+      name: `Release check pool ${stamp}`,
       steps: [{ title: `QA step ${stamp}`, detail: 'Check this step.' }],
     },
   });

@@ -85,7 +85,7 @@ test('a dated project item shows on the project and on the work list', async ({ 
   expect(missingDate.status()).toBe(400);
 
   await page.reload();
-  const row = card.locator('li').filter({ hasText: title });
+  const row = page.locator(`#project-${project.id}`).locator('li').filter({ hasText: title });
   await expect(row.getByText('Dec 15, 2026')).toBeVisible();
   await expect(row.getByText('PPS meeting prep')).toBeVisible();
 

@@ -111,7 +111,7 @@ test('a crew-update spreadsheet becomes a claimable task and keeps the requestor
   await expect(page.getByRole('button', { name: 'Import crew requests' })).toBeVisible();
   const row = page.locator('article').filter({ hasText: volunteer });
   await expect(row.getByText('Crew request')).toBeVisible();
-  await expect(row.getByText('QA Requestor')).toBeVisible();
+  await expect(row.getByText('Release check requestor')).toBeVisible();
 
   const done = await page.request.patch(`/api/v1/work-items/${item!.id}`, {
     data: { status: 'DONE' },
@@ -119,6 +119,6 @@ test('a crew-update spreadsheet becomes a claimable task and keeps the requestor
   expect(done.ok()).toBeTruthy();
   const finished = await done.json();
   expect(finished.status).toBe('DONE');
-  expect(finished.requestorEmail).toBe('qa-crew@example.com');
-  expect(finished.requestorName).toBe('QA Requestor');
+  expect(finished.requestorEmail).toBe('release-check@example.com');
+  expect(finished.requestorName).toBe('Release check requestor');
 });

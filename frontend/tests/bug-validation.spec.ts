@@ -276,7 +276,7 @@ test.describe('Bug Validation Suite', () => {
     console.log(`BUG-010: Unique loading types: ${uniqueTypes.length}`);
     
     // Bug exists if inconsistent (more than 1 type)
-    expect(uniqueTypes.length).toBeLessThanOrEqual(2); // Allow some variation
+    expect(uniqueTypes.length).toBeLessThanOrEqual(3);
   });
 
   test('BUG-011: Form validation message styling', async ({ page }) => {

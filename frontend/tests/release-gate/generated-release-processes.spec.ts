@@ -114,6 +114,14 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   const heading = await revealWork(page, name);
   const processRow = page.locator(`article[data-work-id="${run.item.id}"]`);
   await expect(heading).toBeVisible();
+  const details = processRow.locator('details');
+  if (await details.count()) {
+    await details.evaluateAll((nodes) => {
+      nodes.forEach((node) => {
+        (node as HTMLDetailsElement).open = true;
+      });
+    });
+  }
   await expect(page.getByRole('heading', { name: first })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: second })).toHaveCount(0);
   const stepsSummary = processRow.locator('summary', { hasText: 'Tasks' });
