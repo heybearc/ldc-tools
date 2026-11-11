@@ -6,6 +6,7 @@ import { readMobileToken } from '@/lib/mobile-session';
 import { mobileGateResponse } from '@/lib/mobile-actor';
 import { timingLabel } from '@/lib/work-items';
 import { formatPhoneForDisplay } from '@/lib/phone-utils';
+import { hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
 
 const ROLE_LABEL: Record<string, string> = {
   TTO: 'Overseer',
@@ -55,13 +56,13 @@ export async function GET(request: NextRequest) {
     } as const;
     const [work, available, teams, groups] = await Promise.all([
       prisma.workItem.findMany({
-        where: { constructionGroupId: groupId, assigneeId: user.id, status: 'OPEN' },
+        where: { constructionGroupId: groupId, assigneeId: user.id, status: 'OPEN', ...hiddenReleaseCheckWork },
         orderBy: [{ dueOn: 'asc' }, { createdAt: 'desc' }],
         take: 50,
         select: workSelect,
       }),
       prisma.workItem.findMany({
-        where: { constructionGroupId: groupId, assigneeId: null, claimable: true, status: 'OPEN' },
+        where: { constructionGroupId: groupId, assigneeId: null, claimable: true, status: 'OPEN', ...hiddenReleaseCheckWork },
         orderBy: [{ dueOn: 'asc' }, { createdAt: 'desc' }],
         take: 50,
         select: workSelect,

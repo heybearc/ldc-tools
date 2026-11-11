@@ -8,6 +8,7 @@ import { getUserOrgRoles } from '@/lib/api-permissions';
 import { canManageProjects } from '@/lib/permissions';
 import { canPostWork } from '@/lib/work-item-access';
 import { canAssignProjectPersonnel, personnelInGroup } from '@/lib/project-personnel';
+import { hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
 
 export async function GET() {
   try {
@@ -55,6 +56,7 @@ export async function GET() {
           constructionGroupId: scope.constructionGroupId,
           timingKind: 'PROJECT_DATE',
           projectId: { not: null },
+          ...hiddenReleaseCheckWork,
         },
         select: { id: true, title: true, detail: true, dueOn: true, status: true, projectId: true },
         orderBy: [{ status: 'asc' }, { dueOn: 'asc' }],

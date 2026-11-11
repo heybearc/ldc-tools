@@ -1,5 +1,20 @@
 import { prisma } from '@/lib/prisma';
 
+/** Release tests use these titles. They stay out of the work list and the phone app. */
+export const hiddenReleaseCheckWork = {
+  NOT: {
+    OR: [
+      { title: { startsWith: 'QA ' } },
+      { title: { contains: 'QA Volunteer' } },
+      { requestorEmail: 'qa-crew@example.com' },
+    ],
+  },
+};
+
+export const hiddenReleaseCheckProcess = {
+  NOT: { name: { startsWith: 'QA ' } },
+};
+
 // Release tests create work, processes, and chat whose titles start with "QA ".
 // Personnel can remove that set after a run. Real crew requests stay.
 export async function removeReleaseCheckData(constructionGroupId: string) {

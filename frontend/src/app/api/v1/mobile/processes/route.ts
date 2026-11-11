@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { canManageGroup, requireMobileActor } from '@/lib/mobile-actor';
 import { validateProcessTemplate } from '@/lib/processes';
+import { hiddenReleaseCheckProcess } from '@/lib/release-check-cleanup';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
     const canManage = await canManageGroup(actor);
     const [templates, projects] = await Promise.all([
       prisma.processTemplate.findMany({
-        where: { constructionGroupId: actor.constructionGroupId, isActive: true },
+        where: { constructionGroupId: actor.constructionGroupId, isActive: true, ...hiddenReleaseCheckProcess },
         include: { steps: { orderBy: { position: 'asc' } } },
         orderBy: { name: 'asc' },
       }),

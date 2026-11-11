@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { canCreateProject, canManageGroup, requireMobileActor, scopeForActor } from '@/lib/mobile-actor';
 import { canAssignProjectPersonnel, personnelInGroup } from '@/lib/project-personnel';
 import { formatCalendarDate } from '@/lib/work-items';
+import { hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
 
 const STATUS_LABELS: Record<string, string> = {
   PLANNING: 'Planning',
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
         orderBy: { name: 'asc' },
       }),
       prisma.workItem.findMany({
-        where: { constructionGroupId: groupId, timingKind: 'PROJECT_DATE', projectId: { not: null } },
+        where: { constructionGroupId: groupId, timingKind: 'PROJECT_DATE', projectId: { not: null }, ...hiddenReleaseCheckWork },
         select: { id: true, title: true, detail: true, dueOn: true, status: true, projectId: true },
         orderBy: [{ status: 'asc' }, { dueOn: 'asc' }],
       }),

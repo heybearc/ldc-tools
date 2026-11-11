@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getCGScope, withCGFilter } from '@/lib/cg-scope';
 import { activeUserInGroup, canPostWork, isPersonnelLead, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
 import { dueOnDate, timingLabel, validateWorkItemInput } from '@/lib/work-items';
+import { hiddenReleaseCheckProcess, hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
 
 const itemInclude = {
   assignee: { select: { id: true, name: true, email: true } },
@@ -135,6 +136,7 @@ export async function GET() {
                 { processTemplateId: { not: null } },
               ],
             },
+            hiddenReleaseCheckWork,
           ],
         },
         include: itemInclude,
@@ -155,7 +157,7 @@ export async function GET() {
           })
         : Promise.resolve([]),
       prisma.processTemplate.findMany({
-        where: { ...withCGFilter(scope), isActive: true },
+        where: { ...withCGFilter(scope), isActive: true, ...hiddenReleaseCheckProcess },
         include: { steps: { orderBy: { position: 'asc' } } },
         orderBy: { name: 'asc' },
       }),

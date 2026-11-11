@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
 import { validateProcessTemplate } from '@/lib/processes';
+import { hiddenReleaseCheckProcess } from '@/lib/release-check-cleanup';
 
 const templateInclude = {
   steps: { orderBy: { position: 'asc' as const } },
@@ -25,7 +26,7 @@ export async function GET() {
     const canPost = await canPostWork(session.user.id, scope);
     const [templates, projects] = await Promise.all([
       prisma.processTemplate.findMany({
-        where: { constructionGroupId: scope.constructionGroupId, isActive: true },
+        where: { constructionGroupId: scope.constructionGroupId, isActive: true, ...hiddenReleaseCheckProcess },
         include: templateInclude,
         orderBy: { name: 'asc' },
       }),
