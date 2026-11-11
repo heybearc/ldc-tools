@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireMobileActor } from '@/lib/mobile-actor';
-import { blockedUserIds, ensureTeamChannel } from '@/lib/chat';
-import { userInGroupWhere } from '@/lib/work-item-access';
+import { blockedUserIds, chatPeople, ensureTeamChannel } from '@/lib/chat';
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,14 +24,7 @@ export async function GET(request: NextRequest) {
         },
         orderBy: { createdAt: 'asc' },
       }),
-      prisma.user.findMany({
-        where: {
-          ...userInGroupWhere(groupId),
-          id: { notIn: [actor.id, ...Array.from(blocked)] },
-        },
-        select: { id: true, name: true, email: true },
-        orderBy: [{ name: 'asc' }, { email: 'asc' }],
-      }),
+      chatPeople(groupId),
       prisma.chatRead.findMany({
         where: { userId: actor.id },
         select: { channelId: true, readAt: true },
@@ -55,7 +47,7 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({
-      teammates,
+      teammates: teammates.filter((person) => person.id !== actor.id && !blocked.has(person.id)),
       channels: visible.map((channel, index) => {
         const otherId = channel.kind === 'DIRECT'
           ? channel.directKey.split(':').find((id) => id !== actor.id) || null
@@ -66,7 +58,7 @@ export async function GET(request: NextRequest) {
         return {
           id: channel.id,
           kind: channel.kind,
-          title: channel.kind === 'TEAM' ? 'Team' : (other?.name || other?.email || 'Direct message'),
+          title: channel.kind === 'TEAM' ? 'Team chat' : (other?.name || other?.email || 'Direct message'),
           otherUserId: otherId,
           unread: unreadCounts[index] || 0,
           latest: latestVisible ? {
@@ -75,7 +67,7 @@ export async function GET(request: NextRequest) {
             authorName: latestVisible.author.name || latestVisible.author.email,
           } : null,
         };
-      }),
+      }).sort((a, b) => (a.kind === b.kind ? a.title.localeCompare(b.title) : a.kind === 'TEAM' ? -1 : 1)),
     });
   } catch (error) {
     console.error('Mobile list chat error:', error);

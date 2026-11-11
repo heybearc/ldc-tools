@@ -34,12 +34,12 @@ export default async function ChatHelpPage() {
 
           <h2>Team chat</h2>
           <p>
-            Open Chat. The Team conversation is there for everyone in this group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send. Choose Mark unread to keep a conversation marked until you are ready, or Mark read to clear it. The Chat link shows how many conversations are still unread. The phone app can also show an alert, a badge, and a sound for a new chat message or an announcement. Allow alerts when the phone asks.
+            Open Chat and choose Team chat. A message there goes to everyone in this group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send. Choose Mark unread to keep a conversation marked until you are ready, or Mark read to clear it. The Chat link shows how many conversations are still unread. The phone app can also show an alert, a badge, and a sound for a new chat message or an announcement. Allow alerts when the phone asks.
           </p>
 
           <h2>A direct message</h2>
           <p>
-            Choose one teammate and start a conversation with that person. It stays between the two of you.
+            Find a person under Message one person and choose that name. It stays between the two of you.
           </p>
         </div>
       </div>

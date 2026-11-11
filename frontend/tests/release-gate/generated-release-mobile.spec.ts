@@ -22,7 +22,7 @@ test('a phone shows the menu, and chat opens the list before a thread', async ({
   await expect(page.getByRole('heading', { name: 'Chat' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Chats' })).toBeHidden();
 
-  const team = page.locator('button').filter({ has: page.getByText('Team', { exact: true }) }).first();
+  const team = page.locator('button').filter({ has: page.getByText('Team chat', { exact: true }) }).first();
   await expect(team).toBeVisible();
   await team.click();
   await expect(page.getByRole('button', { name: 'Chats' })).toBeVisible();

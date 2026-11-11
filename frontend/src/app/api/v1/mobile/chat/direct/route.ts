@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireMobileActor } from '@/lib/mobile-actor';
-import { directKey } from '@/lib/chat';
-import { activeUserInGroup } from '@/lib/work-item-access';
+import { directKey, personCanChat } from '@/lib/chat';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,8 +13,7 @@ export async function POST(request: NextRequest) {
     if (!userId || userId === actor.id) {
       return NextResponse.json({ error: 'Choose a teammate' }, { status: 400 });
     }
-    const teammate = await activeUserInGroup(userId, actor.constructionGroupId);
-    if (!teammate) {
+    if (!(await personCanChat(userId, actor.constructionGroupId))) {
       return NextResponse.json({ error: 'That person is not in this construction group' }, { status: 400 });
     }
 

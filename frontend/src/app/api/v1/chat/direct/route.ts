@@ -3,8 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
-import { activeUserInGroup } from '@/lib/work-item-access';
-import { directKey } from '@/lib/chat';
+import { directKey, personCanChat } from '@/lib/chat';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,8 +21,7 @@ export async function POST(request: NextRequest) {
     if (!userId || userId === session.user.id) {
       return NextResponse.json({ error: 'Choose a teammate' }, { status: 400 });
     }
-    const teammate = await activeUserInGroup(userId, scope.constructionGroupId);
-    if (!teammate) {
+    if (!(await personCanChat(userId, scope.constructionGroupId))) {
       return NextResponse.json({ error: 'That person is not in this construction group' }, { status: 400 });
     }
 

@@ -62,7 +62,7 @@ function ChatScreen() {
   const [selectedId, setSelectedId] = useState<string | null>(requested);
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
-  const [teammateId, setTeammateId] = useState('');
+  const [personQuery, setPersonQuery] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [notificationsOn, setNotificationsOn] = useState(false);
@@ -240,20 +240,19 @@ function ChatScreen() {
     }
   }
 
-  async function openDirect() {
-    if (!teammateId) return;
+  async function openDirect(userId: string) {
     setError('');
     const response = await fetch('/api/v1/chat/direct', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: teammateId }),
+      body: JSON.stringify({ userId }),
     });
     const body = await response.json();
     if (!response.ok) {
       setError(userError(response.status, body.error, 'Could not open the chat'));
       return;
     }
-    setTeammateId('');
+    setPersonQuery('');
     await loadChannels();
     setSelectedId(body.id);
   }
@@ -275,7 +274,12 @@ function ChatScreen() {
         setError('Notification permission was not granted.');
         return;
       }
-      const registration = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      const registration = await navigator.serviceWorker.ready;
+      if (!registration.active) {
+        setError('Notifications did not start. Refresh the page and try again.');
+        return;
+      }
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapid) as BufferSource,
@@ -294,7 +298,10 @@ function ChatScreen() {
       setNotificationsOn(true);
       setNotice('Notifications are on for this browser.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : userError(0, '', 'Could not turn on notifications'));
+      const message = err instanceof Error ? err.message : '';
+      setError(message.includes('Service Worker') || message.includes('push service')
+        ? 'Notifications did not start. Refresh the page and try again.'
+        : (message || userError(0, '', 'Could not turn on notifications')));
     }
   }
 
@@ -326,6 +333,10 @@ function ChatScreen() {
   }
 
   const selected = channels.find((channel) => channel.id === selectedId) || null;
+  const needle = personQuery.trim().toLowerCase();
+  const shownTeammates = needle
+    ? teammates.filter((person) => `${personName(person)} ${person.email}`.toLowerCase().includes(needle))
+    : teammates;
 
   return (
     <div className="space-y-4">
@@ -333,7 +344,7 @@ function ChatScreen() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Chat</h1>
           <p className="mt-2 text-gray-600 max-w-3xl">
-            The team room is for everyone in this construction group. A direct message goes to one person. Turn on notifications to hear about new messages on this phone or computer.
+            Team chat goes to everyone in this construction group. A direct message goes to one person. Turn on notifications to hear about new messages on this phone or computer.
           </p>
         </div>
         <button
@@ -348,27 +359,6 @@ function ChatScreen() {
       {notice && <p className="rounded-md bg-green-50 text-green-800 px-4 py-3 text-sm">{notice}</p>}
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4 min-h-[60vh]">
         <aside className={`${selectedId ? 'hidden lg:block' : ''} bg-white rounded-lg shadow p-3 space-y-3`}>
-          <div className="flex gap-2">
-            <select
-              value={teammateId}
-              onChange={(event) => setTeammateId(event.target.value)}
-              className="flex-1 rounded-md border border-gray-300 px-2 py-2 bg-white text-sm min-h-[44px]"
-              aria-label="Teammate"
-            >
-              <option value="">Message one person</option>
-              {teammates.map((person) => (
-                <option key={person.id} value={person.id}>{personName(person)}</option>
-              ))}
-            </select>
-            <button
-              type="button"
-              disabled={!teammateId}
-              onClick={openDirect}
-              className="px-3 min-h-[44px] rounded-md bg-gray-900 text-white text-sm disabled:opacity-60"
-            >
-              Open
-            </button>
-          </div>
           <ul className="space-y-1">
             {channels.map((channel) => (
               <li key={channel.id} className="flex items-stretch gap-1">
@@ -384,6 +374,9 @@ function ChatScreen() {
                     )}
                   </span>
                   {channel.latest && <span className="block text-xs text-gray-500 truncate">{channel.latest.body}</span>}
+                  {channel.kind === 'TEAM' && (
+                    <span className="block text-xs text-gray-500">Everyone in this group</span>
+                  )}
                 </button>
                 <button
                   type="button"
@@ -395,6 +388,38 @@ function ChatScreen() {
               </li>
             ))}
           </ul>
+          <div>
+            <label className="block">
+              <span className="text-sm font-medium text-gray-700">Message one person</span>
+              <input
+                value={personQuery}
+                onChange={(event) => setPersonQuery(event.target.value)}
+                placeholder="Find a person"
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+              />
+            </label>
+            <p className="mt-2 text-sm text-gray-500">
+              {shownTeammates.length === teammates.length
+                ? `${teammates.length} people`
+                : `${shownTeammates.length} of ${teammates.length} people`}
+            </p>
+            <ul className="mt-2 rounded-md border border-gray-200 divide-y divide-gray-100">
+              {shownTeammates.map((person) => (
+                <li key={person.id}>
+                  <button
+                    type="button"
+                    onClick={() => void openDirect(person.id)}
+                    className="w-full text-left px-3 py-2 min-h-[44px] text-sm text-gray-900 hover:bg-gray-50"
+                  >
+                    {personName(person)}
+                  </button>
+                </li>
+              ))}
+              {shownTeammates.length === 0 && (
+                <li className="px-3 py-3 text-sm text-gray-500">No one matches.</li>
+              )}
+            </ul>
+          </div>
         </aside>
         <section className={`${selectedId ? 'flex' : 'hidden lg:flex'} bg-white rounded-lg shadow flex-col min-h-[70vh]`}>
           <div className="border-b border-gray-100 px-4 py-3 font-semibold text-gray-900 flex items-center gap-3">
@@ -405,7 +430,12 @@ function ChatScreen() {
             >
               Chats
             </button>
-            <span className="min-w-0 truncate">{selected?.title || 'Chat'}</span>
+            <span className="min-w-0">
+              <span className="block truncate">{selected?.title || 'Chat'}</span>
+              {selected?.kind === 'TEAM' && (
+                <span className="block text-xs font-normal text-gray-500">Everyone in this construction group</span>
+              )}
+            </span>
           </div>
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
             {messages.map((message) => (

@@ -3,8 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
-import { userInGroupWhere } from '@/lib/work-item-access';
-import { ensureTeamChannel } from '@/lib/chat';
+import { chatPeople, ensureTeamChannel } from '@/lib/chat';
 import { getPushConfig } from '@/lib/web-push';
 
 export async function GET() {
@@ -28,11 +27,7 @@ export async function GET() {
         },
         orderBy: { createdAt: 'asc' },
       }),
-      prisma.user.findMany({
-        where: { ...userInGroupWhere(groupId), id: { not: session.user.id } },
-        select: { id: true, name: true, email: true },
-        orderBy: [{ name: 'asc' }, { email: 'asc' }],
-      }),
+      chatPeople(groupId),
       prisma.chatRead.findMany({
         where: { userId: session.user.id },
         select: { channelId: true, readAt: true },
@@ -58,7 +53,7 @@ export async function GET() {
     return NextResponse.json({
       currentUserId: session.user.id,
       vapidPublicKey: push.publicKey,
-      teammates,
+      teammates: teammates.filter((person) => person.id !== session.user.id),
       channels: visible.map((channel, index) => {
         const otherId = channel.kind === 'DIRECT'
           ? channel.directKey.split(':').find((id) => id !== session.user.id) || null
@@ -68,7 +63,7 @@ export async function GET() {
         return {
           id: channel.id,
           kind: channel.kind,
-          title: channel.kind === 'TEAM' ? 'Team' : (other?.name || other?.email || 'Direct message'),
+          title: channel.kind === 'TEAM' ? 'Team chat' : (other?.name || other?.email || 'Direct message'),
           otherUserId: otherId,
           unread: unreadCounts[index] || 0,
           latest: latest ? {
@@ -77,7 +72,7 @@ export async function GET() {
             authorName: latest.author.name || latest.author.email,
           } : null,
         };
-      }),
+      }).sort((a, b) => (a.kind === b.kind ? a.title.localeCompare(b.title) : a.kind === 'TEAM' ? -1 : 1)),
     });
   } catch (error) {
     console.error('List chat error:', error);
