@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.48.8**
+Current: **1.49.0**
 
 ## Version History
+- **v1.49.0** (2026-11-11) - Process templates stay drafts until published, with a schedule and a choice of standalone or project
 - **v1.48.8** (2026-11-11) - Completion email follows the selection, chat lists everyone, and project assignment lists every Personnel person
 - **v1.48.7** (2026-11-11) - Phone numbers use one format, (555) 555-5555
 - **v1.48.6** (2026-11-11) - Select several accounts, invite someone who has not finished setup, and add a person to Personnel
@@ -64,8 +65,10 @@ Current: **1.48.8**
 - Help requests can be answered on the task
 
 ### Processes
-- A checklist saved for this construction group
-- Starting it adds one claimable process, and the steps stay inside it
+- A template stays a draft until someone publishes it
+- The schedule can be one time, daily, weekly, every two weeks, monthly, quarterly, yearly, or a custom interval
+- A published template is standalone, or it is added to a project
+- Starting it adds one work item, and the tasks stay inside that item
 
 ### Directory
 - Construction group, Personnel, and ancillary contacts sit above the trades
