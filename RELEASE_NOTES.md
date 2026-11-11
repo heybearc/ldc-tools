@@ -1,5 +1,14 @@
 # LDC Tools Release Notes
 
+## v1.48.5 - Creating an account uses platform access
+
+**Release Date:** November 11, 2026
+
+### 🐛 Bug Fixes
+
+- Accounts are created with User, Admin, Super Admin, or Read Only access
+- Organizational roles stay on the volunteer record
+
 ## v1.48.4 - The sign-in logo shows again
 
 **Release Date:** November 10, 2026
