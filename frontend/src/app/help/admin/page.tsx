@@ -59,8 +59,9 @@ export default function AdminHelpPage() {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-bold text-gray-900 mb-2">User accounts</h2>
         <p className="text-gray-700">
-          Open Admin, then Accounts. The invite form at the top sends an email with a setup link.
-          Choose the pencil to change a name or email, then choose Update User.
+          Open Admin, then Accounts. A new account appears in the list right away, including someone who has not finished setting up sign-in.
+          Select one or more people with the checkboxes. Send invitations emails each of them a setup link. You can also change access, status, or construction group for the selected people, then choose Apply.
+          Open More actions on one row to send a single invitation, or choose the pencil to change a name or email and then Update User.
           For someone who has not accepted an invitation, open More actions and choose Cancel Invitation.
           A notice asks you to confirm. They stay on the accounts list as inactive and cannot accept that invite.
         </p>

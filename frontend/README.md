@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.48.5**
+Current: **1.48.6**
 
 ## Version History
+- **v1.48.6** (2026-11-11) - Select several accounts, invite someone who has not finished setup, and add a person to Personnel
 - **v1.48.5** (2026-11-11) - Creating an account uses platform access
 - **v1.48.4** (2026-11-10) - The sign-in logo shows again
 - **v1.48.3** (2026-11-08) - Each phone screen is checked before release
