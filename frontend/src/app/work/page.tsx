@@ -86,6 +86,14 @@ function personName(person: Person | null) {
   return person.name || person.email;
 }
 
+function applyNotify(items: WorkItem[], overrides: Map<string, boolean>): WorkItem[] {
+  if (overrides.size === 0) return items;
+  return items.map((item) => {
+    const notifyRequestor = overrides.get(item.id);
+    return notifyRequestor === undefined ? item : { ...item, notifyRequestor };
+  });
+}
+
 function formatDone(value: string | null) {
   if (!value) return '';
   const date = new Date(value);
@@ -121,19 +129,26 @@ export default function WorkPage() {
   const [processPage, setProcessPage] = useState(0);
   const fileInput = useRef<HTMLInputElement>(null);
   const loadGeneration = useRef(0);
+  const emailOverride = useRef(new Map<string, boolean>());
 
   const load = useCallback(async () => {
     const generation = ++loadGeneration.current;
     setError('');
     try {
       const response = await fetch('/api/v1/work-items', { cache: 'no-store' });
-      if (generation !== loadGeneration.current) return;
       const body = await response.json().catch(() => ({}));
+      if (generation !== loadGeneration.current) return;
       if (!response.ok) {
         setError(userError(response.status, body.error, 'Could not load work'));
         return;
       }
-      setData(body);
+      const items = applyNotify(body.items || [], emailOverride.current);
+      for (const item of body.items || []) {
+        if (emailOverride.current.get(item.id) === item.notifyRequestor) {
+          emailOverride.current.delete(item.id);
+        }
+      }
+      setData({ ...body, items });
     } catch {
       if (generation !== loadGeneration.current) return;
       setError(userError(0, '', 'Could not load work'));
@@ -292,23 +307,38 @@ export default function WorkPage() {
     }
   }
 
+  function rememberEmail(id: string, notifyRequestor: boolean) {
+    emailOverride.current.set(id, notifyRequestor);
+    setData((current) => current ? { ...current, items: applyNotify(current.items, emailOverride.current) } : current);
+  }
+
   async function setNotifySelected(notifyRequestor: boolean) {
-    if (selectedIds.length === 0) return;
+    const ids = selectedIds;
+    if (ids.length === 0) return;
     setError('');
     setNotice('');
     try {
       const response = await fetch('/api/v1/work-items/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: selectedIds, notifyRequestor }),
+        body: JSON.stringify({ ids, notifyRequestor }),
       });
       const body = await response.json();
-      if (!response.ok) {
+      const savedIds = Array.isArray(body.ids)
+        ? body.ids.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0)
+        : [];
+      if (!response.ok || savedIds.length === 0) {
         setError(userError(response.status, body.error, 'Could not update the completion email'));
         return;
       }
-      setNotice(notifyRequestor ? 'Completion email is on for the selection.' : 'Completion email is off for the selection.');
+      savedIds.forEach((id: string) => emailOverride.current.set(id, notifyRequestor));
+      setData((current) => current ? { ...current, items: applyNotify(current.items, emailOverride.current) } : current);
+      const count = savedIds.length;
+      setNotice(notifyRequestor
+        ? `Completion email is on for ${count} task${count === 1 ? '' : 's'}.`
+        : `Completion email is off for ${count} task${count === 1 ? '' : 's'}.`);
       setSelectedIds([]);
+      setLastSelectedIndex(null);
       await load();
     } catch {
       setError(userError(0, '', 'Could not update the completion email'));
@@ -744,6 +774,7 @@ export default function WorkPage() {
                   onClaim={() => claim(item.id)}
                   onDone={() => setStatus(item.id, 'DONE')}
                   onChanged={load}
+                  onEmailChange={rememberEmail}
                 />
               );
             })}
@@ -783,6 +814,7 @@ export default function WorkPage() {
                     onClaim={() => claim(item.id)}
                     onDone={() => setStatus(item.id, 'OPEN')}
                     onChanged={load}
+                    onEmailChange={rememberEmail}
                   />
                 ))}
                 <Pager
@@ -1042,6 +1074,7 @@ export function WorkRow({
   onClaim,
   onDone,
   onChanged,
+  onEmailChange,
 }: {
   item: WorkItem;
   currentUserId: string;
@@ -1052,6 +1085,7 @@ export function WorkRow({
   onClaim: () => void;
   onDone: () => void;
   onChanged: () => Promise<void>;
+  onEmailChange?: (id: string, notifyRequestor: boolean) => void;
 }) {
   const [note, setNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
@@ -1168,15 +1202,19 @@ export function WorkRow({
           {(item.timingKind === 'CREW_REQUEST' || item.requestorEmail) && (
             <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
               <input
+                key={item.notifyRequestor === false ? 'email-off' : 'email-on'}
                 type="checkbox"
                 checked={item.notifyRequestor !== false && !isAirgappedEmail(item.requestorEmail)}
                 disabled={isAirgappedEmail(item.requestorEmail)}
                 onChange={async (event) => {
-                  await fetch(`/api/v1/work-items/${item.id}`, {
+                  const next = event.target.checked;
+                  const response = await fetch(`/api/v1/work-items/${item.id}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ notifyRequestor: event.target.checked }),
+                    body: JSON.stringify({ notifyRequestor: next }),
                   });
+                  if (!response.ok) return;
+                  onEmailChange?.(item.id, next);
                   await onChanged();
                 }}
               />

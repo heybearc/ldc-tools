@@ -7,6 +7,8 @@ import { activeUserInGroup, canPostWork, isPersonnelLead, projectInGroup, userIn
 import { dueOnDate, timingLabel, validateWorkItemInput } from '@/lib/work-items';
 import { hiddenReleaseCheckProcess, hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
 
+export const dynamic = 'force-dynamic';
+
 const itemInclude = {
   assignee: { select: { id: true, name: true, email: true } },
   project: { select: { id: true, name: true } },
@@ -190,6 +192,8 @@ export async function GET() {
           referenceUrl: step.referenceUrl,
         })),
       })),
+    }, {
+      headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
     console.error('List work items error:', error);
