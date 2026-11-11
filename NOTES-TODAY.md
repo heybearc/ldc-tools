@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-11)
+- Shipped v1.48.4 (`1683f98`). LIVE blue CT133. STANDBY was synced, then green CT135 took `fd1d11b`. qa-01 full suite 94 passed, plus the sign-in logo test.
+- Signed-out `/logo.svg` was redirected to sign-in, so the logo was a blank circle. Public files now load without a session.
+- The release gate writes QA rows into the shared database. The old rows and the v1.48.4 leftovers are deleted. Available work is 174 open crew requests.
+- Release tests now delete QA work, processes, and chat when they finish. That code is on STANDBY only.
+- A claimed task still shows the Claimable tag. Sort stays by due date. Not changed.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: `/ship` so live has the test cleanup. New session before the next slice.
+
 ### Mid-day (2026-11-09)
 - Shipped v1.48.3 (`5b47b4c`). LIVE green CT135. STANDBY blue CT133, synced. qa-01 directory gate plus the phone-feature API test passed.
 - Each phone feature has its own Maestro flow. Android emulator: 10/10 passed. iOS was not rerun.

@@ -1,18 +1,21 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-09  
+**Last updated:** 2026-11-11  
 **Current branch:** main  
-**Working on:** v1.48.3 is LIVE on green (CT135). STANDBY is blue (CT133). Both are `5b47b4c`. Hub dates stay paused.
+**Working on:** v1.48.4 is LIVE on blue (CT133). STANDBY green (CT135) is `fd1d11b` (QA cleanup, not shipped). Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.48.3 (`5b47b4c`) is LIVE on green CT135 and synced to blue CT133. Android phone feature flows passed 10/10. iOS 1.1.0 build 10 and Android version code 17 are uploaded. Hub dates stay paused.
+v1.48.4 (`1683f98`) is LIVE on blue CT133. Sign-in logo loads while signed out. STANDBY green CT135 is `fd1d11b`: release tests delete their QA rows. Available work is 174. Hub dates stay paused.
 
 ### What I'm doing right now
 Nothing in progress.
 
 ### Recent completions
+- ✅ Shipped v1.48.4 (`1683f98`). Sign-in logo. qa-01 full suite 94 plus the logo test. LIVE blue CT133.
+- ✅ Removed QA work left by the release gate. Available work is 174 crew requests.
+- ✅ Release-test cleanup (`fd1d11b`) is on STANDBY green CT135. Not shipped.
 - ✅ D-069 recorded. `/ship` classifies site vs phone and builds both store binaries when `mobile/` changed.
 - ✅ Site standby deploy of `0e45f7f` succeeded on green CT135. Main later moved for governance only (`7f43079`).
 - ✅ Shipped v1.47.0 (`b9733db`). Public privacy and support, account deletion, chat report and block. qa-01 full suite (88) plus the generated store-review test. LIVE green CT135, STANDBY blue CT133.
@@ -47,7 +50,7 @@ Nothing in progress.
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Hub assignment dates stay paused. New session before the next slice.
+`/ship` the QA cleanup (`fd1d11b`). Hub assignment dates stay paused. New session before the next slice.
 
 ---
 
@@ -65,4 +68,4 @@ Hub assignment dates stay paused. New session before the next slice.
 ---
 
 ## Exact Next Command
-Hub assignment dates stay paused. New session before the next slice.
+`/ship` the QA cleanup (`fd1d11b`). Hub assignment dates stay paused. New session before the next slice.

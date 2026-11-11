@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-09  
+**Last updated:** 2026-11-11  
 **Current phase:** Region work queue  
-**Status:** v1.48.3 is LIVE on green (CT135). STANDBY is blue (CT133). Both are `5b47b4c`. Hub dates are paused.
+**Status:** v1.48.4 is LIVE on blue (CT133, `1683f98`). STANDBY green (CT135) is `fd1d11b`. Hub dates are paused.
 
 ---
 
@@ -33,6 +33,8 @@
 - [x] Slice 6 — crew-request spreadsheet import onto the work list
 - [x] Slice 8 — directory contacts are not sign-in accounts
 - [x] D-069 — `/ship` classifies site vs phone and builds iOS then Android when `mobile/` changed
+- [x] Sign-in logo; `/ship` v1.48.4
+- [ ] Release tests delete QA rows (`fd1d11b` on STANDBY). Ship so live matches.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
