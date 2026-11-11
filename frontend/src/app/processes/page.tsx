@@ -41,6 +41,7 @@ export default function ProcessesPage() {
   const [appliesTo, setAppliesTo] = useState<ProcessAppliesTo>('TEAM');
   const [cadence, setCadence] = useState<ProcessCadence>('MONTHLY');
   const [tasks, setTasks] = useState<Task[]>([{ ...EMPTY_TASK }]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [projectChoice, setProjectChoice] = useState<Record<string, string>>({});
@@ -79,6 +80,30 @@ export default function ProcessesPage() {
     setTasks((current) => current.map((task, i) => (i === index ? { ...task, ...patch } : task)));
   }
 
+  function resetForm() {
+    setEditingId(null);
+    setName('');
+    setPurpose('');
+    setAppliesTo('TEAM');
+    setCadence('MONTHLY');
+    setTasks([{ ...EMPTY_TASK }]);
+  }
+
+  function editTemplate(template: Template) {
+    setEditingId(template.id);
+    setName(template.name);
+    setPurpose(template.purpose || '');
+    setAppliesTo(template.appliesTo);
+    setCadence(template.cadence === 'WEEKLY' ? 'WEEKLY' : template.appliesTo === 'PROJECT' ? 'ONCE' : 'MONTHLY');
+    setTasks(template.steps.map((step) => ({
+      title: step.title,
+      instructions: taskInstructions(step.detail, step.explanation),
+      referenceUrl: step.referenceUrl || '',
+    })));
+    setShowForm(true);
+    setError('');
+  }
+
   function chooseScope(next: ProcessAppliesTo) {
     setAppliesTo(next);
     setCadence(next === 'TEAM' ? 'MONTHLY' : cadence === 'WEEKLY' ? 'WEEKLY' : 'ONCE');
@@ -89,31 +114,28 @@ export default function ProcessesPage() {
     setSaving(true);
     setError('');
     try {
-      const response = await fetch('/api/v1/processes', {
-        method: 'POST',
+      const payload = {
+        name,
+        purpose,
+        appliesTo,
+        cadence: appliesTo === 'TEAM' ? 'MONTHLY' : cadence,
+        steps: tasks.map((task) => ({
+          title: task.title,
+          detail: task.instructions,
+          referenceUrl: task.referenceUrl || null,
+        })),
+      };
+      const response = await fetch(editingId ? `/api/v1/processes/${editingId}` : '/api/v1/processes', {
+        method: editingId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          purpose,
-          appliesTo,
-          cadence: appliesTo === 'TEAM' ? 'MONTHLY' : cadence,
-          steps: tasks.map((task) => ({
-            title: task.title,
-            detail: task.instructions,
-            referenceUrl: task.referenceUrl || null,
-          })),
-        }),
+        body: JSON.stringify(payload),
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(userError(response.status, body.error, 'Could not add the process'));
+        setError(userError(response.status, body.error, editingId ? 'Could not update the process' : 'Could not add the process'));
         return;
       }
-      setName('');
-      setPurpose('');
-      setAppliesTo('TEAM');
-      setCadence('MONTHLY');
-      setTasks([{ ...EMPTY_TASK }]);
+      resetForm();
       setShowForm(false);
       await load();
     } finally {
@@ -168,7 +190,10 @@ export default function ProcessesPage() {
         {canPost && (
           <button
             type="button"
-            onClick={() => setShowForm((open) => !open)}
+            onClick={() => {
+              if (showForm) resetForm();
+              setShowForm((open) => !open);
+            }}
             className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium"
           >
             Add process
@@ -186,6 +211,7 @@ export default function ProcessesPage() {
 
       {showForm && canPost && (
         <form onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">
+          {editingId && <p className="text-sm font-medium text-gray-700">Editing this template. Work already started keeps its copied tasks.</p>}
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Name</span>
             <input
@@ -311,7 +337,7 @@ export default function ProcessesPage() {
               disabled={saving}
               className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
             >
-              Save process
+              {editingId ? 'Save changes' : 'Save process'}
             </button>
           </div>
         </form>
@@ -352,7 +378,14 @@ export default function ProcessesPage() {
                 })}
               </ol>
               {canPost && (
-                <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                <div className="mt-4 flex flex-col sm:flex-row flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => editTemplate(template)}
+                    className="px-4 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium"
+                  >
+                    Edit
+                  </button>
                   {template.appliesTo === 'PROJECT' && (
                     <select
                       value={projectChoice[template.id] || ''}

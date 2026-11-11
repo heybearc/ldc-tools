@@ -36,6 +36,7 @@ export default async function ProcessesHelpPage() {
           <p>
             Personnel can add a process. Give it a name and a purpose. Each task has a title. Instructions and a reference link are optional.
             A team process is monthly and is not tied to a project. A project process is once or weekly.
+            Edit changes the template. Work already started keeps the tasks it copied.
           </p>
 
           <h2>Start a process</h2>
