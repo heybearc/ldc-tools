@@ -75,6 +75,63 @@ function personName(person: Person) {
   return person.name || person.email;
 }
 
+function PersonnelPicker({
+  people,
+  disabled,
+  onAssign,
+}: {
+  people: Person[];
+  disabled: boolean;
+  onAssign: (userId: string) => void;
+}) {
+  const [query, setQuery] = useState('');
+  const needle = query.trim().toLowerCase();
+  const shown = needle
+    ? people.filter((person) => `${personName(person)} ${person.email}`.toLowerCase().includes(needle))
+    : people;
+
+  return (
+    <div className="mt-3">
+      <label className="block">
+        <span className="text-sm font-medium text-gray-700">Add Personnel</span>
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Find a person"
+          className="mt-1 w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+        />
+      </label>
+      {people.length === 0 ? (
+        <p className="mt-2 text-sm text-gray-500">Everyone on Personnel is already assigned.</p>
+      ) : (
+        <>
+          <p className="mt-2 text-sm text-gray-500">
+            {shown.length === people.length ? `${people.length} people` : `${shown.length} of ${people.length} people`}
+          </p>
+          <ul className="mt-2 rounded-md border border-gray-200 divide-y divide-gray-100">
+            {shown.map((person) => (
+              <li key={person.id} className="flex items-center justify-between gap-3 px-3 py-2">
+                <span className="text-sm text-gray-900">{personName(person)}</span>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => onAssign(person.id)}
+                  className="shrink-0 px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
+                >
+                  Assign
+                </button>
+              </li>
+            ))}
+            {shown.length === 0 && (
+              <li className="px-3 py-3 text-sm text-gray-500">No one matches.</li>
+            )}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [personnel, setPersonnel] = useState<Person[]>([]);
@@ -87,7 +144,6 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [choice, setChoice] = useState<Record<string, string>>({});
   const [drafts, setDrafts] = useState<Record<string, DateDraft>>({});
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -130,9 +186,7 @@ export default function ProjectsPage() {
     return () => window.removeEventListener('cg-filter-changed', onGroupChange);
   }, [load]);
 
-  async function assign(projectId: string) {
-    const userId = choice[projectId];
-    if (!userId) return;
+  async function assign(projectId: string, userId: string) {
     setBusyId(projectId);
     setError('');
     try {
@@ -146,7 +200,6 @@ export default function ProjectsPage() {
         setError(userError(response.status, body.error, 'Could not assign Personnel'));
         return;
       }
-      setChoice((current) => ({ ...current, [projectId]: '' }));
       await load();
     } finally {
       setBusyId(null);
@@ -535,26 +588,11 @@ export default function ProjectsPage() {
                   </ul>
                 )}
                 {canAssign && (
-                  <div className="mt-3 flex flex-col sm:flex-row gap-2">
-                    <select
-                      value={choice[project.id] || ''}
-                      onChange={(event) => setChoice({ ...choice, [project.id]: event.target.value })}
-                      className="rounded-md border border-gray-300 px-3 py-2 bg-white text-sm min-h-[44px]"
-                    >
-                      <option value="">Add Personnel</option>
-                      {personnel.filter((person) => !project.personnel.some((assigned) => assigned.id === person.id)).map((person) => (
-                        <option key={person.id} value={person.id}>{personName(person)}</option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      disabled={!choice[project.id] || busyId === project.id}
-                      onClick={() => assign(project.id)}
-                      className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
-                    >
-                      Assign
-                    </button>
-                  </div>
+                  <PersonnelPicker
+                    people={personnel.filter((person) => !project.personnel.some((assigned) => assigned.id === person.id))}
+                    disabled={busyId === project.id}
+                    onAssign={(userId) => assign(project.id, userId)}
+                  />
                 )}
               </div>
               <div className="mt-4 border-t border-gray-100 pt-4">
