@@ -22,6 +22,9 @@ test('directory edit keeps an ended person until a replacement starts', async ({
 
   await page.getByRole('button', { name: 'Add person' }).click();
   await expect(page.getByRole('heading', { name: 'Add person' })).toBeVisible();
+  await expect(page.getByLabel('Place')).toBeVisible();
+  await page.getByLabel('Place').selectOption('personnel');
+  await expect(page.getByLabel('Role').locator('option')).toHaveText(['Contact', 'Assistant', 'Support']);
   await expect(page.getByText('An end date deactivates this person.')).toBeVisible();
   await page.getByRole('button', { name: 'Cancel' }).click();
   await expect(page.getByRole('heading', { name: 'Add person' })).toBeHidden();

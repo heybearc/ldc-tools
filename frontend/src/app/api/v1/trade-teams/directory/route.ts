@@ -4,7 +4,9 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth-config';
 import { parseDirectoryDate } from '@/lib/directory-assignments';
+import { getCGScope } from '@/lib/cg-scope';
 import {
+  PERSONNEL_CONTACT_CONFIG,
   TRADE_CREW_OVERSIGHT_CONFIG,
   TRADE_TEAM_OVERSIGHT_CONFIG,
   validateRoleLimit,
@@ -173,9 +175,9 @@ async function ensureVolunteer(
         phone: fields.phone,
       },
     });
-    return;
+    return user.volunteer.id;
   }
-  if (!constructionGroupId) return;
+  if (!constructionGroupId) return null;
   const volunteer = await prisma.volunteer.create({
     data: {
       firstName: fields.firstName || 'Unknown',
@@ -190,6 +192,155 @@ async function ensureVolunteer(
     where: { id: userId },
     data: { volunteerId: volunteer.id },
   });
+  return volunteer.id;
+}
+
+async function createDirectoryGroupPerson(body: Record<string, unknown>) {
+  const place = body.scope === 'construction-group' ? 'construction-group' : 'personnel';
+  const firstName = String(body.firstName || '').trim();
+  const lastName = String(body.lastName || '').trim();
+  const email = String(body.email || '').trim().toLowerCase();
+  const phone = String(body.phone || '').trim() || null;
+  const photo = profileImage(body.image);
+  const role = String(body.role || '');
+  const isSister = body.isSister === true;
+  const startDate = parseDirectoryDate(body.startDate) || new Date();
+  const endDate = typeof body.endDate === 'string' && body.endDate ? parseDirectoryDate(body.endDate) : null;
+  const allowed = place === 'personnel'
+    ? ['PC', 'PCA', 'PC-Support']
+    : ['CGO', 'ACGO', 'CG-Support'];
+
+  if (photo.error) return NextResponse.json({ error: photo.error }, { status: 400 });
+  if (!firstName || !lastName || !email) {
+    return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
+  }
+  if (!allowed.includes(role)) {
+    return NextResponse.json({ error: 'Choose a role for that team' }, { status: 400 });
+  }
+  if (isSister && !role.endsWith('Support')) {
+    return NextResponse.json({ error: 'Sisters can only be Support' }, { status: 400 });
+  }
+
+  const cgScope = await getCGScope();
+  const constructionGroupId = cgScope?.constructionGroupId;
+  if (!constructionGroupId) {
+    return NextResponse.json({ error: 'Choose a construction group in the header first.' }, { status: 400 });
+  }
+
+  const displayName = `${firstName} ${lastName}`.trim();
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  const user = existingUser
+    ? await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          name: existingUser.name || displayName,
+          firstName: existingUser.firstName || firstName,
+          lastName: existingUser.lastName || lastName,
+          isSister,
+          ...(photo.image ? { image: photo.image } : {}),
+          constructionGroupId: existingUser.constructionGroupId || constructionGroupId,
+        },
+      })
+    : await prisma.user.create({
+        data: {
+          name: displayName,
+          firstName,
+          lastName,
+          email,
+          isSister,
+          image: photo.image,
+          constructionGroupId,
+          role: 'USER',
+          status: 'INVITED',
+        },
+      });
+
+  const volunteerId = await ensureVolunteer(user.id, constructionGroupId, { firstName, lastName, email, phone });
+  if (!volunteerId) {
+    return NextResponse.json({ error: 'Could not save this person' }, { status: 500 });
+  }
+  await prisma.volunteer.update({
+    where: { id: volunteerId },
+    data: { isActive: endDate == null, constructionGroupId },
+  });
+
+  if (place === 'personnel') {
+    const contactRole = role === 'PC-Support' ? 'PC_SUPPORT' : role;
+    const already = await prisma.personnelContact.findUnique({
+      where: {
+        constructionGroupId_userId_role: {
+          constructionGroupId,
+          userId: user.id,
+          role: contactRole as 'PC',
+        },
+      },
+    });
+    if (!(already?.isActive) && !endDate) {
+      const currentCount = await prisma.personnelContact.count({
+        where: { constructionGroupId, role: contactRole as 'PC', isActive: true, endDate: null },
+      });
+      const validation = validateRoleLimit(PERSONNEL_CONTACT_CONFIG, contactRole, currentCount);
+      if (!validation.valid) return NextResponse.json({ error: validation.message }, { status: 400 });
+    }
+    if (already?.isActive && !endDate) {
+      return NextResponse.json({ error: 'This person already has that role on Personnel' }, { status: 409 });
+    }
+    if (already) {
+      await prisma.personnelContact.update({
+        where: { id: already.id },
+        data: { isActive: endDate == null, endDate, startDate },
+      });
+    } else {
+      await prisma.personnelContact.create({
+        data: {
+          constructionGroupId,
+          userId: user.id,
+          role: contactRole as 'PC',
+          isActive: endDate == null,
+          startDate,
+          endDate,
+        },
+      });
+    }
+  } else {
+    const currentCount = await prisma.volunteerRole.count({
+      where: {
+        roleCode: { in: roleAliases(role) },
+        isActive: true,
+        endDate: null,
+        entityId: constructionGroupId,
+      },
+    });
+    const max = role === 'CGO' ? 1 : role === 'ACGO' ? 2 : null;
+    const alreadyRole = await prisma.volunteerRole.findFirst({
+      where: { volunteerId, roleCode: { in: roleAliases(role) }, entityId: constructionGroupId, isActive: true, endDate: null },
+    });
+    if (!alreadyRole && max != null && currentCount >= max) {
+      return NextResponse.json({ error: `Only ${max} people can have that role` }, { status: 400 });
+    }
+  }
+
+  const existingRole = await prisma.volunteerRole.findFirst({
+    where: { volunteerId, roleCode: { in: roleAliases(role) }, entityId: constructionGroupId },
+  });
+  const roleData = {
+    roleCode: role,
+    roleName: GROUP_ROLE_NAMES[role] || role,
+    roleCategory: place === 'personnel' ? 'REGION_SUPPORT_SERVICES' as const : 'CG_OVERSIGHT' as const,
+    entityType: 'Construction Group',
+    entityId: constructionGroupId,
+    isPrimary: false,
+    startDate,
+    endDate,
+    isActive: endDate == null,
+  };
+  if (existingRole) {
+    await prisma.volunteerRole.update({ where: { id: existingRole.id }, data: roleData });
+  } else {
+    await prisma.volunteerRole.create({ data: { volunteerId, ...roleData } });
+  }
+
+  return NextResponse.json({ success: true }, { status: 201 });
 }
 
 export async function POST(request: NextRequest) {
@@ -198,6 +349,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const body = await request.json();
+    if (body.scope === 'personnel' || body.scope === 'construction-group') {
+      return createDirectoryGroupPerson(body);
+    }
     const firstName = String(body.firstName || '').trim();
     const lastName = String(body.lastName || '').trim();
     const email = String(body.email || '').trim().toLowerCase();

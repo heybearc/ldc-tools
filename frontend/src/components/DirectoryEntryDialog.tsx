@@ -125,7 +125,7 @@ export default function DirectoryEntryDialog({
   const isGroup = entry?.kind === 'group';
   const initialName = entry ? nameParts(entry.user) : { firstName: '', lastName: '' };
   const initialCrew = entry?.crewId || defaults?.crewId || '';
-  const initialTeam = entry?.tradeTeamId || defaults?.tradeTeamId || teams[0]?.id || '';
+  const initialTeam = entry?.tradeTeamId || defaults?.tradeTeamId || teams[0]?.id || 'personnel';
   const initialGroupRole = normalizeGroupRole(entry?.role || 'PC-Support');
   const [firstName, setFirstName] = useState(initialName.firstName);
   const [lastName, setLastName] = useState(initialName.lastName);
@@ -136,7 +136,7 @@ export default function DirectoryEntryDialog({
   const [photoError, setPhotoError] = useState<string | null>(null);
   const positionerRef = useRef<PhotoPositionHandle>(null);
   const [isSister, setIsSister] = useState(entry?.user.isSister === true);
-  const [tradeTeamId, setTradeTeamId] = useState(initialTeam);
+  const [place, setPlace] = useState(initialTeam);
   const [crewId, setCrewId] = useState(initialCrew);
   const [role, setRole] = useState(
     isGroup
@@ -149,14 +149,19 @@ export default function DirectoryEntryDialog({
   const [error, setError] = useState<string | null>(null);
 
   const crews = useMemo(
-    () => teams.find((team) => team.id === tradeTeamId)?.crews || [],
-    [teams, tradeTeamId]
+    () => teams.find((team) => team.id === place)?.crews || [],
+    [teams, place]
   );
+  const groupPlace = place === 'personnel' || place === 'construction-group';
   const groupFamily = PERSONNEL_ROLES.concat(CONSTRUCTION_ROLES).some((item) => item.value === initialGroupRole);
   const groupChoices = groupRoles(initialGroupRole).filter((item) => !isSister || !groupFamily || item.label === 'Support' || item.value.endsWith('Support'));
+  const placeRoles = (place === 'construction-group' ? CONSTRUCTION_ROLES : PERSONNEL_ROLES)
+    .filter((item) => !isSister || item.value.endsWith('Support'));
   const roles = isGroup
     ? groupChoices
-    : (crewId ? CREW_ROLES : TEAM_ROLES).filter((item) => !isSister || item.value === supportRole(Boolean(crewId)));
+    : groupPlace
+      ? placeRoles
+      : (crewId ? CREW_ROLES : TEAM_ROLES).filter((item) => !isSister || item.value === supportRole(Boolean(crewId)));
 
   async function save() {
     setSaving(true);
@@ -191,7 +196,20 @@ export default function DirectoryEntryDialog({
           startDate,
           endDate,
         }
-      : {
+      : mode === 'add' && groupPlace
+        ? {
+            scope: place,
+            firstName,
+            lastName,
+            email,
+            phone,
+            image: nextImage,
+            isSister,
+            role,
+            startDate,
+            endDate,
+          }
+        : {
           id: entry?.id,
           scope: crewId ? 'crew' : 'team',
           firstName,
@@ -201,7 +219,7 @@ export default function DirectoryEntryDialog({
           image: nextImage,
           isSister,
           role,
-          tradeTeamId,
+          tradeTeamId: place,
           crewId: crewId || null,
           originScope: entry?.crewId ? 'crew' : 'team',
           startDate,
@@ -304,21 +322,67 @@ export default function DirectoryEntryDialog({
               onChange={(event) => {
                 const sister = event.target.checked;
                 setIsSister(sister);
-                setRole(isGroup ? (groupRoles(initialGroupRole).find((item) => item.label === 'Support')?.value || role) : roleForScope(Boolean(crewId), sister, role));
+                setRole(isGroup
+                  ? (groupRoles(initialGroupRole).find((item) => item.label === 'Support')?.value || role)
+                  : groupPlace
+                    ? ((place === 'construction-group' ? CONSTRUCTION_ROLES : PERSONNEL_ROLES).find((item) => item.value.endsWith('Support'))?.value || role)
+                    : roleForScope(Boolean(crewId), sister, role));
               }}
             />
             Sister
           </label>
           <p className="text-xs text-gray-500">Sisters can only be Support.</p>
-          {!isGroup && (
+          {!isGroup && mode === 'add' && (
+            <label className="block text-sm text-gray-700">
+              Place
+              <select
+                className="mt-1 w-full rounded border px-2 py-2"
+                value={place}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  setPlace(next);
+                  setCrewId('');
+                  if (next === 'personnel') setRole(isSister ? 'PC-Support' : 'PC');
+                  else if (next === 'construction-group') setRole(isSister ? 'CG-Support' : 'CGO');
+                  else setRole(roleForScope(false, isSister, role));
+                }}
+              >
+                <option value="personnel">Personnel</option>
+                <option value="construction-group">Construction group</option>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>{team.name}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          {!isGroup && mode === 'add' && !groupPlace && (
+            <label className="block text-sm text-gray-700">
+              Crew
+              <select
+                className="mt-1 w-full rounded border px-2 py-2"
+                value={crewId}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  setCrewId(next);
+                  setRole(roleForScope(Boolean(next), isSister, role));
+                }}
+              >
+                <option value="">Team level</option>
+                {crews.map((crew) => (
+                  <option key={crew.id} value={crew.id}>{crew.name}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          {!isGroup && mode === 'edit' && (
             <>
               <label className="block text-sm text-gray-700">
                 Trade
                 <select
                   className="mt-1 w-full rounded border px-2 py-2"
-                  value={tradeTeamId}
+                  value={place}
                   onChange={(event) => {
-                    setTradeTeamId(event.target.value);
+                    setPlace(event.target.value);
                     setCrewId('');
                     setRole(roleForScope(false, isSister, role));
                   }}

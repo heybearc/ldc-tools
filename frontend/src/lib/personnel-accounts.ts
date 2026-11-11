@@ -35,6 +35,11 @@ export function mobileSignInAccountWhere(constructionGroupId: string) {
       },
       { role: { in: SIGN_IN_ADMIN_ROLES } },
       {
+        passwordHash: { not: null },
+        tradeTeamOversight: { none: { isActive: true, endDate: null } },
+        tradeCrewOversight: { none: { isActive: true, endDate: null } },
+      },
+      {
         invitedBy: { not: null },
         tradeTeamOversight: { none: { isActive: true, endDate: null } },
         tradeCrewOversight: { none: { isActive: true, endDate: null } },
@@ -77,6 +82,11 @@ export function adminSignInAccountWhere(scope: { constructionGroupId: string | n
             },
           },
           { role: { in: SIGN_IN_ADMIN_ROLES } },
+          {
+            passwordHash: { not: null },
+            tradeTeamOversight: { none: { isActive: true, endDate: null } },
+            tradeCrewOversight: { none: { isActive: true, endDate: null } },
+          },
           {
             invitedBy: { not: null },
             tradeTeamOversight: { none: { isActive: true, endDate: null } },
