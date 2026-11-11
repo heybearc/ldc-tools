@@ -2,17 +2,18 @@
 
 **Last updated:** 2026-11-11  
 **Current branch:** main  
-**Working on:** v1.48.7 is LIVE on green (CT135, `962eeb0`). STANDBY blue (CT133) is `2ca911f` (QA tasks stay off the work list, not shipped). Hub dates stay paused.
+**Working on:** Assign and chat rosters are on STANDBY blue (CT133, `15ba2b3`). LIVE is still v1.48.7 on green (CT135, `962eeb0`). Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.48.7 (`962eeb0`) is LIVE on green CT135. Phone numbers show as (555) 555-5555. Accounts from v1.48.6 are included. STANDBY blue CT133 is `2ca911f`: work lists skip titles that start with "QA ". Hub dates stay paused.
+Projects list every Personnel person, including people who have not signed in. Chat lists every person. Team chat is first and a message there goes to the whole group. Notifications wait until the service worker is active. STANDBY blue CT133 is `15ba2b3` (includes the QA-task hide). LIVE green CT135 is still `962eeb0`. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress.
+Nothing in progress. Test on STANDBY, then ship.
 
 ### Recent completions
+- ✅ Project assign and chat rosters (`6c4a93f`, `15ba2b3`) on STANDBY blue CT133. Not shipped.
 - ✅ Shipped v1.48.7 (`962eeb0`). Phone numbers use (555) 555-5555. qa-01 directory and volunteers gate plus the phone-format test. LIVE green CT135. STANDBY blue CT133 was synced, then took `2ca911f`.
 - ✅ Shipped v1.48.6 (`8220ede`). Created accounts stay on the list, several can be invited, and Add person can choose Personnel. LIVE was blue CT133.
 - ✅ Deleted the three QA work items and three QA process templates from the shared database. The hide rule is on STANDBY only (`2ca911f`).
@@ -56,7 +57,7 @@ Nothing in progress.
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-`/ship` the QA-task hide (`2ca911f`). Hub assignment dates stay paused. New session before the next slice.
+Test https://blue.ldctools.com (project assign, Team chat, notifications), then `/ship` `15ba2b3`. Hub assignment dates stay paused. New session before the next slice.
 
 ---
 
@@ -74,4 +75,4 @@ Nothing in progress.
 ---
 
 ## Exact Next Command
-`/ship` the QA-task hide (`2ca911f`). Hub assignment dates stay paused. New session before the next slice.
+Test https://blue.ldctools.com (project assign, Team chat, notifications), then `/ship` `15ba2b3`. Hub assignment dates stay paused. New session before the next slice.

@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-11, assign and chat)
+- Project assign lists every Personnel person, including invited accounts (`6c4a93f`). The system menu was hiding names past the first screen.
+- Chat lists every person. Team chat is first and a message there goes to the whole group (`15ba2b3`).
+- Notifications failed until the service worker was active. Refresh STANDBY and turn them on again.
+- The long console trace is the 1Password extension. One app line: Mark Stoner's directory photo returns 404.
+- STANDBY blue CT133 is `15ba2b3`. LIVE stays v1.48.7 green CT135. Not switched.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: test https://blue.ldctools.com, then `/ship`. New session before the next slice.
+
 ### Mid-day (2026-11-11, phone format and QA tasks)
 - Shipped v1.48.6 (`8220ede`) then v1.48.7 (`962eeb0`). LIVE green CT135. STANDBY blue CT133 is `2ca911f`.
 - v1.48.6: created accounts stay listed, several can be invited, Add person includes Personnel. v1.48.7: phone numbers show as (555) 555-5555 and a partial number is rejected.
