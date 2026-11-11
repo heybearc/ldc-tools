@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-11  
 **Current phase:** Region work queue  
-**Status:** v1.48.7 is LIVE on green (CT135, `962eeb0`). STANDBY blue (CT133) is `15ba2b3`. Hub dates are paused.
+**Status:** v1.48.8 is LIVE on blue (CT133, `df42264`). STANDBY green (CT135) is `81ff84c`. Hub dates are paused.
 
 ---
 
@@ -37,8 +37,8 @@
 - [x] Account create uses platform access; `/ship` v1.48.5
 - [x] Created accounts stay on the list, and Add person can choose Personnel; `/ship` v1.48.6
 - [x] Phone numbers use (555) 555-5555; `/ship` v1.48.7
-- [x] Project assign and chat show the full roster; Team chat notifies the group (`15ba2b3` on STANDBY). Not shipped.
-- [ ] Work lists skip QA test tasks (included in `15ba2b3` on STANDBY). Ship so live matches.
+- [x] Phone numbers, QA-task hide, and completion email for a selection; `/ship` v1.48.8
+- [ ] Project search assigns several Personnel people. Chat is the Personnel team only (`81ff84c` on STANDBY). Ship so live matches.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-11, personnel search and chat)
+- Shipped v1.48.8 (`df42264`). LIVE blue CT133. Completion email stays off after a shift-select. qa-01 directory and volunteers gate plus the email-off test passed.
+- Project assign is a search. Check several Personnel people, then assign them together (`c8fe9a2`). Checked on STANDBY: two names, then Assign 2 people.
+- Chat no longer lists the directory. Message one person and team chat are the Personnel team only (`81ff84c`). STANDBY search showed 15 people, not 205.
+- STANDBY green CT135 is `81ff84c`. LIVE stays v1.48.8. Not switched.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: test https://green.ldctools.com, then `/ship`. New session before the next slice.
+
 ### Mid-day (2026-11-11, assign and chat)
 - Project assign lists every Personnel person, including invited accounts (`6c4a93f`). The system menu was hiding names past the first screen.
 - Chat lists every person. Team chat is first and a message there goes to the whole group (`15ba2b3`).
