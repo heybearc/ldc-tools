@@ -33,9 +33,9 @@ test('resending an invitation asks in a notice before any email is sent', async 
 
   const row = page.locator('tr').filter({ hasText: invited.email });
   await row.getByTitle('More actions').click();
-  await page.getByRole('button', { name: 'Resend Invitation' }).click();
+  await page.getByRole('button', { name: /^(Send invitation|Resend invitation)$/ }).click();
 
-  const notice = page.getByText('Resend the invitation email to this person?');
+  const notice = page.getByText(/Resend the invitation email to this person\?|set up their account\?/);
   await expect(notice).toBeVisible();
   await page.getByRole('button', { name: 'Not now' }).click();
   await expect(notice).toHaveCount(0);

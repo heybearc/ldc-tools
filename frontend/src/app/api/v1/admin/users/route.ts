@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
         updatedAt: true,
         emailVerified: true,
         lastLogin: true,
+        invitedAt: true,
         volunteerId: true,
         constructionGroupId: true,
         volunteer: {
@@ -134,6 +135,7 @@ export async function GET(request: NextRequest) {
         zoneId: effectiveCG?.region?.zone?.code || '',
         volunteerId: user.volunteerId || null,
         lastLogin: user.lastLogin?.toISOString(),
+        invitedAt: user.invitedAt?.toISOString() || null,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
         emailVerified: user.emailVerified?.toISOString() || null,

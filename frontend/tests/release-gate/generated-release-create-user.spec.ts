@@ -55,6 +55,15 @@ test('creating an account uses platform access and rejects an organizational rol
   expect(body.user.role).toBe('USER');
   expect(body.user.email).toBe(email);
 
+  await page.reload();
+  const row = page.locator('tr').filter({ hasText: email });
+  await expect(row).toBeVisible();
+  await row.getByRole('checkbox', { name: 'Select Release Check' }).check();
+  await expect(page.getByRole('button', { name: 'Apply' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Send invitations' })).toBeVisible();
+  await row.getByTitle('More actions').click();
+  await expect(page.getByRole('button', { name: 'Send invitation', exact: true })).toBeVisible();
+
   const removed = await page.request.delete(`/api/v1/admin/users/${body.user.id}`);
   expect(removed.ok()).toBeTruthy();
 });

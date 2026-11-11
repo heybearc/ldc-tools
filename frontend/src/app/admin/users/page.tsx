@@ -13,6 +13,8 @@ interface User {
   ldcRole?: string;
   constructionGroupId?: string;
   status: 'ACTIVE' | 'INVITED' | 'INACTIVE';
+  emailVerified?: string | null;
+  invitedAt?: string | null;
   regionId: string;
   zoneId: string;
   lastLogin?: string;
@@ -50,6 +52,10 @@ export default function UserManagementPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [passwordManagement, setPasswordManagement] = useState({ changePassword: false, newPassword: '', sendResetEmail: false });
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [bulkRole, setBulkRole] = useState('');
+  const [bulkStatus, setBulkStatus] = useState('');
+  const [bulkGroup, setBulkGroup] = useState('');
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number } | null>(null);
   const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   
@@ -269,28 +275,31 @@ export default function UserManagementPage() {
     }
   };
 
-  const handleResendInvitation = async (userId: string) => {
+  const handleSendInvitation = async (user: User) => {
     const accepted = await toast.confirm(
-      'Resend the invitation email to this person?',
+      user.invitedAt
+        ? 'Resend the invitation email to this person?'
+        : 'Send an invitation so this person can set up their account?',
       { confirmLabel: 'Send email', cancelLabel: 'Not now' }
     );
     if (!accepted) return;
     
     try {
-      const response = await fetch(`/api/v1/admin/users/${userId}/resend-invite`, {
+      const response = await fetch(`/api/v1/admin/users/${user.id}/resend-invite`, {
         method: 'POST'
       });
       
       if (response.ok) {
         toast.success('Invitation email sent.');
         loadUsers();
+        loadUserStats();
       } else {
         const data = await response.json();
-        toast.error(data.error || 'Failed to resend invitation. Please try again.');
+        toast.error(data.error || 'Failed to send invitation. Please try again.');
       }
     } catch (error) {
-      console.error('Failed to resend invitation:', error);
-      toast.error('Failed to resend invitation. Please try again.');
+      console.error('Failed to send invitation:', error);
+      toast.error('Failed to send invitation. Please try again.');
     }
   };
 
@@ -357,6 +366,103 @@ export default function UserManagementPage() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUserIds((current) => {
+      const next = new Set(current);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  };
+
+  const toggleAllFiltered = () => {
+    setSelectedUserIds((current) => {
+      const allSelected = filteredUsers.length > 0 && filteredUsers.every((user) => current.has(user.id));
+      if (allSelected) return new Set();
+      return new Set(filteredUsers.map((user) => user.id));
+    });
+  };
+
+  const handleBulkApply = async () => {
+    if (selectedUserIds.size === 0) return;
+    if (!bulkRole && !bulkStatus && !bulkGroup) {
+      toast.error('Choose access, status, or a construction group.');
+      return;
+    }
+
+    const body: Record<string, unknown> = { ids: Array.from(selectedUserIds) };
+    if (bulkRole) body.role = bulkRole;
+    if (bulkStatus) body.status = bulkStatus;
+    if (bulkGroup) body.constructionGroupId = bulkGroup === 'none' ? null : bulkGroup;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/v1/admin/users/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast.error(data.error || 'Failed to update the selected accounts.');
+        return;
+      }
+      if (data.updated) toast.success(`Updated ${data.updated} ${data.updated === 1 ? 'account' : 'accounts'}.`);
+      if (data.errors?.length) toast.error(data.errors.slice(0, 3).join(' '));
+      setBulkRole('');
+      setBulkStatus('');
+      setBulkGroup('');
+      setSelectedUserIds(new Set());
+      loadUsers();
+      loadUserStats();
+    } catch (error) {
+      console.error('Failed to update selected accounts:', error);
+      toast.error('Failed to update the selected accounts.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkInvite = async () => {
+    const inviteIds = users
+      .filter((user) => selectedUserIds.has(user.id) && !user.emailVerified)
+      .map((user) => user.id);
+    if (inviteIds.length === 0) {
+      toast.error('The selected accounts have already been set up.');
+      return;
+    }
+
+    const accepted = await toast.confirm(
+      `Send invitation emails to ${inviteIds.length} ${inviteIds.length === 1 ? 'person' : 'people'}?`,
+      { confirmLabel: 'Send emails', cancelLabel: 'Not now' }
+    );
+    if (!accepted) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/v1/admin/users/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: inviteIds, sendInvitations: true }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast.error(data.error || 'Failed to send invitations.');
+        return;
+      }
+      if (data.invited) toast.success(`Invitation sent to ${data.invited} ${data.invited === 1 ? 'person' : 'people'}.`);
+      if (data.errors?.length) toast.error(data.errors.slice(0, 3).join(' '));
+      setSelectedUserIds(new Set());
+      loadUsers();
+      loadUserStats();
+    } catch (error) {
+      console.error('Failed to send invitations:', error);
+      toast.error('Failed to send invitations.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -414,7 +520,7 @@ export default function UserManagementPage() {
         </h3>
         <p className="mt-1 mb-4 text-sm text-gray-600">
           This sends an email with a link to set up their account. The link expires in 7 days.
-          A person already marked Invited has not finished setup. Use Resend Invitation on their row to send the email again.
+          Someone who has not finished setup can receive that email from their row, including an account you created here.
         </p>
         <form onSubmit={handleInviteUser} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <label className="block text-sm font-medium text-gray-700">
@@ -597,6 +703,76 @@ export default function UserManagementPage() {
           <h3 className="text-lg font-medium text-gray-900">
             Users ({filteredUsers.length})
           </h3>
+          {selectedUserIds.size > 0 && (
+            <div className="mt-3 flex flex-wrap items-end gap-2">
+              <span className="text-sm text-gray-700 pb-2">{selectedUserIds.size} selected</span>
+              <label className="text-xs text-gray-600">
+                Access
+                <select
+                  value={bulkRole}
+                  onChange={(e) => setBulkRole(e.target.value)}
+                  className="mt-1 block px-2 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="">Unchanged</option>
+                  <option value="USER">User</option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="SUPER_ADMIN">Super Admin</option>
+                  <option value="READ_ONLY">Read Only</option>
+                </select>
+              </label>
+              <label className="text-xs text-gray-600">
+                Status
+                <select
+                  value={bulkStatus}
+                  onChange={(e) => setBulkStatus(e.target.value)}
+                  className="mt-1 block px-2 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="">Unchanged</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INVITED">Invited</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+              </label>
+              <label className="text-xs text-gray-600">
+                Construction group
+                <select
+                  value={bulkGroup}
+                  onChange={(e) => setBulkGroup(e.target.value)}
+                  className="mt-1 block px-2 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="">Unchanged</option>
+                  <option value="none">None</option>
+                  {constructionGroups.map((group) => (
+                    <option key={group.id} value={group.id}>{group.code}</option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                onClick={handleBulkApply}
+                disabled={isSubmitting}
+                className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                Apply
+              </button>
+              <button
+                type="button"
+                onClick={handleBulkInvite}
+                disabled={isSubmitting}
+                className="inline-flex items-center px-3 py-2 bg-white border border-gray-300 text-sm rounded-md hover:bg-gray-50 disabled:opacity-50"
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Send invitations
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedUserIds(new Set())}
+                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
+              >
+                Clear
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="relative">
@@ -604,6 +780,15 @@ export default function UserManagementPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-4 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all accounts"
+                    checked={filteredUsers.length > 0 && filteredUsers.every((user) => selectedUserIds.has(user.id))}
+                    onChange={toggleAllFiltered}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   User
                 </th>
@@ -624,13 +809,22 @@ export default function UserManagementPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                     No users found matching your criteria.
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
                   <tr key={user.id} className="group hover:bg-gray-50">
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        aria-label={`Select ${user.name || user.email}`}
+                        checked={selectedUserIds.has(user.id)}
+                        onChange={() => toggleUserSelection(user.id)}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
@@ -732,18 +926,19 @@ export default function UserManagementPage() {
                                   <Edit className="mr-2 h-4 w-4" />
                                   Edit User
                                 </button>
+                                {!user.emailVerified && (
+                                  <button
+                                    onClick={() => {
+                                      handleSendInvitation(user);
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center"
+                                  >
+                                    <Mail className="mr-2 h-4 w-4" />
+                                    {user.invitedAt ? 'Resend invitation' : 'Send invitation'}
+                                  </button>
+                                )}
                                 {user.status === 'INVITED' && (
-                                  <>
-                                    <button
-                                      onClick={() => {
-                                        handleResendInvitation(user.id);
-                                        setOpenDropdownId(null);
-                                      }}
-                                      className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center"
-                                    >
-                                      <Mail className="mr-2 h-4 w-4" />
-                                      Resend Invitation
-                                    </button>
                                     <button
                                       onClick={() => {
                                         handleCancelInvitation(user.id);
@@ -754,7 +949,6 @@ export default function UserManagementPage() {
                                       <X className="mr-2 h-4 w-4" />
                                       Cancel Invitation
                                     </button>
-                                  </>
                                 )}
                                 <button
                                   onClick={() => {
