@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
-import { isAdmin } from '@/lib/auth-helpers';
+import { isAdmin, resolvePlatformRole } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { decryptPassword } from '@/lib/email-crypto';
@@ -28,9 +28,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const access = resolvePlatformRole(String(role));
+    if (!access) {
+      return NextResponse.json(
+        { error: 'Choose a platform access role: User, Admin, Super Admin, or Read Only.' },
+        { status: 400 }
+      );
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email: normalizedEmail }
     });
 
     if (existingUser) {
@@ -70,8 +80,9 @@ export async function POST(request: NextRequest) {
     const newUser = await prisma.user.create({
       data: {
         name: name || null,
-        email,
-        role,
+        email: normalizedEmail,
+        role: access.role,
+        ...(access.adminLevel ? { adminLevel: access.adminLevel } : {}),
         status: 'INVITED',
         ...(cgScope?.constructionGroupId && {
           constructionGroup: {
@@ -93,10 +104,10 @@ export async function POST(request: NextRequest) {
     // Also create the user invitation record for tracking
     const invitation = await prisma.userInvitation.create({
       data: {
-        email,
+        email: normalizedEmail,
         firstName: name?.split(' ')[0] || '',
         lastName: name?.split(' ').slice(1).join(' ') || '',
-        role,
+        role: access.role,
         invitedBy: cgScope.userId,
         invitationToken: inviteToken,
         expiresAt: inviteExpires,
@@ -138,7 +149,7 @@ export async function POST(request: NextRequest) {
     // Send invitation email
     await transporter.sendMail({
       from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
-      to: email,
+      to: normalizedEmail,
       subject: 'You\'ve been invited to LDC Tools',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
-import { isAdmin } from '@/lib/auth-helpers';
+import { isAdmin, resolvePlatformRole } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { decryptPassword } from '@/lib/email-crypto';
@@ -77,6 +77,12 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
+        const access = resolvePlatformRole(String(role));
+        if (!access) {
+          errors.push(`Row ${i + 1}: Role must be USER, ADMIN, SUPER_ADMIN, or READ_ONLY`);
+          continue;
+        }
+
         // Check if user exists
         const existingUser = await prisma.user.findUnique({
           where: { email }
@@ -123,7 +129,8 @@ export async function POST(request: NextRequest) {
           data: {
             name: name || null,
             email,
-            role,
+            role: access.role,
+            ...(access.adminLevel ? { adminLevel: access.adminLevel } : {}),
             status: userStatus as 'ACTIVE' | 'INVITED' | 'INACTIVE',
             volunteerId: volunteerId || null,
             constructionGroupId,
@@ -140,7 +147,7 @@ export async function POST(request: NextRequest) {
               email,
               firstName: name?.split(' ')[0] || '',
               lastName: name?.split(' ').slice(1).join(' ') || '',
-              role,
+              role: access.role,
               invitationToken: inviteToken,
               expiresAt: inviteExpires,
               status: 'PENDING',

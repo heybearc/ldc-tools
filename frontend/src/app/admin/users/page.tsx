@@ -179,7 +179,8 @@ export default function UserManagementPage() {
         loadUsers();
         loadUserStats();
       } else {
-        toast.error('Failed to create user. Please try again.');
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(errorData.error || errorData.message || 'Failed to create user. Please try again.');
       }
     } catch (error) {
       console.error('Failed to create user:', error);
@@ -853,37 +854,15 @@ export default function UserManagementPage() {
                   onChange={(e) => setCreateForm({...createForm, role: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  <option value="">Select Role</option>
+                  <option value="">Select access</option>
+                  <option value="USER">User</option>
+                  <option value="ADMIN">Admin</option>
                   <option value="SUPER_ADMIN">Super Admin</option>
-                  <option value="ZONE_OVERSEER">Zone Overseer</option>
-                  <option value="ZONE_OVERSEER_ASSISTANT">Zone Overseer Assistant</option>
-                  <option value="ZONE_OVERSEER_SUPPORT">Zone Overseer Support</option>
-                  <option value="CONSTRUCTION_GROUP_OVERSEER">Construction Group Overseer</option>
-                  <option value="CONSTRUCTION_GROUP_OVERSEER_ASSISTANT">Construction Group Overseer Assistant</option>
-                  <option value="CONSTRUCTION_GROUP_OVERSEER_SUPPORT">Construction Group Overseer Support</option>
-                  <option value="TRADE_TEAM_OVERSEER">Trade Team Overseer</option>
-                  <option value="TRADE_TEAM_OVERSEER_ASSISTANT">Trade Team Overseer Assistant</option>
-                  <option value="TRADE_TEAM_OVERSEER_SUPPORT">Trade Team Overseer Support</option>
-                  <option value="TRADE_CREW_OVERSEER">Trade Crew Overseer</option>
-                  <option value="TRADE_CREW_OVERSEER_ASSISTANT">Trade Crew Overseer Assistant</option>
-                  <option value="TRADE_CREW_OVERSEER_SUPPORT">Trade Crew Overseer Support</option>
-                  <option value="PERSONNEL_CONTACT">Personnel Contact</option>
-                  <option value="PERSONNEL_CONTACT_ASSISTANT">Personnel Contact Assistant</option>
-                  <option value="PERSONNEL_CONTACT_SUPPORT">Personnel Contact Support</option>
-                  <option value="FIELD_REP">Field Rep</option>
-                  <option value="FIELD_REP_ASSISTANT">Field Rep Assistant</option>
-                  <option value="FIELD_REP_SUPPORT">Field Rep Support</option>
-                  <option value="DESIGN_CONTACT">Design Contact</option>
-                  <option value="DESIGN_CONTACT_ASSISTANT">Design Contact Assistant</option>
-                  <option value="DESIGN_CONTACT_SUPPORT">Design Contact Support</option>
-                  <option value="PROJECT_CONSTRUCTION_COORDINATOR">Project Construction Coordinator</option>
-                  <option value="PROJECT_CONSTRUCTION_COORDINATOR_ASSISTANT">Project Construction Coordinator Assistant</option>
-                  <option value="PROJECT_CONSTRUCTION_COORDINATOR_SUPPORT">Project Construction Coordinator Support</option>
-                  <option value="SAFETY_COORDINATOR">Safety Coordinator</option>
-                  <option value="SAFETY_COORDINATOR_ASSISTANT">Safety Coordinator Assistant</option>
-                  <option value="SAFETY_COORDINATOR_SUPPORT">Safety Coordinator Support</option>
                   <option value="READ_ONLY">Read Only</option>
                 </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  Platform access. Organizational roles are assigned on the volunteer record.
+                </p>
               </div>
               
               <div className="flex justify-end space-x-3 pt-4">
@@ -965,7 +944,7 @@ export default function UserManagementPage() {
                 <ul className="text-xs text-blue-800 space-y-1">
                   <li>• <strong>name</strong> - Full name of the user</li>
                   <li>• <strong>email</strong> - Email address (must be unique)</li>
-                  <li>• <strong>role</strong> - User role (CFR, FR, DC, PCC, SC, etc.)</li>
+                  <li>• <strong>role</strong> - Platform access: USER, ADMIN, SUPER_ADMIN, or READ_ONLY</li>
                   <li>• <strong>regionId</strong> - Region identifier (optional)</li>
                   <li>• <strong>zoneId</strong> - Zone identifier (optional)</li>
                 </ul>
@@ -981,26 +960,15 @@ export default function UserManagementPage() {
                 <button
                   onClick={() => {
                     // Download comprehensive template with examples
-                    const csvContent = `name,email,role,ldcRole,regionId,zoneId,status
-John Doe,john.doe@example.com,ZONE_OVERSEER,ZONE_OVERSEER,01.12,01,ACTIVE
-Jane Smith,jane.smith@example.com,TRADE_TEAM_OVERSEER,TRADE_TEAM_OVERSEER,01.12,01,ACTIVE
-Bob Johnson,bob.johnson@example.com,PERSONNEL_CONTACT,PERSONNEL_CONTACT,01.12,01,ACTIVE
-Alice Williams,alice.williams@example.com,READ_ONLY,,01.12,01,INVITED
+                    const csvContent = `name,email,role,status
+John Doe,john.doe@example.com,USER,ACTIVE
+Jane Smith,jane.smith@example.com,ADMIN,ACTIVE
+Bob Johnson,bob.johnson@example.com,SUPER_ADMIN,ACTIVE
+Alice Williams,alice.williams@example.com,READ_ONLY,INVITED
 
-# Role Options:
-# SUPER_ADMIN, ZONE_OVERSEER, ZONE_OVERSEER_ASSISTANT, ZONE_OVERSEER_SUPPORT
-# CONSTRUCTION_GROUP_OVERSEER, CONSTRUCTION_GROUP_OVERSEER_ASSISTANT, CONSTRUCTION_GROUP_OVERSEER_SUPPORT
-# TRADE_TEAM_OVERSEER, TRADE_TEAM_OVERSEER_ASSISTANT, TRADE_TEAM_OVERSEER_SUPPORT
-# TRADE_CREW_OVERSEER, TRADE_CREW_OVERSEER_ASSISTANT, TRADE_CREW_OVERSEER_SUPPORT
-# PERSONNEL_CONTACT, PERSONNEL_CONTACT_ASSISTANT, PERSONNEL_CONTACT_SUPPORT
-# FIELD_REP, FIELD_REP_ASSISTANT, FIELD_REP_SUPPORT
-# DESIGN_CONTACT, DESIGN_CONTACT_ASSISTANT, DESIGN_CONTACT_SUPPORT
-# PROJECT_CONSTRUCTION_COORDINATOR, PROJECT_CONSTRUCTION_COORDINATOR_ASSISTANT, PROJECT_CONSTRUCTION_COORDINATOR_SUPPORT
-# SAFETY_COORDINATOR, SAFETY_COORDINATOR_ASSISTANT, SAFETY_COORDINATOR_SUPPORT
-# READ_ONLY
-
-# Status Options: ACTIVE, INVITED, INACTIVE
-# ldcRole is optional - use for organizational roles`;
+# Role options: USER, ADMIN, SUPER_ADMIN, READ_ONLY
+# Status options: ACTIVE, INVITED, INACTIVE
+# Organizational roles are assigned on the volunteer record, not in this file.`;
                     const blob = new Blob([csvContent], { type: 'text/csv' });
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');

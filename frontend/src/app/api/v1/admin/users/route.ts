@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
-import { isAdmin } from '@/lib/auth-helpers';
+import { isAdmin, resolvePlatformRole } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { adminSignInAccountWhere } from '@/lib/personnel-accounts';
@@ -188,9 +188,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const access = resolvePlatformRole(String(role));
+    if (!access) {
+      return NextResponse.json(
+        { error: 'Choose a platform access role: User, Admin, Super Admin, or Read Only.' },
+        { status: 400 }
+      );
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const nameParts = String(name).trim().split(/\s+/).filter(Boolean);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ');
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email: normalizedEmail }
     });
 
     if (existingUser) {
@@ -230,10 +243,13 @@ export async function POST(request: NextRequest) {
     // Create the user
     const newUser = await prisma.user.create({
       data: {
-        name,
-        email,
+        name: `${firstName} ${lastName}`.trim(),
+        firstName,
+        lastName,
+        email: normalizedEmail,
         passwordHash: hashedPassword,
-        role,
+        role: access.role,
+        ...(access.adminLevel ? { adminLevel: access.adminLevel } : {}),
         status: 'ACTIVE',
         volunteerId: volunteerId || null,
         constructionGroupId,

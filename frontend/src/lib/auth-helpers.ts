@@ -47,3 +47,24 @@ export function isReadOnlyAdmin(session: Session | null): boolean {
   const adminLevel = (session.user as any).adminLevel?.toUpperCase();
   return adminLevel === 'READ_ONLY_ADMIN';
 }
+
+const PLATFORM_ROLES = ['SUPER_ADMIN', 'ADMIN', 'USER', 'READ_ONLY'] as const;
+export type PlatformRole = (typeof PLATFORM_ROLES)[number];
+
+/**
+ * Map a create/invite access choice onto User.role.
+ * READ_ONLY_ADMIN is an adminLevel, not a UserRole.
+ */
+export function resolvePlatformRole(input: string): {
+  role: PlatformRole;
+  adminLevel?: 'READ_ONLY_ADMIN';
+} | null {
+  const value = input.trim().toUpperCase();
+  if (value === 'READ_ONLY_ADMIN') {
+    return { role: 'READ_ONLY', adminLevel: 'READ_ONLY_ADMIN' };
+  }
+  if ((PLATFORM_ROLES as readonly string[]).includes(value)) {
+    return { role: value as PlatformRole };
+  }
+  return null;
+}
