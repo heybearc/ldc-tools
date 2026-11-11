@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Choose a teammate' }, { status: 400 });
     }
     if (!(await personCanChat(userId, scope.constructionGroupId))) {
-      return NextResponse.json({ error: 'That person is not in this construction group' }, { status: 400 });
+      return NextResponse.json({ error: 'That person is not on the Personnel team' }, { status: 400 });
     }
 
     const key = directKey(session.user.id, userId);

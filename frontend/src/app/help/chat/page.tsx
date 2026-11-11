@@ -28,18 +28,18 @@ export default async function ChatHelpPage() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
             <h2 className="text-xl font-semibold text-blue-900 mt-0 mb-3">Who can you message?</h2>
             <p className="text-blue-800 mb-0">
-              People signed in to the same construction group. Another group does not see these chats.
+              The Personnel team in this construction group. Directory names are not in chat. Another group does not see these chats.
             </p>
           </div>
 
           <h2>Team chat</h2>
           <p>
-            Open Chat and choose Team chat. A message there goes to everyone in this group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send. Choose Mark unread to keep a conversation marked until you are ready, or Mark read to clear it. The Chat link shows how many conversations are still unread. The phone app can also show an alert, a badge, and a sound for a new chat message or an announcement. Allow alerts when the phone asks.
+            Open Chat and choose Team chat. A message there goes to the Personnel team in this construction group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send. Choose Mark unread to keep a conversation marked until you are ready, or Mark read to clear it. The Chat link shows how many conversations are still unread. The phone app can also show an alert, a badge, and a sound for a new chat message or an announcement. Allow alerts when the phone asks.
           </p>
 
           <h2>A direct message</h2>
           <p>
-            Everyone signed in to this group is listed under Message one person. Choose a name to open a conversation that stays between the two of you. Turn on notifications in the browser when you want this computer to be told about a new message. Each phone and computer does this once.
+            Choose Find a Personnel person, search, and choose a name. That conversation stays between the two of you. Only the Personnel team is listed. Turn on notifications in the browser when you want this computer to be told about a new message. Each phone and computer does this once.
           </p>
         </div>
       </div>

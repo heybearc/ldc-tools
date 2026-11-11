@@ -24,8 +24,13 @@ export async function POST(
     }
 
     const body = await request.json();
-    const userId = typeof body.userId === 'string' ? body.userId : '';
-    if (!userId) {
+    const fromList = Array.isArray(body.userIds)
+      ? body.userIds.filter((id: unknown): id is string => typeof id === 'string' && id.length > 0)
+      : [];
+    const userIds = fromList.length > 0
+      ? fromList
+      : (typeof body.userId === 'string' && body.userId ? [body.userId] : []);
+    if (userIds.length === 0) {
       return NextResponse.json({ error: 'Choose a Personnel person' }, { status: 400 });
     }
 
@@ -38,21 +43,21 @@ export async function POST(
     }
 
     const personnel = await personnelInGroup(scope.constructionGroupId);
-    if (!personnel.some((person) => person.id === userId)) {
+    const allowed = new Set(personnel.map((person) => person.id));
+    if (userIds.some((id) => !allowed.has(id))) {
       return NextResponse.json({ error: 'That person is not Personnel in this construction group' }, { status: 400 });
     }
 
-    await prisma.projectPersonnel.upsert({
-      where: { projectId_userId: { projectId: project.id, userId } },
-      update: {},
-      create: {
+    const result = await prisma.projectPersonnel.createMany({
+      data: userIds.map((userId) => ({
         projectId: project.id,
         userId,
         assignedById: session.user.id,
-      },
+      })),
+      skipDuplicates: true,
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, assigned: result.count });
   } catch (error) {
     console.error('Assign project personnel error:', error);
     return NextResponse.json({ error: 'Failed to assign Personnel' }, { status: 500 });

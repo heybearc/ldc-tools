@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Building2, Plus } from 'lucide-react';
 import ProjectDateCalendar from '@/components/ProjectDateCalendar';
 import { userError } from '@/lib/user-error';
@@ -82,50 +82,132 @@ function PersonnelPicker({
 }: {
   people: Person[];
   disabled: boolean;
-  onAssign: (userId: string) => void;
+  onAssign: (userIds: string[]) => Promise<boolean>;
 }) {
+  const listId = useId();
+  const box = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
   const needle = query.trim().toLowerCase();
   const shown = needle
     ? people.filter((person) => `${personName(person)} ${person.email}`.toLowerCase().includes(needle))
     : people;
+  const chosen = people.filter((person) => selected.includes(person.id));
+
+  const peopleKey = people.map((person) => person.id).join('\n');
+  useEffect(() => {
+    const available = new Set(peopleKey ? peopleKey.split('\n') : []);
+    setSelected((current) => {
+      const next = current.filter((id) => available.has(id));
+      return next.length === current.length ? current : next;
+    });
+  }, [peopleKey]);
+
+  useEffect(() => {
+    function close(event: MouseEvent) {
+      if (!box.current?.contains(event.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, []);
+
+  function toggle(id: string) {
+    setSelected((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
+  }
 
   return (
-    <div className="mt-3">
-      <label className="block">
-        <span className="text-sm font-medium text-gray-700">Add Personnel</span>
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Find a person"
-          className="mt-1 w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
-        />
+    <div className="mt-3 max-w-md" ref={box}>
+      <label className="block text-sm font-medium text-gray-700" htmlFor={listId}>
+        Add Personnel
       </label>
       {people.length === 0 ? (
         <p className="mt-2 text-sm text-gray-500">Everyone on Personnel is already assigned.</p>
       ) : (
         <>
-          <p className="mt-2 text-sm text-gray-500">
-            {shown.length === people.length ? `${people.length} people` : `${shown.length} of ${people.length} people`}
-          </p>
-          <ul className="mt-2 rounded-md border border-gray-200 divide-y divide-gray-100">
-            {shown.map((person) => (
-              <li key={person.id} className="flex items-center justify-between gap-3 px-3 py-2">
-                <span className="text-sm text-gray-900">{personName(person)}</span>
-                <button
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => onAssign(person.id)}
-                  className="shrink-0 px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
-                >
-                  Assign
-                </button>
-              </li>
-            ))}
-            {shown.length === 0 && (
-              <li className="px-3 py-3 text-sm text-gray-500">No one matches.</li>
-            )}
-          </ul>
+          {chosen.length > 0 && (
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {chosen.map((person) => (
+                <li key={person.id} className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-sm text-blue-900">
+                  {personName(person)}
+                  <button
+                    type="button"
+                    aria-label={`Remove ${personName(person)} from the selection`}
+                    onClick={() => toggle(person.id)}
+                    className="px-1 text-base leading-none"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <input
+            id={listId}
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={`${listId}-list`}
+            aria-autocomplete="list"
+            value={query}
+            disabled={disabled}
+            onFocus={() => setOpen(true)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setOpen(true);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') setOpen(false);
+              if (event.key === 'Enter' && open && shown[0]) {
+                event.preventDefault();
+                toggle(shown[0].id);
+              }
+            }}
+            placeholder="Find people"
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+          />
+          {open && (
+            <ul
+              id={`${listId}-list`}
+              role="listbox"
+              aria-multiselectable="true"
+              className="mt-1 max-h-60 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm"
+            >
+              {shown.map((person) => {
+                const on = selected.includes(person.id);
+                return (
+                  <li key={person.id} role="option" aria-selected={on}>
+                    <button
+                      type="button"
+                      onClick={() => toggle(person.id)}
+                      className="flex w-full items-center gap-2 px-3 py-2 min-h-[44px] text-left text-sm text-gray-900 hover:bg-gray-50"
+                    >
+                      <input type="checkbox" readOnly checked={on} tabIndex={-1} className="h-4 w-4 rounded border-gray-300" />
+                      {personName(person)}
+                    </button>
+                  </li>
+                );
+              })}
+              {shown.length === 0 && (
+                <li className="px-3 py-3 text-sm text-gray-500">No one matches.</li>
+              )}
+            </ul>
+          )}
+          {selected.length > 0 && (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={async () => {
+                const ok = await onAssign(selected);
+                if (!ok) return;
+                setSelected([]);
+                setQuery('');
+                setOpen(false);
+              }}
+              className="mt-2 px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
+            >
+              {selected.length === 1 ? 'Assign 1 person' : `Assign ${selected.length} people`}
+            </button>
+          )}
         </>
       )}
     </div>
@@ -186,21 +268,26 @@ export default function ProjectsPage() {
     return () => window.removeEventListener('cg-filter-changed', onGroupChange);
   }, [load]);
 
-  async function assign(projectId: string, userId: string) {
+  async function assign(projectId: string, userIds: string[]) {
+    if (userIds.length === 0) return false;
     setBusyId(projectId);
     setError('');
     try {
       const response = await fetch(`/api/v1/projects/${projectId}/personnel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userIds }),
       });
       const body = await response.json();
       if (!response.ok) {
         setError(userError(response.status, body.error, 'Could not assign Personnel'));
-        return;
+        return false;
       }
       await load();
+      return true;
+    } catch {
+      setError(userError(0, '', 'Could not assign Personnel'));
+      return false;
     } finally {
       setBusyId(null);
     }

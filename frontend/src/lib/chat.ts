@@ -2,8 +2,6 @@ import { prisma } from '@/lib/prisma';
 import { personnelInGroup } from '@/lib/project-personnel';
 import { sendChatPush } from '@/lib/web-push';
 
-const CHAT_STATUS = ['ACTIVE', 'INVITED'] as const;
-
 export type ChatPerson = { id: string; name: string | null; email: string };
 
 export function directKey(userA: string, userB: string) {
@@ -26,25 +24,7 @@ export async function ensureTeamChannel(constructionGroupId: string) {
 }
 
 export async function chatPeople(constructionGroupId: string): Promise<ChatPerson[]> {
-  const [accounts, personnel] = await Promise.all([
-    prisma.user.findMany({
-      where: {
-        status: { in: [...CHAT_STATUS] },
-        OR: [
-          { volunteer: { isActive: true, constructionGroupId } },
-          { constructionGroupId },
-        ],
-      },
-      select: { id: true, name: true, email: true },
-    }),
-    personnelInGroup(constructionGroupId),
-  ]);
-
-  const people = new Map<string, ChatPerson>();
-  for (const person of [...accounts, ...personnel]) {
-    people.set(person.id, { id: person.id, name: person.name, email: person.email });
-  }
-  return Array.from(people.values()).sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
+  return personnelInGroup(constructionGroupId);
 }
 
 export async function personCanChat(userId: string, constructionGroupId: string) {

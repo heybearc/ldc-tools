@@ -63,6 +63,8 @@ function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
   const [personQuery, setPersonQuery] = useState('');
+  const [peopleOpen, setPeopleOpen] = useState(false);
+  const peopleBox = useRef<HTMLDivElement>(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [notificationsOn, setNotificationsOn] = useState(false);
@@ -332,6 +334,14 @@ function ChatScreen() {
     }
   }
 
+  useEffect(() => {
+    function closePeople(event: MouseEvent) {
+      if (!peopleBox.current?.contains(event.target as Node)) setPeopleOpen(false);
+    }
+    document.addEventListener('mousedown', closePeople);
+    return () => document.removeEventListener('mousedown', closePeople);
+  }, []);
+
   const selected = channels.find((channel) => channel.id === selectedId) || null;
   const needle = personQuery.trim().toLowerCase();
   const shownTeammates = needle
@@ -344,7 +354,7 @@ function ChatScreen() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Chat</h1>
           <p className="mt-2 text-gray-600 max-w-3xl">
-            Team chat goes to everyone in this construction group. A direct message goes to one person. Turn on notifications to hear about new messages on this phone or computer.
+            Team chat goes to the Personnel team in this construction group. A direct message goes to one person on that team. Turn on notifications to hear about new messages on this phone or computer.
           </p>
         </div>
         <button
@@ -375,7 +385,7 @@ function ChatScreen() {
                   </span>
                   {channel.latest && <span className="block text-xs text-gray-500 truncate">{channel.latest.body}</span>}
                   {channel.kind === 'TEAM' && (
-                    <span className="block text-xs text-gray-500">Everyone in this group</span>
+                    <span className="block text-xs text-gray-500">Personnel team</span>
                   )}
                 </button>
                 <button
@@ -388,37 +398,47 @@ function ChatScreen() {
               </li>
             ))}
           </ul>
-          <div>
+          <div ref={peopleBox}>
             <label className="block">
               <span className="text-sm font-medium text-gray-700">Message one person</span>
               <input
+                role="combobox"
+                aria-expanded={peopleOpen}
                 value={personQuery}
-                onChange={(event) => setPersonQuery(event.target.value)}
-                placeholder="Find a person"
+                onFocus={() => setPeopleOpen(true)}
+                onChange={(event) => {
+                  setPersonQuery(event.target.value);
+                  setPeopleOpen(true);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') setPeopleOpen(false);
+                }}
+                placeholder="Find a Personnel person"
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
               />
             </label>
-            <p className="mt-2 text-sm text-gray-500">
-              {shownTeammates.length === teammates.length
-                ? `${teammates.length} people`
-                : `${shownTeammates.length} of ${teammates.length} people`}
-            </p>
-            <ul className="mt-2 rounded-md border border-gray-200 divide-y divide-gray-100">
-              {shownTeammates.map((person) => (
-                <li key={person.id}>
-                  <button
-                    type="button"
-                    onClick={() => void openDirect(person.id)}
-                    className="w-full text-left px-3 py-2 min-h-[44px] text-sm text-gray-900 hover:bg-gray-50"
-                  >
-                    {personName(person)}
-                  </button>
-                </li>
-              ))}
-              {shownTeammates.length === 0 && (
-                <li className="px-3 py-3 text-sm text-gray-500">No one matches.</li>
-              )}
-            </ul>
+            {peopleOpen && (
+              <ul className="mt-1 max-h-60 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm">
+                {shownTeammates.map((person) => (
+                  <li key={person.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPeopleOpen(false);
+                        setPersonQuery('');
+                        void openDirect(person.id);
+                      }}
+                      className="w-full text-left px-3 py-2 min-h-[44px] text-sm text-gray-900 hover:bg-gray-50"
+                    >
+                      {personName(person)}
+                    </button>
+                  </li>
+                ))}
+                {shownTeammates.length === 0 && (
+                  <li className="px-3 py-3 text-sm text-gray-500">No one on the Personnel team matches.</li>
+                )}
+              </ul>
+            )}
           </div>
         </aside>
         <section className={`${selectedId ? 'flex' : 'hidden lg:flex'} bg-white rounded-lg shadow flex-col min-h-[70vh]`}>
