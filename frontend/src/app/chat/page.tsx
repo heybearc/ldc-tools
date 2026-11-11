@@ -453,7 +453,7 @@ function ChatScreen() {
             <span className="min-w-0">
               <span className="block truncate">{selected?.title || 'Chat'}</span>
               {selected?.kind === 'TEAM' && (
-                <span className="block text-xs font-normal text-gray-500">Everyone in this construction group</span>
+                <span className="block text-xs font-normal text-gray-500">Personnel team</span>
               )}
             </span>
           </div>
