@@ -17,7 +17,7 @@ async function signIn(page: Page) {
 function crewCsv(id: string, volunteer: string) {
   return [
     'ID,Your Email,Choose an Action,Your Name,Volunteer Name,Volunteer BA ID (if known),Crew Name,Project Roster Name,Questions or Comments',
-    `${id},qa-crew@example.com,Add Volunteer to a Crew,QA Requestor,${volunteer},12345,QA-CREW,QA Roster,release check`,
+    `${id},release-check@example.com,Add Volunteer to a Crew,Release check requestor,${volunteer},12345,QA-CREW,QA Roster,release check`,
   ].join('\n');
 }
 
@@ -44,7 +44,7 @@ test('a crew-update spreadsheet becomes a claimable task and keeps the requestor
   expect(list.canAssign).toBe(true);
 
   const stamp = Date.now();
-  const volunteer = `QA Volunteer ${stamp}`;
+  const volunteer = `Release check volunteer ${stamp}`;
   const csv = crewCsv(String(stamp), volunteer);
 
   const rejected = await page.request.post('/api/v1/work-items/import', {
@@ -102,8 +102,8 @@ test('a crew-update spreadsheet becomes a claimable task and keeps the requestor
   expect(item?.timingLabel).toBe('Crew request');
   expect(item?.claimable).toBe(true);
   expect(item?.status).toBe('OPEN');
-  expect(item?.requestorName).toBe('QA Requestor');
-  expect(item?.requestorEmail).toBe('qa-crew@example.com');
+  expect(item?.requestorName).toBe('Release check requestor');
+  expect(item?.requestorEmail).toBe('release-check@example.com');
   expect(item?.detail).toContain('QA-CREW');
   expect(item?.detail).toContain('QA Roster');
 

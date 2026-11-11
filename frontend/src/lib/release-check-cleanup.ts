@@ -46,13 +46,22 @@ export async function removeReleaseCheckData(constructionGroupId: string) {
       constructionGroupId,
       OR: [
         { title: { startsWith: 'QA ' } },
+        { title: { startsWith: 'Release check' } },
         { title: { contains: 'QA Volunteer' } },
+        { title: { contains: 'Release check volunteer' } },
         { requestorEmail: 'qa-crew@example.com' },
+        { requestorEmail: 'release-check@example.com' },
       ],
     },
   });
   const processes = await prisma.processTemplate.deleteMany({
-    where: { constructionGroupId, name: { startsWith: 'QA ' } },
+    where: {
+      constructionGroupId,
+      OR: [
+        { name: { startsWith: 'QA ' } },
+        { name: { startsWith: 'Release check' } },
+      ],
+    },
   });
 
   return {

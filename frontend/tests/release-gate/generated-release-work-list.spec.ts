@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { removeReleaseChecks } from './cleanup-release-checks';
+import { removeReleaseChecks, revealWork } from './cleanup-release-checks';
 
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL || 'admin@test.com',
@@ -50,7 +50,7 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   await expect(page.getByRole('heading', { name: 'Work', exact: true })).toBeVisible();
 
   const stamp = Date.now();
-  const deadlineTitle = `QA deadline ${stamp}`;
+  const deadlineTitle = `Release check deadline ${stamp}`;
   const created = await page.request.post('/api/v1/work-items', {
     data: {
       title: deadlineTitle,
@@ -73,7 +73,7 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   });
   expect(missingDate.status()).toBe(400);
 
-  const claimTitle = `QA claim ${stamp}`;
+  const claimTitle = `Release check claim ${stamp}`;
   const claimable = await page.request.post('/api/v1/work-items', {
     data: {
       title: claimTitle,
@@ -92,7 +92,7 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   const claimed = await claim.json();
   expect(claimed.assigneeId).toBe(list.currentUserId);
 
-  await page.reload();
+  await revealWork(page, deadlineTitle);
   await expect(page.getByRole('heading', { name: deadlineTitle })).toBeVisible();
   await expect(page.getByText('Dec 15, 2026').first()).toBeVisible();
   const claimRow = page.locator('article').filter({ hasText: claimTitle });

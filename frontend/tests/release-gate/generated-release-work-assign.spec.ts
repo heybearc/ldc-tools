@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import './cleanup-release-checks';
+import { revealWork } from './cleanup-release-checks';
 
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL || 'admin@test.com',
@@ -66,8 +66,8 @@ test('a task can have no deadline and several tasks can be assigned together', a
   expect(assignee?.id).toBeTruthy();
 
   const stamp = Date.now();
-  const firstTitle = `QA no deadline ${stamp}`;
-  const secondTitle = `QA no deadline next ${stamp}`;
+  const firstTitle = `Release check no deadline ${stamp}`;
+  const secondTitle = `Release check no deadline next ${stamp}`;
   const created = [];
   for (const title of [firstTitle, secondTitle]) {
     const response = await page.request.post('/api/v1/work-items', {
@@ -91,7 +91,7 @@ test('a task can have no deadline and several tasks can be assigned together', a
   expect(assigned.ok()).toBeTruthy();
   expect((await assigned.json()).assigned).toBe(2);
 
-  await page.goto('/work');
+  await revealWork(page, firstTitle);
   const row = page.locator('article').filter({ hasText: firstTitle });
   await expect(row.getByText('No deadline', { exact: true })).toBeVisible();
   await expect(row.getByRole('checkbox', { name: `Select ${firstTitle}` })).toBeVisible();

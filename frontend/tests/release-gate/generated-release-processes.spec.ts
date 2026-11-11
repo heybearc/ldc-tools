@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { removeReleaseChecks } from './cleanup-release-checks';
+import { removeReleaseChecks, revealWork } from './cleanup-release-checks';
 
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL || 'admin@test.com',
@@ -49,7 +49,7 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   expect(empty.status()).toBe(400);
 
   const stamp = Date.now();
-  const name = `QA process ${stamp}`;
+  const name = `Release check process ${stamp}`;
   const first = `QA step one ${stamp}`;
   const second = `QA step two ${stamp}`;
   const projectId = processes.projects?.[0]?.id || null;
@@ -111,9 +111,9 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   expect(run.item.steps).toHaveLength(2);
   expect(run.item.claimable).toBe(true);
 
-  await page.goto('/work');
+  const heading = await revealWork(page, name);
   const processRow = page.locator(`article[data-work-id="${run.item.id}"]`);
-  await expect(processRow.getByRole('heading', { name })).toBeVisible();
+  await expect(heading).toBeVisible();
   await expect(page.getByRole('heading', { name: first })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: second })).toHaveCount(0);
   const stepsSummary = processRow.locator('summary', { hasText: 'Tasks' });

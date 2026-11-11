@@ -39,24 +39,33 @@ test('starting a process keeps the project and confirms it started', async ({ pa
   if (!processes.canPost) return;
 
   const stamp = Date.now();
-  const name = `QA start ${stamp}`;
+  const name = `Release check start ${stamp}`;
   const created = await page.request.post('/api/v1/processes', {
     data: {
       name,
+      appliesTo: 'PROJECT',
+      cadence: 'ONCE',
       steps: [{ title: `QA check ${stamp}`, detail: 'Mark this step.' }],
     },
   });
   expect(created.status()).toBe(201);
+  const template = await created.json();
+  const published = await page.request.post(`/api/v1/processes/${template.id}/publish`, { data: { publish: true } });
+  expect(published.ok()).toBeTruthy();
 
   await page.goto('/processes');
   const card = page.locator('article').filter({ has: page.getByRole('heading', { name }) });
   const select = card.getByLabel(`Project for ${name}`);
   const projectId = await select.locator('option').nth(1).getAttribute('value');
   if (projectId) await select.selectOption(projectId);
-  await card.getByRole('button', { name: 'Start' }).click();
-  await expect(page.getByText(/Started/)).toBeVisible();
+  await card.getByRole('button', { name: 'Add to project' }).click();
+  if (!projectId) {
+    await expect(page.getByText('Choose a project for this process')).toBeVisible();
+    return;
+  }
+  await expect(page.getByText(/Added to /)).toBeVisible();
   await expect(page.getByRole('link', { name: 'Open Work' })).toBeVisible();
-  if (projectId) await expect(select).toHaveValue(projectId);
+  await expect(select).toHaveValue(projectId);
 });
 
 test('an assignee can check a step and return the work to the pool', async ({ page }) => {
@@ -73,6 +82,8 @@ test('an assignee can check a step and return the work to the pool', async ({ pa
   });
   expect(created.status()).toBe(201);
   const template = await created.json();
+  const published = await page.request.post(`/api/v1/processes/${template.id}/publish`, { data: { publish: true } });
+  expect(published.ok()).toBeTruthy();
   const started = await page.request.post(`/api/v1/processes/${template.id}/start`, { data: { projectId: null } });
   expect(started.status()).toBe(201);
   const run = await started.json();
@@ -122,7 +133,7 @@ test('the phone app opens claimed work and the team chat', async ({ page }) => {
   expect(chat.ok()).toBeTruthy();
   const rooms = await chat.json();
   expect(Array.isArray(rooms.channels)).toBe(true);
-  expect(rooms.channels.some((channel: { title?: string }) => channel.title === 'Team')).toBe(true);
+  expect(rooms.channels.some((channel: { title?: string }) => channel.title === 'Team chat')).toBe(true);
 
   if (!processes.canPost) return;
   const stamp = Date.now();
@@ -134,6 +145,8 @@ test('the phone app opens claimed work and the team chat', async ({ page }) => {
   });
   expect(created.status()).toBe(201);
   const template = await created.json();
+  const published = await page.request.post(`/api/v1/processes/${template.id}/publish`, { data: { publish: true } });
+  expect(published.ok()).toBeTruthy();
   const started = await page.request.post(`/api/v1/processes/${template.id}/start`, { data: {} });
   expect(started.status()).toBe(201);
   const workId = (await started.json()).item.id as string;

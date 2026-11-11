@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import './cleanup-release-checks';
+import { revealWork } from './cleanup-release-checks';
 
 const TEST_USER = {
   email: process.env.TEST_USER_EMAIL || 'admin@test.com',
@@ -57,7 +57,7 @@ test('a dated project item shows on the project and on the work list', async ({ 
     return;
   }
 
-  const title = `QA schedule ${Date.now()}`;
+  const title = `Release check schedule ${Date.now()}`;
   const created = await page.request.post('/api/v1/work-items', {
     data: {
       title,
@@ -89,7 +89,7 @@ test('a dated project item shows on the project and on the work list', async ({ 
   await expect(row.getByText('Dec 15, 2026')).toBeVisible();
   await expect(row.getByText('PPS meeting prep')).toBeVisible();
 
-  await page.goto('/work');
+  await revealWork(page, title);
   const workRow = page.locator('article').filter({ hasText: title });
   await expect(workRow.getByRole('heading', { name: title })).toBeVisible();
   await expect(workRow.getByText(/Dec 15, 2026/)).toBeVisible();
