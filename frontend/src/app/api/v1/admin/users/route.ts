@@ -255,6 +255,7 @@ export async function POST(request: NextRequest) {
         status: 'ACTIVE',
         volunteerId: volunteerId || null,
         constructionGroupId,
+        invitedBy: session.user?.id || null,
       },
       select: {
         id: true,

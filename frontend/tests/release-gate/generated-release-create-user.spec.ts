@@ -55,7 +55,11 @@ test('creating an account uses platform access and rejects an organizational rol
   expect(body.user.role).toBe('USER');
   expect(body.user.email).toBe(email);
 
+  const listed = page.waitForResponse(
+    (response) => response.url().includes('/api/v1/admin/users') && !response.url().includes('/stats') && response.ok()
+  );
   await page.reload();
+  await listed;
   const row = page.locator('tr').filter({ hasText: email });
   await expect(row).toBeVisible();
   await row.getByRole('checkbox', { name: 'Select Release Check' }).check();
