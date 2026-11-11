@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
-import { validateProcessTemplate } from '@/lib/processes';
+import { processTemplateJson, validateProcessTemplate } from '@/lib/processes';
 import { hiddenReleaseCheckProcess } from '@/lib/release-check-cleanup';
 
 const templateInclude = {
@@ -26,7 +26,12 @@ export async function GET() {
     const canPost = await canPostWork(session.user.id, scope);
     const [templates, projects] = await Promise.all([
       prisma.processTemplate.findMany({
-        where: { constructionGroupId: scope.constructionGroupId, isActive: true, ...hiddenReleaseCheckProcess },
+        where: {
+          constructionGroupId: scope.constructionGroupId,
+          isActive: true,
+          ...(canPost ? {} : { status: 'PUBLISHED' as const }),
+          ...hiddenReleaseCheckProcess,
+        },
         include: templateInclude,
         orderBy: { name: 'asc' },
       }),
@@ -42,20 +47,7 @@ export async function GET() {
     return NextResponse.json({
       canPost,
       projects,
-      templates: templates.map((template) => ({
-        id: template.id,
-        name: template.name,
-        purpose: template.purpose,
-        appliesTo: template.appliesTo,
-        cadence: template.cadence,
-        steps: template.steps.map((step) => ({
-          id: step.id,
-          title: step.title,
-          detail: step.detail,
-          explanation: step.explanation,
-          referenceUrl: step.referenceUrl,
-        })),
-      })),
+      templates: templates.map(processTemplateJson),
     });
   } catch (error) {
     console.error('List processes error:', error);
@@ -90,6 +82,9 @@ export async function POST(request: NextRequest) {
         purpose: parsed.value.purpose,
         appliesTo: parsed.value.appliesTo,
         cadence: parsed.value.cadence,
+        customEvery: parsed.value.customEvery,
+        customUnit: parsed.value.customUnit,
+        status: 'DRAFT',
         createdById: session.user.id,
         steps: {
           create: parsed.value.steps.map((step, index) => ({
@@ -104,20 +99,7 @@ export async function POST(request: NextRequest) {
       include: templateInclude,
     });
 
-    return NextResponse.json({
-      id: created.id,
-      name: created.name,
-      purpose: created.purpose,
-      appliesTo: created.appliesTo,
-      cadence: created.cadence,
-      steps: created.steps.map((step) => ({
-        id: step.id,
-        title: step.title,
-        detail: step.detail,
-        explanation: step.explanation,
-        referenceUrl: step.referenceUrl,
-      })),
-    }, { status: 201 });
+    return NextResponse.json(processTemplateJson(created), { status: 201 });
   } catch (error) {
     console.error('Create process error:', error);
     return NextResponse.json({ error: 'Failed to add a process' }, { status: 500 });

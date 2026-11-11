@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { canManageGroup, requireMobileActor } from '@/lib/mobile-actor';
-import { validateProcessTemplate } from '@/lib/processes';
+import { processTemplateJson, validateProcessTemplate } from '@/lib/processes';
 import { hiddenReleaseCheckProcess } from '@/lib/release-check-cleanup';
 
 export async function GET(request: NextRequest) {
@@ -12,7 +12,12 @@ export async function GET(request: NextRequest) {
     const canManage = await canManageGroup(actor);
     const [templates, projects] = await Promise.all([
       prisma.processTemplate.findMany({
-        where: { constructionGroupId: actor.constructionGroupId, isActive: true, ...hiddenReleaseCheckProcess },
+        where: {
+          constructionGroupId: actor.constructionGroupId,
+          isActive: true,
+          ...(canManage ? {} : { status: 'PUBLISHED' as const }),
+          ...hiddenReleaseCheckProcess,
+        },
         include: { steps: { orderBy: { position: 'asc' } } },
         orderBy: { name: 'asc' },
       }),
@@ -28,11 +33,7 @@ export async function GET(request: NextRequest) {
       canManage,
       projects,
       templates: templates.map((template) => ({
-        id: template.id,
-        name: template.name,
-        purpose: template.purpose,
-        appliesTo: template.appliesTo,
-        cadence: template.cadence,
+        ...processTemplateJson(template),
         steps: template.steps.map((step) => ({
           id: step.id,
           title: step.title,
@@ -63,6 +64,9 @@ export async function POST(request: NextRequest) {
         purpose: parsed.value.purpose,
         appliesTo: parsed.value.appliesTo,
         cadence: parsed.value.cadence,
+        customEvery: parsed.value.customEvery,
+        customUnit: parsed.value.customUnit,
+        status: 'DRAFT',
         createdById: actor.id,
         steps: {
           create: parsed.value.steps.map((step, index) => ({

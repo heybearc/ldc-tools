@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ListChecks } from 'lucide-react';
-import { scheduleLabel, taskInstructions, type ProcessAppliesTo, type ProcessCadence } from '@/lib/processes';
+import { CADENCE_OPTIONS, cadenceLabel, scheduleLabel, taskInstructions, type ProcessAppliesTo, type ProcessCadence, type ProcessCustomUnit, type ProcessTemplateStatus } from '@/lib/processes';
 import { userError } from '@/lib/user-error';
 
 interface Task {
@@ -18,6 +18,9 @@ interface Template {
   purpose: string | null;
   appliesTo: ProcessAppliesTo;
   cadence: ProcessCadence;
+  customEvery: number | null;
+  customUnit: ProcessCustomUnit | null;
+  status: ProcessTemplateStatus;
   steps: Array<{
     id: string;
     title: string;
@@ -39,7 +42,9 @@ export default function ProcessesPage() {
   const [name, setName] = useState('');
   const [purpose, setPurpose] = useState('');
   const [appliesTo, setAppliesTo] = useState<ProcessAppliesTo>('TEAM');
-  const [cadence, setCadence] = useState<ProcessCadence>('MONTHLY');
+  const [cadence, setCadence] = useState<ProcessCadence>('ONCE');
+  const [customEvery, setCustomEvery] = useState('2');
+  const [customUnit, setCustomUnit] = useState<ProcessCustomUnit>('WEEK');
   const [tasks, setTasks] = useState<Task[]>([{ ...EMPTY_TASK }]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -85,7 +90,9 @@ export default function ProcessesPage() {
     setName('');
     setPurpose('');
     setAppliesTo('TEAM');
-    setCadence('MONTHLY');
+    setCadence('ONCE');
+    setCustomEvery('2');
+    setCustomUnit('WEEK');
     setTasks([{ ...EMPTY_TASK }]);
   }
 
@@ -94,7 +101,9 @@ export default function ProcessesPage() {
     setName(template.name);
     setPurpose(template.purpose || '');
     setAppliesTo(template.appliesTo);
-    setCadence(template.cadence === 'WEEKLY' ? 'WEEKLY' : template.appliesTo === 'PROJECT' ? 'ONCE' : 'MONTHLY');
+    setCadence(template.cadence);
+    setCustomEvery(String(template.customEvery || 2));
+    setCustomUnit(template.customUnit || 'WEEK');
     setTasks(template.steps.map((step) => ({
       title: step.title,
       instructions: taskInstructions(step.detail, step.explanation),
@@ -102,11 +111,6 @@ export default function ProcessesPage() {
     })));
     setShowForm(true);
     setError('');
-  }
-
-  function chooseScope(next: ProcessAppliesTo) {
-    setAppliesTo(next);
-    setCadence(next === 'TEAM' ? 'MONTHLY' : cadence === 'WEEKLY' ? 'WEEKLY' : 'ONCE');
   }
 
   async function onSubmit(event: FormEvent) {
@@ -118,7 +122,9 @@ export default function ProcessesPage() {
         name,
         purpose,
         appliesTo,
-        cadence: appliesTo === 'TEAM' ? 'MONTHLY' : cadence,
+        cadence,
+        customEvery: cadence === 'CUSTOM' ? Number(customEvery) : null,
+        customUnit: cadence === 'CUSTOM' ? customUnit : null,
         steps: tasks.map((task) => ({
           title: task.title,
           detail: task.instructions,
@@ -165,13 +171,38 @@ export default function ProcessesPage() {
         return;
       }
       const projectName = projects.find((project) => project.id === projectId)?.name;
+      const rhythm = cadenceLabel(template.cadence, template.customEvery, template.customUnit);
       setNotice(
         template.appliesTo === 'PROJECT' && projectName
-          ? `Added to ${projectName}. It is on Work and can be claimed.`
-          : 'Added to Work. It is monthly for the team and can be claimed.',
+          ? `Added to ${projectName}. ${rhythm}. It is on Work and can be claimed.`
+          : `Added to Work. ${rhythm}, and not tied to a project. It can be claimed.`,
       );
     } catch {
       setError(userError(0, '', 'Could not start the process'));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function setPublished(template: Template, publish: boolean) {
+    setBusyId(template.id);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`/api/v1/processes/${template.id}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publish }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, publish ? 'Could not publish the process' : 'Could not return the process to draft'));
+        return;
+      }
+      setNotice(publish ? `${template.name} is published and can be used.` : `${template.name} is a draft again.`);
+      await load();
+    } catch {
+      setError(userError(0, '', publish ? 'Could not publish the process' : 'Could not return the process to draft'));
     } finally {
       setBusyId(null);
     }
@@ -183,8 +214,7 @@ export default function ProcessesPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Processes</h1>
           <p className="mt-2 text-gray-600 max-w-3xl">
-            Templates for this construction group. A team process is monthly and goes on Work with no project.
-            A project process is once or weekly, and you choose the project when you start it. The tasks stay on that one work item.
+            Templates for this construction group. A draft stays here until you publish it. A published template creates one work item, either on its own or on a project you choose. The cadence is the repeat rule for that template: one time, daily, weekly, every two weeks, monthly, quarterly, yearly, or a custom interval. Start it again when the next one is due. The tasks stay on that work item.
           </p>
         </div>
         {canPost && (
@@ -211,7 +241,11 @@ export default function ProcessesPage() {
 
       {showForm && canPost && (
         <form onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">
-          {editingId && <p className="text-sm font-medium text-gray-700">Editing this template. Work already started keeps its copied tasks.</p>}
+          <p className="text-sm text-gray-600">
+            {editingId
+              ? 'Editing this template. Work already started keeps its copied tasks. Saving does not change draft or published.'
+              : 'Saving keeps this as a draft. Publish it when the team should use it.'}
+          </p>
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Name</span>
             <input
@@ -236,13 +270,13 @@ export default function ProcessesPage() {
             <legend className="text-sm font-medium text-gray-700">Where it applies</legend>
             <div className="mt-2 flex flex-wrap gap-2">
               {([
-                ['TEAM', 'Team'],
+                ['TEAM', 'Standalone'],
                 ['PROJECT', 'Project'],
               ] as const).map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
-                  onClick={() => chooseScope(value)}
+                  onClick={() => setAppliesTo(value)}
                   className={`px-4 py-2 min-h-[44px] rounded-md border text-sm font-medium ${
                     appliesTo === value ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-gray-300 text-gray-800'
                   }`}
@@ -253,31 +287,49 @@ export default function ProcessesPage() {
             </div>
             <p className="mt-2 text-sm text-gray-600">
               {appliesTo === 'TEAM'
-                ? 'Monthly work for the construction group. It is not tied to a project.'
-                : 'Runs on one project. Choose once or weekly.'}
+                ? 'Creates a work item for the construction group. It is not tied to a project.'
+                : 'Creates a work item on the project you choose when you start it.'}
             </p>
           </fieldset>
-          {appliesTo === 'PROJECT' && (
-            <fieldset>
-              <legend className="text-sm font-medium text-gray-700">How often</legend>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {([
-                  ['ONCE', 'Once'],
-                  ['WEEKLY', 'Weekly'],
-                ] as const).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setCadence(value)}
-                    className={`px-4 py-2 min-h-[44px] rounded-md border text-sm font-medium ${
-                      cadence === value ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-gray-300 text-gray-800'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
+          <label className="block max-w-sm">
+            <span className="text-sm font-medium text-gray-700">How often</span>
+            <select
+              value={cadence}
+              onChange={(event) => setCadence(event.target.value as ProcessCadence)}
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white min-h-[44px]"
+            >
+              {CADENCE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          {cadence === 'CUSTOM' && (
+            <div className="flex flex-wrap items-end gap-3">
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">Every</span>
+                <input
+                  required
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={customEvery}
+                  onChange={(event) => setCustomEvery(event.target.value)}
+                  className="mt-1 w-28 rounded-md border border-gray-300 px-3 py-2"
+                />
+              </label>
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">Unit</span>
+                <select
+                  value={customUnit}
+                  onChange={(event) => setCustomUnit(event.target.value as ProcessCustomUnit)}
+                  className="mt-1 rounded-md border border-gray-300 px-3 py-2 bg-white min-h-[44px]"
+                >
+                  <option value="DAY">Days</option>
+                  <option value="WEEK">Weeks</option>
+                  <option value="MONTH">Months</option>
+                </select>
+              </label>
+            </div>
           )}
           {tasks.map((task, index) => (
             <div key={index} className="space-y-3 border-t border-gray-100 pt-4">
@@ -337,7 +389,7 @@ export default function ProcessesPage() {
               disabled={saving}
               className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
             >
-              {editingId ? 'Save changes' : 'Save process'}
+              {editingId ? 'Save changes' : 'Save draft'}
             </button>
           </div>
         </form>
@@ -351,13 +403,26 @@ export default function ProcessesPage() {
           No processes for this construction group.
         </div>
       ) : (
-        <div className="space-y-3">
-          {templates.map((template) => (
+        <div className="space-y-8">
+          {(['DRAFT', 'PUBLISHED'] as const).map((status) => {
+            const group = templates.filter((template) => template.status === status);
+            if (group.length === 0) return null;
+            return (
+              <section key={status} className="space-y-3">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                  {status === 'DRAFT' ? 'Drafts' : 'Published'}
+                </h2>
+                {group.map((template) => (
             <article key={template.id} className="bg-white rounded-lg shadow p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-lg font-semibold text-gray-900">{template.name}</h2>
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  template.status === 'PUBLISHED' ? 'bg-green-50 text-green-800' : 'bg-amber-50 text-amber-800'
+                }`}>
+                  {template.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+                </span>
                 <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
-                  {scheduleLabel(template.appliesTo, template.cadence)}
+                  {scheduleLabel(template.appliesTo, template.cadence, template.customEvery, template.customUnit)}
                 </span>
               </div>
               {template.purpose && <p className="mt-2 text-sm text-gray-700">{template.purpose}</p>}
@@ -386,7 +451,26 @@ export default function ProcessesPage() {
                   >
                     Edit
                   </button>
-                  {template.appliesTo === 'PROJECT' && (
+                  {template.status === 'PUBLISHED' ? (
+                    <button
+                      type="button"
+                      disabled={busyId === template.id}
+                      onClick={() => setPublished(template, false)}
+                      className="px-4 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium disabled:opacity-60"
+                    >
+                      Return to draft
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={busyId === template.id}
+                      onClick={() => setPublished(template, true)}
+                      className="px-4 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
+                    >
+                      Publish
+                    </button>
+                  )}
+                  {template.status === 'PUBLISHED' && template.appliesTo === 'PROJECT' && (
                     <select
                       value={projectChoice[template.id] || ''}
                       onChange={(event) => setProjectChoice({ ...projectChoice, [template.id]: event.target.value })}
@@ -399,18 +483,23 @@ export default function ProcessesPage() {
                       ))}
                     </select>
                   )}
-                  <button
-                    type="button"
-                    disabled={busyId === template.id}
-                    onClick={() => start(template)}
-                    className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
-                  >
-                    {template.appliesTo === 'PROJECT' ? 'Add to project' : 'Add to work'}
-                  </button>
+                  {template.status === 'PUBLISHED' && (
+                    <button
+                      type="button"
+                      disabled={busyId === template.id}
+                      onClick={() => start(template)}
+                      className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
+                    >
+                      {template.appliesTo === 'PROJECT' ? 'Add to project' : 'Add to work'}
+                    </button>
+                  )}
                 </div>
               )}
             </article>
-          ))}
+                ))}
+              </section>
+            );
+          })}
         </div>
       )}
     </div>

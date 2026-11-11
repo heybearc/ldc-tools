@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
-import { validateProcessTemplate } from '@/lib/processes';
+import { processTemplateJson, validateProcessTemplate } from '@/lib/processes';
 
 export async function PATCH(
   request: NextRequest,
@@ -46,6 +46,8 @@ export async function PATCH(
           purpose: parsed.value.purpose,
           appliesTo: parsed.value.appliesTo,
           cadence: parsed.value.cadence,
+          customEvery: parsed.value.customEvery,
+          customUnit: parsed.value.customUnit,
           steps: {
             create: parsed.value.steps.map((step, index) => ({
               position: index,
@@ -60,20 +62,7 @@ export async function PATCH(
       });
     });
 
-    return NextResponse.json({
-      id: updated.id,
-      name: updated.name,
-      purpose: updated.purpose,
-      appliesTo: updated.appliesTo,
-      cadence: updated.cadence,
-      steps: updated.steps.map((step) => ({
-        id: step.id,
-        title: step.title,
-        detail: step.detail,
-        explanation: step.explanation,
-        referenceUrl: step.referenceUrl,
-      })),
-    });
+    return NextResponse.json(processTemplateJson(updated));
   } catch (error) {
     console.error('Update process error:', error);
     return NextResponse.json({ error: 'Failed to update the process' }, { status: 500 });

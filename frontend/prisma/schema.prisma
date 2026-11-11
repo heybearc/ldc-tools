@@ -1049,8 +1049,24 @@ enum ProcessAppliesTo {
 
 enum ProcessCadence {
   ONCE
+  DAILY
   WEEKLY
+  BIWEEKLY
   MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
+
+enum ProcessCustomUnit {
+  DAY
+  WEEK
+  MONTH
+}
+
+enum ProcessTemplateStatus {
+  DRAFT
+  PUBLISHED
 }
 
 enum WorkNoteKind {
@@ -1079,6 +1095,7 @@ model WorkItem {
   createdById         String
   processTemplateId   String?
   processCadence      ProcessCadence?
+  processSchedule     String?
   claimedAt           DateTime?
   completedAt         DateTime?
   createdAt           DateTime       @default(now())
@@ -1156,10 +1173,14 @@ model ProcessTemplate {
   id                  String           @id @default(cuid())
   constructionGroupId String
   name                String
-  purpose             String?          @db.Text
-  appliesTo           ProcessAppliesTo @default(TEAM)
-  cadence             ProcessCadence   @default(MONTHLY)
-  isActive            Boolean          @default(true)
+  purpose             String?              @db.Text
+  appliesTo           ProcessAppliesTo     @default(TEAM)
+  cadence             ProcessCadence       @default(ONCE)
+  customEvery         Int?
+  customUnit          ProcessCustomUnit?
+  status              ProcessTemplateStatus @default(DRAFT)
+  publishedAt         DateTime?
+  isActive            Boolean              @default(true)
   createdById         String
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt

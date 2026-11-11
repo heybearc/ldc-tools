@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { ClipboardList, Plus, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { isAirgappedEmail } from '@/lib/reachable-email';
-import { scheduleLabel } from '@/lib/processes';
+import { scheduleLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
 import { userError } from '@/lib/user-error';
 
 interface Person {
@@ -57,7 +57,9 @@ interface ProcessOffer {
   name: string;
   purpose: string | null;
   appliesTo: 'TEAM' | 'PROJECT';
-  cadence: 'ONCE' | 'WEEKLY' | 'MONTHLY';
+  cadence: ProcessCadence;
+  customEvery: number | null;
+  customUnit: ProcessCustomUnit | null;
   steps: Step[];
 }
 
@@ -658,7 +660,7 @@ export default function WorkPage() {
                         </span>
                       </div>
                       <p className="mt-2 text-sm text-gray-600">
-                        {scheduleLabel(process.appliesTo, process.cadence)}
+                        {scheduleLabel(process.appliesTo, process.cadence, process.customEvery, process.customUnit)}
                         {' · '}
                         {process.steps.length === 1 ? '1 task' : `${process.steps.length} tasks`}
                       </p>

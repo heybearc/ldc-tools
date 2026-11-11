@@ -1,4 +1,5 @@
 import { canEmailAddress } from '@/lib/reachable-email';
+import { cadenceLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
 
 export const WORK_TIMING_KINDS = ['DEADLINE', 'PROJECT_DATE', 'MONTHLY', 'YEARLY', 'PROCESS', 'CREW_REQUEST', 'NONE'] as const;
 export type WorkTimingKind = (typeof WORK_TIMING_KINDS)[number];
@@ -36,15 +37,16 @@ export function timingLabel(
   kind: WorkTimingKind,
   dueOn: string | null,
   projectName: string | null,
-  cadence?: 'ONCE' | 'WEEKLY' | 'MONTHLY' | null,
+  cadence?: ProcessCadence | null,
+  schedule?: string | null,
+  customEvery?: number | null,
+  customUnit?: ProcessCustomUnit | null,
 ): string {
   if (kind === 'MONTHLY') return 'Monthly';
   if (kind === 'YEARLY') return 'Yearly';
   if (kind === 'PROCESS') {
-    if (cadence === 'MONTHLY') return 'Monthly';
-    if (cadence === 'WEEKLY') return projectName ? `Weekly · ${projectName}` : 'Weekly';
-    if (cadence === 'ONCE') return projectName ? `Once · ${projectName}` : 'Once';
-    return projectName ? `Process · ${projectName}` : 'Process';
+    const base = schedule || (cadence ? cadenceLabel(cadence, customEvery, customUnit) : 'Process');
+    return projectName ? `${base} · ${projectName}` : base;
   }
   if (kind === 'CREW_REQUEST') return 'Crew request';
   if (kind === 'NONE') return 'No deadline';

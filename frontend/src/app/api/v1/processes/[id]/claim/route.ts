@@ -34,7 +34,7 @@ export async function POST(
     }
     const placement = placementForTemplate(template, null);
     if (!placement.ok) {
-      return NextResponse.json({ error: 'Start this process from Processes and choose the project' }, { status: 400 });
+      return NextResponse.json({ error: placement.error }, { status: 400 });
     }
 
     const member = await activeUserInGroup(session.user.id, template.constructionGroupId);
@@ -50,6 +50,8 @@ export async function POST(
       name: template.name,
       purpose: template.purpose,
       cadence: placement.cadence,
+      customEvery: template.customEvery,
+      customUnit: template.customUnit,
       steps: template.steps,
       projectId: null,
       assigneeId: session.user.id,

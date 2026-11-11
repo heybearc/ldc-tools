@@ -1,5 +1,29 @@
 import { prisma } from '@/lib/prisma';
-import type { ProcessCadence } from '@/lib/processes';
+import { cadenceLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
+
+export async function setProcessPublished(input: {
+  id: string;
+  constructionGroupId: string;
+  publish: boolean;
+}) {
+  const template = await prisma.processTemplate.findFirst({
+    where: { id: input.id, constructionGroupId: input.constructionGroupId, isActive: true },
+    include: { steps: { select: { id: true }, take: 1 } },
+  });
+  if (!template) return { ok: false as const, status: 404, error: 'Process not found' };
+  if (input.publish && template.steps.length === 0) {
+    return { ok: false as const, status: 400, error: 'Add at least one task before publishing' };
+  }
+  const updated = await prisma.processTemplate.update({
+    where: { id: template.id },
+    data: {
+      status: input.publish ? 'PUBLISHED' : 'DRAFT',
+      publishedAt: input.publish ? new Date() : null,
+    },
+    include: { steps: { orderBy: { position: 'asc' } } },
+  });
+  return { ok: true as const, template: updated };
+}
 
 export interface ProcessRunStep {
   title: string;
@@ -15,6 +39,8 @@ export async function createProcessRun(input: {
   name: string;
   purpose: string | null;
   cadence: ProcessCadence;
+  customEvery: number | null;
+  customUnit: ProcessCustomUnit | null;
   steps: ProcessRunStep[];
   projectId: string | null;
   assigneeId: string | null;
@@ -35,6 +61,7 @@ export async function createProcessRun(input: {
       status: 'OPEN',
       processTemplateId: input.templateId,
       processCadence: input.cadence,
+      processSchedule: cadenceLabel(input.cadence, input.customEvery, input.customUnit),
       createdById: input.createdById,
       steps: {
         create: input.steps.map((step, index) => ({

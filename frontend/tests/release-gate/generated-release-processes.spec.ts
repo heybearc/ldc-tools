@@ -68,6 +68,15 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   expect(created.status()).toBe(201);
   const template = await created.json();
 
+  const blocked = await page.request.post(`/api/v1/processes/${template.id}/start`, {
+    data: { projectId },
+  });
+  expect(blocked.status()).toBe(400);
+  const published = await page.request.post(`/api/v1/processes/${template.id}/publish`, {
+    data: { publish: true },
+  });
+  expect(published.ok()).toBeTruthy();
+
   const started = await page.request.post(`/api/v1/processes/${template.id}/start`, {
     data: { projectId },
   });

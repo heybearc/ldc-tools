@@ -40,6 +40,8 @@ export async function POST(
       name: template.name,
       purpose: template.purpose,
       cadence: placement.cadence,
+      customEvery: template.customEvery,
+      customUnit: template.customUnit,
       steps: template.steps,
       projectId: placement.projectId,
       assigneeId: null,

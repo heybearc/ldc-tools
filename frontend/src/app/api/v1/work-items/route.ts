@@ -35,7 +35,8 @@ function serialize(item: {
   claimedAt: Date | null;
   completedAt: Date | null;
   createdAt: Date;
-  processCadence?: 'ONCE' | 'WEEKLY' | 'MONTHLY' | null;
+  processCadence?: 'ONCE' | 'DAILY' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'CUSTOM' | null;
+  processSchedule?: string | null;
   assignee: { id: string; name: string | null; email: string } | null;
   project: { id: string; name: string } | null;
   steps?: Array<{
@@ -64,7 +65,7 @@ function serialize(item: {
     referenceUrl: item.referenceUrl,
     timingKind: item.timingKind,
     dueOn,
-    timingLabel: timingLabel(item.timingKind, dueOn, item.project?.name || null, item.processCadence),
+    timingLabel: timingLabel(item.timingKind, dueOn, item.project?.name || null, item.processCadence, item.processSchedule),
     project: item.project,
     claimable: item.claimable,
     status: item.status,
@@ -160,7 +161,7 @@ export async function GET() {
           })
         : Promise.resolve([]),
       prisma.processTemplate.findMany({
-        where: { ...withCGFilter(scope), isActive: true, ...hiddenReleaseCheckProcess },
+        where: { ...withCGFilter(scope), isActive: true, status: 'PUBLISHED', ...hiddenReleaseCheckProcess },
         include: { steps: { orderBy: { position: 'asc' } } },
         orderBy: { name: 'asc' },
       }),
@@ -188,6 +189,9 @@ export async function GET() {
         purpose: process.purpose,
         appliesTo: process.appliesTo,
         cadence: process.cadence,
+        customEvery: process.customEvery,
+        customUnit: process.customUnit,
+        status: process.status,
         steps: process.steps.map((step) => ({
           id: step.id,
           title: step.title,

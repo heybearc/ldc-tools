@@ -11,7 +11,10 @@ type Template = {
   name: string;
   purpose?: string | null;
   appliesTo?: 'TEAM' | 'PROJECT';
-  cadence?: 'ONCE' | 'WEEKLY' | 'MONTHLY';
+  cadence?: string;
+  customEvery?: number | null;
+  customUnit?: 'DAY' | 'WEEK' | 'MONTH' | null;
+  status?: 'DRAFT' | 'PUBLISHED';
   steps: Step[];
 };
 type Project = { id: string; name: string };
@@ -25,7 +28,9 @@ export default function ProcessesScreen() {
   const [projectId, setProjectId] = useState('');
   const [name, setName] = useState('');
   const [appliesTo, setAppliesTo] = useState<'TEAM' | 'PROJECT'>('TEAM');
-  const [cadence, setCadence] = useState<'ONCE' | 'WEEKLY'>('ONCE');
+  const [cadence, setCadence] = useState('ONCE');
+  const [customEvery, setCustomEvery] = useState('2');
+  const [customUnit, setCustomUnit] = useState<'DAY' | 'WEEK' | 'MONTH'>('WEEK');
   const [stepTitle, setStepTitle] = useState('');
   const [stepDetail, setStepDetail] = useState('');
   const [error, setError] = useState('');
@@ -87,6 +92,29 @@ export default function ProcessesScreen() {
     }
   }
 
+  async function publish(id: string) {
+    if (!token || busy) return;
+    setBusy(id);
+    setError('');
+    try {
+      await apiRequest(apiBase, `/api/v1/mobile/processes/${id}/publish`, {
+        method: 'POST',
+        token,
+        body: { publish: true },
+        action: 'Could not publish the process',
+      });
+      await load();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        await signOut();
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Could not publish the process');
+    } finally {
+      setBusy('');
+    }
+  }
+
   async function create() {
     if (!token || busy) return;
     setBusy('create');
@@ -99,7 +127,9 @@ export default function ProcessesScreen() {
         body: {
           name,
           appliesTo,
-          cadence: appliesTo === 'TEAM' ? 'MONTHLY' : cadence,
+          cadence,
+          customEvery: cadence === 'CUSTOM' ? Number(customEvery) : null,
+          customUnit: cadence === 'CUSTOM' ? customUnit : null,
           steps: [{ title: stepTitle, detail: stepDetail, explanation: '', referenceUrl: '' }],
         },
       });
@@ -122,18 +152,34 @@ export default function ProcessesScreen() {
           <Text style={styles.title}>New process</Text>
           <Field label="Name" value={name} onChangeText={setName} />
           <View style={styles.row}>
-            <Choice label="Team · Monthly" selected={appliesTo === 'TEAM'} onPress={() => setAppliesTo('TEAM')} />
+            <Choice label="Standalone" selected={appliesTo === 'TEAM'} onPress={() => setAppliesTo('TEAM')} />
             <Choice label="Project" selected={appliesTo === 'PROJECT'} onPress={() => setAppliesTo('PROJECT')} />
           </View>
-          {appliesTo === 'PROJECT' ? (
+          <View style={styles.row}>
+            {[
+              ['ONCE', 'One time'],
+              ['DAILY', 'Daily'],
+              ['WEEKLY', 'Weekly'],
+              ['BIWEEKLY', '2 weeks'],
+              ['MONTHLY', 'Monthly'],
+              ['QUARTERLY', 'Quarterly'],
+              ['YEARLY', 'Yearly'],
+              ['CUSTOM', 'Custom'],
+            ].map(([value, label]) => (
+              <Choice key={value} label={label} selected={cadence === value} onPress={() => setCadence(value)} />
+            ))}
+          </View>
+          {cadence === 'CUSTOM' ? (
             <View style={styles.row}>
-              <Choice label="Once" selected={cadence === 'ONCE'} onPress={() => setCadence('ONCE')} />
-              <Choice label="Weekly" selected={cadence === 'WEEKLY'} onPress={() => setCadence('WEEKLY')} />
+              <Field label="Every" value={customEvery} onChangeText={setCustomEvery} />
+              <Choice label="Days" selected={customUnit === 'DAY'} onPress={() => setCustomUnit('DAY')} />
+              <Choice label="Weeks" selected={customUnit === 'WEEK'} onPress={() => setCustomUnit('WEEK')} />
+              <Choice label="Months" selected={customUnit === 'MONTH'} onPress={() => setCustomUnit('MONTH')} />
             </View>
           ) : null}
           <Field label="Task" value={stepTitle} onChangeText={setStepTitle} />
           <Field label="Instructions" value={stepDetail} onChangeText={setStepDetail} multiline />
-          <PrimaryButton label={busy === 'create' ? 'Saving…' : 'Add process'} onPress={() => void create()} disabled={Boolean(busy)} />
+          <PrimaryButton label={busy === 'create' ? 'Saving…' : 'Save draft'} onPress={() => void create()} disabled={Boolean(busy)} />
         </View>
       ) : null}
       {templates.length === 0 && !error ? <Text style={styles.empty}>No processes yet.</Text> : null}
@@ -148,17 +194,23 @@ export default function ProcessesScreen() {
         <View key={template.id} style={styles.card}>
           <Text style={styles.title}>{template.name}</Text>
           <Text style={styles.detail}>
-            {template.appliesTo === 'PROJECT'
-              ? (template.cadence === 'WEEKLY' ? 'Project · Weekly' : 'Project · Once')
-              : 'Team · Monthly'}
+            {template.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+            {' · '}
+            {template.appliesTo === 'PROJECT' ? 'Project' : 'Standalone'}
+            {' · '}
+            {template.cadence === 'CUSTOM' && template.customEvery && template.customUnit
+              ? `Every ${template.customEvery} ${template.customUnit.toLowerCase()}${template.customEvery === 1 ? '' : 's'}`
+              : (template.cadence || 'One time').toLowerCase()}
           </Text>
           {template.steps.map((step) => (
             <Text key={step.id} style={styles.detail}>{step.title}{step.detail ? ` — ${step.detail}` : ''}</Text>
           ))}
           {canManage ? (
             <PrimaryButton
-              label={busy === template.id ? 'Starting…' : template.appliesTo === 'PROJECT' ? 'Add to project' : 'Add to work'}
-              onPress={() => void start(template.id)}
+              label={busy === template.id ? 'Working…' : template.status === 'PUBLISHED'
+                ? (template.appliesTo === 'PROJECT' ? 'Add to project' : 'Add to work')
+                : 'Publish'}
+              onPress={() => void (template.status === 'PUBLISHED' ? start(template.id) : publish(template.id))}
               disabled={Boolean(busy)}
             />
           ) : null}

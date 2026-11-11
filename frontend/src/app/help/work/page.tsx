@@ -56,7 +56,7 @@ export default async function WorkHelpPage() {
           <h2>Finish a task</h2>
           <p>
             The assignee, or Personnel, can mark the task Done. The page says whether the completion email was sent. Done tasks stay in a collapsed Done section, with the date they were finished.
-            A team process is listed as available and is monthly. Claiming it keeps every task inside that process. A project process is started from Processes after you choose the project. Finishing the process marks that one work item done.
+            A published process is listed as available. A draft is not. Claiming a standalone process keeps every task inside that process. A project process is started from Processes after you choose the project. Finishing the process marks that one work item done.
             Anyone on the work list can add a note or ask for help on a task. A help request is listed at the top of Work.
             If email is already configured, the Personnel Contact and Assistant are told. Support is not.
             They can reply on the request. A new reply shows as unread until they open it. The person who asked also sees unread replies.
