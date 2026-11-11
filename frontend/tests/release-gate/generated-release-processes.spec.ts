@@ -67,6 +67,31 @@ test('starting a process lists one claimable process, not its steps', async ({ p
   });
   expect(created.status()).toBe(201);
   const template = await created.json();
+  expect(template.status).toBe('DRAFT');
+
+  const custom = await page.request.post('/api/v1/processes', {
+    data: {
+      name: `QA custom ${stamp}`,
+      appliesTo: 'TEAM',
+      cadence: 'CUSTOM',
+      steps: [{ title: `QA custom task ${stamp}`, detail: 'Walk the site.' }],
+    },
+  });
+  expect(custom.status()).toBe(400);
+  const customOk = await page.request.post('/api/v1/processes', {
+    data: {
+      name: `QA custom ${stamp}`,
+      appliesTo: 'TEAM',
+      cadence: 'CUSTOM',
+      customEvery: 10,
+      customUnit: 'DAY',
+      steps: [{ title: `QA custom task ${stamp}`, detail: 'Walk the site.' }],
+    },
+  });
+  expect(customOk.status()).toBe(201);
+  const customTemplate = await customOk.json();
+  expect(customTemplate.status).toBe('DRAFT');
+  expect(customTemplate.cadence).toBe('CUSTOM');
 
   const blocked = await page.request.post(`/api/v1/processes/${template.id}/start`, {
     data: { projectId },
