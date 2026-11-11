@@ -2,18 +2,21 @@
 
 **Last updated:** 2026-11-11  
 **Current branch:** main  
-**Working on:** v1.48.4 is LIVE on blue (CT133). STANDBY green (CT135) is `fd1d11b` (QA cleanup, not shipped). Hub dates stay paused.
+**Working on:** v1.48.5 is LIVE on green (CT135). STANDBY blue (CT133) is `ec017c7` (accounts list and Personnel place, not shipped). Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.48.4 (`1683f98`) is LIVE on blue CT133. Sign-in logo loads while signed out. STANDBY green CT135 is `fd1d11b`: release tests delete their QA rows. Available work is 174. Hub dates stay paused.
+v1.48.5 (`99313b9`) is LIVE on green CT135. Creating an account uses User, Admin, Super Admin, or Read Only. STANDBY blue CT133 is `ec017c7`: created accounts stay on the list, several accounts can be edited or invited, and Add person can choose Personnel or the construction group. Hub dates stay paused.
 
 ### What I'm doing right now
 Nothing in progress.
 
 ### Recent completions
-- ✅ Shipped v1.48.4 (`1683f98`). Sign-in logo. qa-01 full suite 94 plus the logo test. LIVE blue CT133.
+- ✅ Shipped v1.48.5 (`99313b9`). Account create uses platform access. qa-01 full suite 95 plus the create-user test. LIVE green CT135. STANDBY was synced, then blue CT133 took later commits.
+- ✅ Created accounts with a password show on Accounts. Add person Place includes Personnel and Construction group (`ec017c7`) on STANDBY blue CT133. Not shipped.
+- ✅ Bulk edit and send invitation for accounts that were created without an email (`86cce95`) on STANDBY. Not shipped.
+- ✅ Shipped v1.48.4 (`1683f98`). Sign-in logo. qa-01 full suite 94 plus the logo test. LIVE was blue CT133.
 - ✅ Removed QA work left by the release gate. Available work is 174 crew requests.
 - ✅ Release-test cleanup (`fd1d11b`) is on STANDBY green CT135. Not shipped.
 - ✅ D-069 recorded. `/ship` classifies site vs phone and builds both store binaries when `mobile/` changed.
@@ -50,7 +53,7 @@ Nothing in progress.
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-`/ship` the QA cleanup (`fd1d11b`). Hub assignment dates stay paused. New session before the next slice.
+`/ship` the accounts list and Personnel place (`ec017c7`). Hub assignment dates stay paused. New session before the next slice.
 
 ---
 
@@ -68,4 +71,4 @@ Nothing in progress.
 ---
 
 ## Exact Next Command
-`/ship` the QA cleanup (`fd1d11b`). Hub assignment dates stay paused. New session before the next slice.
+`/ship` the accounts list and Personnel place (`ec017c7`). Hub assignment dates stay paused. New session before the next slice.

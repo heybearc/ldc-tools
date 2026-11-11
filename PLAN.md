@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-11  
 **Current phase:** Region work queue  
-**Status:** v1.48.4 is LIVE on blue (CT133, `1683f98`). STANDBY green (CT135) is `fd1d11b`. Hub dates are paused.
+**Status:** v1.48.5 is LIVE on green (CT135, `99313b9`). STANDBY blue (CT133) is `ec017c7`. Hub dates are paused.
 
 ---
 
@@ -34,7 +34,8 @@
 - [x] Slice 8 — directory contacts are not sign-in accounts
 - [x] D-069 — `/ship` classifies site vs phone and builds iOS then Android when `mobile/` changed
 - [x] Sign-in logo; `/ship` v1.48.4
-- [ ] Release tests delete QA rows (`fd1d11b` on STANDBY). Ship so live matches.
+- [x] Account create uses platform access; `/ship` v1.48.5
+- [ ] Created accounts stay on the list, and Add person can choose Personnel (`ec017c7` on STANDBY). Ship so live matches.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

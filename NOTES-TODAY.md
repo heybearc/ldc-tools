@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-11, accounts)
+- Shipped v1.48.5 (`99313b9`). LIVE green CT135. STANDBY was synced to blue, then blue CT133 took `ec017c7`. qa-01 full suite 95 passed, plus the create-user test.
+- Create User was sending organizational roles. Prisma rejected them. The form now offers User, Admin, Super Admin, or Read Only.
+- A created account with a password was missing from Accounts. The list now includes those accounts. Several rows can be edited, and an account that was never emailed can be invited.
+- Directory Add person Place now includes Personnel and Construction group, then the trades. Checked on STANDBY.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: `/ship` so live has the accounts list and Personnel place. New session before the next slice.
+
 ### Mid-day (2026-11-11)
 - Shipped v1.48.4 (`1683f98`). LIVE blue CT133. STANDBY was synced, then green CT135 took `fd1d11b`. qa-01 full suite 94 passed, plus the sign-in logo test.
 - Signed-out `/logo.svg` was redirected to sign-in, so the logo was a blank circle. Public files now load without a session.
