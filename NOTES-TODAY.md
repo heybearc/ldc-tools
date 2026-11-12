@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-12, ship stopped)
+- Process templates stay drafts until published. Schedule is one time through yearly, or custom. Standalone or project. One work item per start.
+- qa-01 full suite 98 passed on GREEN, plus the generated process test. Empty requestor email was hidden by the release-check filter. Fixed in `f927b88` on STANDBY.
+- v1.49.0 notes are on main (`1ab944e`). No tag. That commit is not on STANDBY. LIVE stays v1.48.8 on blue CT133.
+- iOS archive hung twice in actool. Builds 11 and 12 were not uploaded. `app.json` is build 10. Android was not started. Traffic was not switched. Sync was not run.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: rerun the iOS lane, then Android, tag, deploy, switch, and sync. New session before the next slice.
+
 ### Mid-day (2026-11-11, personnel search and chat)
 - Shipped v1.48.8 (`df42264`). LIVE blue CT133. Completion email stays off after a shift-select. qa-01 directory and volunteers gate plus the email-off test passed.
 - Project assign is a search. Check several Personnel people, then assign them together (`c8fe9a2`). Checked on STANDBY: two names, then Assign 2 people.

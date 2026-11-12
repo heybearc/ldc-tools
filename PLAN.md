@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-11  
+**Last updated:** 2026-11-12  
 **Current phase:** Region work queue  
-**Status:** v1.48.8 is LIVE on blue (CT133, `df42264`). STANDBY green (CT135) is `81ff84c`. Hub dates are paused.
+**Status:** v1.48.8 is LIVE on blue (CT133). STANDBY green (CT135) is `f927b88`. v1.49.0 is not tagged. Hub dates are paused.
 
 ---
 
@@ -38,7 +38,8 @@
 - [x] Created accounts stay on the list, and Add person can choose Personnel; `/ship` v1.48.6
 - [x] Phone numbers use (555) 555-5555; `/ship` v1.48.7
 - [x] Phone numbers, QA-task hide, and completion email for a selection; `/ship` v1.48.8
-- [ ] Project search assigns several Personnel people. Chat is the Personnel team only (`81ff84c` on STANDBY). Ship so live matches.
+- [x] Project search assigns several Personnel people. Chat is the Personnel team only (`81ff84c`, included in the unshipped range).
+- [ ] Process drafts, publish, and schedule (`f927b88` on STANDBY). `/ship` v1.49.0 stopped on the iOS actool hang. Tag, switch, and sync are still open.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

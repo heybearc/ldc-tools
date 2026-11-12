@@ -1,18 +1,20 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-11  
+**Last updated:** 2026-11-12  
 **Current branch:** main  
-**Working on:** Personnel search-assign and Personnel-only chat are on STANDBY green (CT135, `81ff84c`). LIVE is v1.48.8 on blue (CT133, `df42264`). Hub dates stay paused.
+**Working on:** `/ship` v1.49.0 is stopped before the store build. STANDBY green (CT135) is `f927b88`. LIVE is v1.48.8 on blue (CT133). Hub dates stay paused.
 
 ---
 
 ## Current Task
-Project assign is a search. Check several Personnel people, then assign them together. Chat and team messages are the Personnel team only, not the directory. STANDBY green CT135 is `81ff84c`. LIVE blue CT133 is v1.48.8 (`df42264`). Hub dates stay paused.
+Process templates stay drafts until published. Schedule is one time through yearly, or custom. A published process is standalone or on a project. Starting it creates one work item. `/ship` v1.49.0 stopped: the iOS archive hung in actool. STANDBY green CT135 is `f927b88`. LIVE blue CT133 is v1.48.8. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress. Test on STANDBY, then ship.
+Nothing in progress. Clear the iOS asset-catalog hang, then finish the store builds, tag, switch, and sync.
 
 ### Recent completions
+- ✅ Process drafts, publish, cadence, and standalone or project are on STANDBY green CT135 (`f927b88`). qa-01 full suite 98 passed, plus the generated process test. Not shipped. Work with no requestor email was hidden by the release-check filter; that is fixed in `f927b88`.
+- ✅ Version notes for v1.49.0 are on main (`1ab944e`). No GitHub tag. Not deployed.
 - ✅ Shipped v1.48.8 (`df42264`). Completion email follows a shift-select. qa-01 directory and volunteers gate plus the email-off test. LIVE blue CT133. STANDBY was synced, then green CT135 took `81ff84c`.
 - ✅ Project assign is a search that can add several people. Chat lists and notifies only the Personnel team (`81ff84c`) on STANDBY green CT135. Not shipped.
 - ✅ Shipped v1.48.7 (`962eeb0`). Phone numbers use (555) 555-5555. qa-01 directory and volunteers gate plus the phone-format test. LIVE green CT135. STANDBY blue CT133 was synced, then took `2ca911f`.
@@ -58,11 +60,12 @@ Nothing in progress. Test on STANDBY, then ship.
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Test https://green.ldctools.com (project search-assign, Personnel-only chat), then `/ship` `81ff84c`. Hub assignment dates stay paused. New session before the next slice.
+Rerun `npm run release:ios` from `mobile/` after the actool hang is clear, then Android. Tag v1.49.0, deploy STANDBY, switch traffic, then sync. Hub assignment dates stay paused. New session before the next slice.
 
 ---
 
 ## Known Issues
+- Undeployed work on branch main: `1ab944e` (v1.49.0 notes only). Process code `f927b88` is on STANDBY. No tag. iOS actool hung twice; builds 11 and 12 were not uploaded. `mobile/app.json` is build 10. Android was not started.
 - iOS 1.1.0 build 10 is in App Store Connect. Android 1.1.0 version code 17 is on the Play internal track. The first iOS archive failed on the asset catalog; the retry uploaded. No icon change was made.
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
 - Phone feature flows passed 10/10 on the Android emulator. iOS Simulator 27.2 is installed. Those flows were not rerun on iOS.
@@ -76,4 +79,4 @@ Test https://green.ldctools.com (project search-assign, Personnel-only chat), th
 ---
 
 ## Exact Next Command
-Test https://green.ldctools.com (project search-assign, Personnel-only chat), then `/ship` `81ff84c`. Hub assignment dates stay paused. New session before the next slice.
+Rerun `npm run release:ios` from `mobile/` after the actool hang is clear, then Android. Tag v1.49.0, deploy STANDBY, switch traffic, then sync. Hub assignment dates stay paused. New session before the next slice.
