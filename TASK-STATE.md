@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-14  
 **Current branch:** main  
-**Working on:** v1.49.0 is LIVE on green (CT135). v1.49.1 is on main (`79c68ff`) and was not tagged. The iOS archive hung, so traffic was not switched. Hub dates stay paused.
+**Working on:** v1.49.1 is LIVE on blue (CT133). STANDBY green (CT135) is synced. Hub dates stay paused.
 
 ---
 
@@ -10,10 +10,11 @@
 Process templates stay drafts until published. Schedule is one time through yearly, or custom. A published process is standalone or on a project. Starting it creates one work item. v1.49.0 is LIVE. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress. v1.49.1 is waiting on an iOS archive that gets past actool. Hub assignment dates stay paused.
+Nothing in progress. Hub assignment dates stay paused.
 
 ### Recent completions
-- ⏸ v1.49.1 (`79c68ff`) stopped before the tag. qa-01 gate passed on standby blue: directory gate and the chat picker test. iOS build 12 was not uploaded. Android was not started. Traffic stayed on green CT135. Sync was not run.
+- ✅ Shipped v1.49.1 (`5b4023f`). qa-01 directory gate and the chat picker test passed. LIVE blue CT133. STANDBY green CT135 synced. iOS build 12 is on TestFlight. Android version code 19 is on the Play internal track. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.49.1
+- ⏸ The first v1.49.1 attempt stopped when actool hung. The archive watcher now opens the handshake and retries a stuck catalog compile (`da45232`).
 - ✅ Shipped v1.49.0 (`6ed30e6`). qa-01 full suite 98 passed, plus the generated process test. LIVE green CT135. STANDBY blue CT133 synced. iOS build 11 is on TestFlight. Android version code 18 is on the Play internal track. Chat on the live site lists the Personnel team.
 - ✅ Process drafts, publish, cadence, and standalone or project shipped in v1.49.0. Work with no requestor email was hidden by the release-check filter; that is fixed in `f927b88`.
 - ✅ Version notes for v1.49.0 are on main (`1ab944e`). No GitHub tag. Not deployed.

@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-14, v1.49.1 live)
+- Shipped v1.49.1 (`5b4023f`). LIVE blue CT133. STANDBY green CT135 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.49.1
+- qa-01 directory gate and the chat picker test passed on standby before the switch.
+- iOS 1.1.0 build 12 uploaded to TestFlight. Android version code 19 uploaded to the Play internal track.
+- actool no longer waits forever: the watcher opens the catalog handshake, and a stuck actool is killed so the archive retries once.
+- Chat starts from New chat. The conversation list does not show the whole Personnel team.
+- Open urgent feedback: 0. Hub dates stay paused.
+
 ### Mid-day (2026-11-14, ship stopped)
 - Chat starts from New chat: search or the person list. The conversation list no longer shows the whole Personnel team.
 - qa-01 gate passed on https://blue.ldctools.com. Directory gate plus `generated-release-chat-picker.spec.ts`. The first picker test failed because it counted conversation buttons. The rerun passed.
