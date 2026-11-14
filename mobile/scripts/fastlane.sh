@@ -18,7 +18,16 @@ if [ -n "${JAVA_HOME:-}" ]; then
 fi
 
 cd "$(dirname "$0")/.."
-# Xcode 27 deadlocks while opening the asset-catalog handshake pipe.
-# nohup ignores SIGHUP before Python starts; exec below would otherwise kill it.
-nohup python3 scripts/hold-asset-catalog-pipes.py >/tmp/ldc-asset-catalog-pipes.log 2>&1 &
-exec bundle exec fastlane "$@"
+# Xcode 27 can deadlock actool against ibtoold. The watcher unblocks the
+# handshake and kills a stuck actool so the lane can retry the archive.
+python3 scripts/hold-asset-catalog-pipes.py >/tmp/ldc-asset-catalog-pipes.log 2>&1 &
+watcher=$!
+cleanup() {
+  kill "$watcher" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+set +e
+bundle exec fastlane "$@"
+status=$?
+set -e
+exit "$status"

@@ -162,20 +162,31 @@ platform :ios do
     workspace, scheme, profile = manual_ios_signing!
     ipa = File.join(PROJECT, "build", IPA_NAME)
 
-    gym(
-      workspace: workspace,
-      scheme: scheme,
-      configuration: "Release",
-      export_method: "app-store",
-      output_directory: File.dirname(ipa),
-      output_name: IPA_NAME,
-      clean: true,
-      export_options: {
-        provisioningProfiles: {
-          BUNDLE_ID => profile
-        }
-      }
-    )
+    2.times do |attempt|
+      begin
+        gym(
+          workspace: workspace,
+          scheme: scheme,
+          configuration: "Release",
+          export_method: "app-store",
+          output_directory: File.dirname(ipa),
+          output_name: IPA_NAME,
+          clean: attempt.zero?,
+          export_options: {
+            provisioningProfiles: {
+              BUNDLE_ID => profile
+            }
+          }
+        )
+        break
+      rescue StandardError => error
+        raise if attempt == 1
+
+        UI.important("Archive failed (#{error.message}). Recycling the asset catalog tools and retrying once.")
+        system("killall -9 actool ibtoold >/dev/null 2>&1 || true")
+        system("pkill -9 -f AssetCatalogAgent >/dev/null 2>&1 || true")
+      end
+    end
 
     pilot(
       api_key: api_key,
