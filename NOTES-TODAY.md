@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-14, v1.49.0 live)
+- Shipped v1.49.0 (`6ed30e6`). LIVE green CT135. STANDBY blue CT133 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.49.0
+- qa-01 full suite 98 passed, plus the generated process test. The first gate failed because port 443 on `10.92.3.3` was closed; the rerun passed.
+- iOS 1.1.0 build 11 uploaded to TestFlight. Android version code 18 uploaded to the Play internal track. The actool pipe deadlock is unblocked by `mobile/scripts/hold-asset-catalog-pipes.py`.
+- Live chat had been listing 206 CG 01.12 accounts. The Personnel team is 15 people. That list is what v1.49.0 serves.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: new session before the next slice.
+
 ### Mid-day (2026-11-12, ship stopped)
 - Process templates stay drafts until published. Schedule is one time through yearly, or custom. Standalone or project. One work item per start.
 - qa-01 full suite 98 passed on GREEN, plus the generated process test. Empty requestor email was hidden by the release-check filter. Fixed in `f927b88` on STANDBY.
