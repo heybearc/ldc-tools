@@ -5,6 +5,13 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-14, ship stopped)
+- Chat starts from New chat: search or the person list. The conversation list no longer shows the whole Personnel team.
+- qa-01 gate passed on https://blue.ldctools.com. Directory gate plus `generated-release-chat-picker.spec.ts`. The first picker test failed because it counted conversation buttons. The rerun passed.
+- v1.49.1 notes are on main (`79c68ff`). No GitHub tag. LIVE stays v1.49.0 on green CT135.
+- iOS archive hung in actool after the handshake pipes were already open. Build 12 was not uploaded. `app.json` is still build 11. Android was not started. Traffic was not switched. Sync was not run.
+- Next: rerun `npm run release:ios`, then Android, then tag, deploy standby, and switch.
+
 ### Mid-day (2026-11-14, v1.49.0 live)
 - Shipped v1.49.0 (`6ed30e6`). LIVE green CT135. STANDBY blue CT133 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.49.0
 - qa-01 full suite 98 passed, plus the generated process test. The first gate failed because port 443 on `10.92.3.3` was closed; the rerun passed.

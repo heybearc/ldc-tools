@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-14  
 **Current phase:** Region work queue  
-**Status:** v1.49.0 is LIVE on green (CT135). STANDBY blue (CT133) is `6ed30e6`. Hub dates are paused.
+**Status:** v1.49.0 is LIVE on green (CT135). v1.49.1 (`79c68ff`) is untagged. The iOS archive hung, so traffic was not switched. Hub dates are paused.
 
 ---
 
