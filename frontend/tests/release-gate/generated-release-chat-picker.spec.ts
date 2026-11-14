@@ -20,8 +20,10 @@ test('a new chat starts from search or the person list', async ({ page }) => {
   const body = await chat.json();
   const teammates: Array<{ name: string | null; email: string }> = body.teammates || [];
   expect(teammates.length).toBeGreaterThan(0);
-  const person = teammates[0];
+  const titles = new Set((body.channels || []).map((channel: { title?: string }) => channel.title || ''));
+  const person = teammates.find((candidate) => candidate.email && !titles.has(candidate.email)) || teammates[0];
   const name = person.name || person.email;
+  const searchNeedle = person.email || name;
 
   await page.goto('/chat');
   await expect(page.getByRole('heading', { name: 'Chat', exact: true })).toBeVisible();
@@ -37,8 +39,8 @@ test('a new chat starts from search or the person list', async ({ page }) => {
   await expect(picker).toBeVisible();
   await expect(picker.locator('option')).toHaveCount(teammates.length + 1);
   await expect(picker.locator('option', { hasText: name })).toHaveCount(1);
-  await expect(page.locator('ul').getByRole('button')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: searchNeedle })).toHaveCount(0);
 
-  await page.getByLabel('Search people').fill(name.slice(0, Math.min(4, name.length)));
-  await expect(page.locator('ul').getByRole('button', { name })).toBeVisible();
+  await page.getByLabel('Search people').fill(searchNeedle);
+  await expect(page.getByRole('button', { name: searchNeedle })).toBeVisible();
 });
