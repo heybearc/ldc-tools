@@ -27,6 +27,7 @@ import time
 HELD = {}
 HELD_AT = {}
 ACTOOL_SEEN = {}
+DONE = set()
 STUCK_AFTER = 20
 HOLD_LIMIT = 2
 
@@ -94,6 +95,7 @@ def fifos():
 def release(path, reason):
     fd = HELD.pop(path, None)
     HELD_AT.pop(path, None)
+    DONE.add(path)
     if fd is not None:
         os.close(fd)
         print(f"asset-catalog pipe: released {path} ({reason})", flush=True)
@@ -107,7 +109,7 @@ def open_handshake():
             release(path, "gone")
     for path in live:
         pid = ibtoold_pid(path)
-        if not pid or not pid_alive(pid):
+        if not pid or not pid_alive(pid) or path in DONE:
             continue
         if path in HELD:
             if ibtoold_has_write(path) and agent_has_read(path):
