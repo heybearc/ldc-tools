@@ -8,6 +8,7 @@ import {
   type KeyboardEvent,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -45,6 +46,8 @@ export function ChatPane() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [blocked, setBlocked] = useState<Person[]>([]);
   const [draft, setDraft] = useState('');
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [personQuery, setPersonQuery] = useState('');
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
   const [appActive, setAppActive] = useState(AppState.currentState === 'active');
@@ -329,6 +332,8 @@ export function ChatPane() {
         body: { userId },
         action: 'Could not open the chat',
       });
+      setPersonQuery('');
+      setPickerOpen(false);
       await loadChannels();
       setSelectedId(body.id);
     } catch (err) {
@@ -338,6 +343,10 @@ export function ChatPane() {
 
   const selected = channels.find((channel) => channel.id === selectedId) || null;
   const showThread = Boolean(selectedId);
+  const needle = personQuery.trim().toLowerCase();
+  const shownTeammates = needle
+    ? teammates.filter((person) => `${personName(person)} ${person.email}`.toLowerCase().includes(needle))
+    : teammates;
 
   return (
     <View ref={screenRef} testID="screen-chat" style={[styles.screen, { paddingBottom: keyboardInset }]}>
@@ -364,12 +373,28 @@ export function ChatPane() {
           ListEmptyComponent={<Text style={styles.empty}>No chats yet.</Text>}
           ListFooterComponent={(
             <View style={styles.people}>
-              <Text style={styles.heading}>Message one person</Text>
-              {teammates.map((person) => (
-                <Pressable key={person.id} onPress={() => void openDirect(person.id)} style={styles.person}>
-                  <Text style={styles.personText}>{personName(person)}</Text>
-                </Pressable>
-              ))}
+              <Pressable onPress={() => setPickerOpen((open) => !open)} style={styles.newChat}>
+                <Text style={styles.newChatText}>{pickerOpen ? 'Close' : 'New chat'}</Text>
+              </Pressable>
+              {pickerOpen ? (
+                <View style={styles.picker}>
+                  <TextInput
+                    value={personQuery}
+                    onChangeText={setPersonQuery}
+                    placeholder="Search the Personnel team"
+                    style={styles.search}
+                    autoCapitalize="none"
+                  />
+                  <ScrollView style={styles.pickerList} nestedScrollEnabled keyboardShouldPersistTaps="handled">
+                    {shownTeammates.map((person) => (
+                      <Pressable key={person.id} onPress={() => void openDirect(person.id)} style={styles.person}>
+                        <Text style={styles.personText}>{personName(person)}</Text>
+                      </Pressable>
+                    ))}
+                    {needle && shownTeammates.length === 0 ? <Text style={styles.empty}>No one matches.</Text> : null}
+                  </ScrollView>
+                </View>
+              ) : null}
               {blocked.length > 0 ? <Text style={styles.heading}>Blocked</Text> : null}
               {blocked.map((person) => (
                 <Pressable key={person.id} onPress={() => void unblockPerson(person)} style={styles.person}>
@@ -434,6 +459,11 @@ const styles = StyleSheet.create({
   listTitle: { fontSize: 13, fontWeight: '700', color: '#6b7280', paddingHorizontal: 16, paddingTop: 16 },
   heading: { fontSize: 13, fontWeight: '700', color: '#6b7280', marginBottom: 8 },
   people: { padding: 16, gap: 8 },
+  newChat: { backgroundColor: '#0f172a', borderRadius: 10, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  newChatText: { color: '#fff', fontWeight: '700' },
+  picker: { gap: 8 },
+  pickerList: { maxHeight: 240, gap: 8 },
+  search: { minHeight: 44, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, backgroundColor: '#fff' },
   person: { backgroundColor: '#fff', borderRadius: 10, minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
   personText: { color: '#111827', fontWeight: '600' },
   unblock: { color: '#1e40af', fontWeight: '600', marginTop: 2 },

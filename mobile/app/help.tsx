@@ -19,7 +19,7 @@ const GUIDES = [
   },
   {
     title: 'Chat',
-    body: 'Chat opens on the list. A number on a conversation is how many messages you have not opened. All chats returns to that list. Message one person starts a direct conversation.',
+    body: 'Chat opens on the list. A number on a conversation is how many messages you have not opened. All chats returns to that list. New chat searches or lists the Personnel team so you can start a direct conversation.',
   },
   {
     title: 'Alerts',

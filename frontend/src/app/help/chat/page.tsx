@@ -39,7 +39,7 @@ export default async function ChatHelpPage() {
 
           <h2>A direct message</h2>
           <p>
-            Choose Find a Personnel person, search, and choose a name. That conversation stays between the two of you. Only the Personnel team is listed. Turn on notifications in the browser when you want this computer to be told about a new message. Each phone and computer does this once.
+            Choose New chat. Search by name or email, or choose a person from the list. That conversation stays between the two of you. The Personnel team stays out of the conversation list until you start a chat. Turn on notifications in the browser when you want this computer to be told about a new message. Each phone and computer does this once.
           </p>
         </div>
       </div>

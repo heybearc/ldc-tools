@@ -33,7 +33,7 @@ export const phoneFeatures: PhoneFeature[] = [
   },
   {
     id: 'chat',
-    steps: [{ tap: 'Chat' }, { see: 'Chats' }, { see: 'Message one person' }, { seeId: 'screen-chat' }],
+    steps: [{ tap: 'Chat' }, { see: 'Chats' }, { see: 'New chat' }, { seeId: 'screen-chat' }],
   },
   {
     id: 'more',
