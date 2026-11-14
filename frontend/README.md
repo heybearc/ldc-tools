@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.49.0**
+Current: **1.49.1**
 
 ## Version History
+- **v1.49.1** (2026-11-14) - Start a direct message from search or a person list
 - **v1.49.0** (2026-11-11) - Process templates stay drafts until published, with a schedule and a choice of standalone or project
 - **v1.48.8** (2026-11-11) - Completion email follows the selection, chat lists everyone, and project assignment lists every Personnel person
 - **v1.48.7** (2026-11-11) - Phone numbers use one format, (555) 555-5555
@@ -86,7 +87,7 @@ Current: **1.49.0**
 - Crew change request workflow
 
 ### Communication
-- Team chat and a direct message for this construction group
+- Team chat, and a direct message you start from search or a person list
 - Email configuration (Gmail/SMTP)
 - Invitation emails with personalized greetings
 - Crew request notifications
