@@ -18,4 +18,7 @@ if [ -n "${JAVA_HOME:-}" ]; then
 fi
 
 cd "$(dirname "$0")/.."
+# Xcode 27 deadlocks while opening the asset-catalog handshake pipe.
+# nohup ignores SIGHUP before Python starts; exec below would otherwise kill it.
+nohup python3 scripts/hold-asset-catalog-pipes.py >/tmp/ldc-asset-catalog-pipes.log 2>&1 &
 exec bundle exec fastlane "$@"
