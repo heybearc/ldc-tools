@@ -4,6 +4,6 @@ appId: com.ldctools.mobile
 - tapOn: "More"
 - tapOn:
     id: "link-help"
-- assertVisible: "These guides stay in the app. You do not need to sign in on the website."
+- assertVisible: "Choose a topic."
 - assertVisible:
     id: "screen-help"

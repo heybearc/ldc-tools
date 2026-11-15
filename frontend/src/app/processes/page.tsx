@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ListChecks } from 'lucide-react';
 import { CADENCE_OPTIONS, cadenceLabel, scheduleLabel, taskInstructions, type ProcessAppliesTo, type ProcessCadence, type ProcessCustomUnit, type ProcessTemplateStatus } from '@/lib/processes';
+import { byTime, publishedOn } from '@/lib/published-date';
 import { userError } from '@/lib/user-error';
 
 interface Task {
@@ -21,6 +22,8 @@ interface Template {
   customEvery: number | null;
   customUnit: ProcessCustomUnit | null;
   status: ProcessTemplateStatus;
+  publishedAt: string | null;
+  createdAt: string;
   steps: Array<{
     id: string;
     title: string;
@@ -51,6 +54,7 @@ export default function ProcessesPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [projectChoice, setProjectChoice] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState('');
+  const [newestFirst, setNewestFirst] = useState(true);
 
   const load = useCallback(async () => {
     setError('');
@@ -217,6 +221,7 @@ export default function ProcessesPage() {
             Templates for this construction group. A draft stays here until you publish it. A published template creates one work item, either on its own or on a project you choose. The cadence is the repeat rule for that template: one time, daily, weekly, every two weeks, monthly, quarterly, yearly, or a custom interval. Start it again when the next one is due. The tasks stay on that work item.
           </p>
         </div>
+        <div className="flex flex-col items-start gap-2">
         {canPost && (
           <button
             type="button"
@@ -229,6 +234,23 @@ export default function ProcessesPage() {
             Add process
           </button>
         )}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setNewestFirst(true)}
+            className={`px-3 py-2 min-h-[44px] rounded-md text-sm font-medium ${newestFirst ? 'bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+          >
+            Newest
+          </button>
+          <button
+            type="button"
+            onClick={() => setNewestFirst(false)}
+            className={`px-3 py-2 min-h-[44px] rounded-md text-sm font-medium ${newestFirst ? 'border border-gray-300 text-gray-700' : 'bg-blue-600 text-white'}`}
+          >
+            Oldest
+          </button>
+        </div>
+        </div>
       </div>
 
       {error && <p className="rounded-md bg-red-50 text-red-700 px-4 py-3 text-sm">{error}</p>}
@@ -405,7 +427,11 @@ export default function ProcessesPage() {
       ) : (
         <div className="space-y-8">
           {(['DRAFT', 'PUBLISHED'] as const).map((status) => {
-            const group = templates.filter((template) => template.status === status);
+            const group = byTime(
+              templates.filter((template) => template.status === status),
+              (template) => (status === 'PUBLISHED' ? template.publishedAt : template.createdAt),
+              newestFirst,
+            );
             if (group.length === 0) return null;
             return (
               <section key={status} className="space-y-3">
@@ -424,6 +450,11 @@ export default function ProcessesPage() {
                 <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
                   {scheduleLabel(template.appliesTo, template.cadence, template.customEvery, template.customUnit)}
                 </span>
+                {publishedOn(template.status === 'PUBLISHED' ? template.publishedAt : template.createdAt) && (
+                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                    {template.status === 'PUBLISHED' ? 'Published' : 'Saved'} {publishedOn(template.status === 'PUBLISHED' ? template.publishedAt : template.createdAt)}
+                  </span>
+                )}
               </div>
               {template.purpose && <p className="mt-2 text-sm text-gray-700">{template.purpose}</p>}
               <ol className="mt-3 space-y-2 list-decimal pl-5">

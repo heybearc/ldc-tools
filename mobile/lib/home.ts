@@ -39,6 +39,7 @@ export type WorkItem = {
   title: string;
   detail: string;
   timing: string;
+  publishedAt?: string | null;
   stepsDone?: number;
   stepsTotal?: number;
 };

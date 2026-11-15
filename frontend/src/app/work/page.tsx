@@ -5,6 +5,7 @@ import { ClipboardList, Plus, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { isAirgappedEmail } from '@/lib/reachable-email';
 import { scheduleLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
+import { byTime, publishedOn } from '@/lib/published-date';
 import { userError } from '@/lib/user-error';
 
 interface Person {
@@ -47,6 +48,7 @@ export interface WorkItem {
   requestorEmail: string | null;
   notifyRequestor?: boolean;
   completedAt: string | null;
+  createdAt: string;
   steps: Step[];
   notes: WorkNote[];
   helpUnread?: boolean;
@@ -60,6 +62,7 @@ interface ProcessOffer {
   cadence: ProcessCadence;
   customEvery: number | null;
   customUnit: ProcessCustomUnit | null;
+  publishedAt?: string | null;
   steps: Step[];
 }
 
@@ -132,6 +135,7 @@ export default function WorkPage() {
   const [completing, setCompleting] = useState(false);
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(0);
+  const [newestFirst, setNewestFirst] = useState(true);
   const [donePage, setDonePage] = useState(0);
   const [processPage, setProcessPage] = useState(0);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -411,9 +415,9 @@ export default function WorkPage() {
   }
 
   const items = data?.items || [];
-  const openItems = items.filter((item) => item.status === 'OPEN');
-  const doneItems = items.filter((item) => item.status === 'DONE');
-  const processes = data?.processes || [];
+  const openItems = byTime(items.filter((item) => item.status === 'OPEN'), (item) => item.createdAt, newestFirst);
+  const doneItems = byTime(items.filter((item) => item.status === 'DONE'), (item) => item.createdAt, newestFirst);
+  const processes = byTime(data?.processes || [], (process) => process.publishedAt, newestFirst);
   const helpItems = openItems.filter((item) => (item.notes || []).some((note) => note.kind === 'HELP'));
   const currentUserId = data?.currentUserId || '';
   const canAssign = Boolean(data?.canAssign);
@@ -437,6 +441,22 @@ export default function WorkPage() {
           <p className="mt-2 text-gray-600 max-w-3xl">
             Tasks for this construction group. A process is one claimable item, and its tasks stay inside it. Personnel add and assign work.
           </p>
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setNewestFirst(true)}
+              className={`px-3 py-2 min-h-[44px] rounded-md text-sm font-medium ${newestFirst ? 'bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+            >
+              Newest
+            </button>
+            <button
+              type="button"
+              onClick={() => setNewestFirst(false)}
+              className={`px-3 py-2 min-h-[44px] rounded-md text-sm font-medium ${newestFirst ? 'border border-gray-300 text-gray-700' : 'bg-blue-600 text-white'}`}
+            >
+              Oldest
+            </button>
+          </div>
         </div>
         {data?.canAssign && (
           <div className="flex flex-wrap gap-2">
@@ -663,6 +683,7 @@ export default function WorkPage() {
                         {scheduleLabel(process.appliesTo, process.cadence, process.customEvery, process.customUnit)}
                         {' · '}
                         {process.steps.length === 1 ? '1 task' : `${process.steps.length} tasks`}
+                        {publishedOn(process.publishedAt) ? ` · Published ${publishedOn(process.publishedAt)}` : ''}
                       </p>
                       {process.purpose && <p className="mt-2 text-sm text-gray-700">{process.purpose}</p>}
                       <StepList steps={process.steps} />
@@ -1206,6 +1227,11 @@ export function WorkRow({
             {item.claimable && item.status === 'OPEN' && (
               <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
                 Claimable
+              </span>
+            )}
+            {publishedOn(item.createdAt) && (
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                Published {publishedOn(item.createdAt)}
               </span>
             )}
             {doneOn && (

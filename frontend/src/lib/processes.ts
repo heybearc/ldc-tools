@@ -183,6 +183,7 @@ export function processTemplateJson(template: {
   customUnit: ProcessCustomUnit | null;
   status: ProcessTemplateStatus;
   publishedAt: Date | null;
+  createdAt: Date;
   steps: Array<{
     id: string;
     title: string;
@@ -201,6 +202,7 @@ export function processTemplateJson(template: {
     customUnit: template.customUnit,
     status: template.status,
     publishedAt: template.publishedAt ? template.publishedAt.toISOString() : null,
+    createdAt: template.createdAt.toISOString(),
     steps: template.steps.map((step) => ({
       id: step.id,
       title: step.title,

@@ -192,6 +192,7 @@ export async function GET() {
         customEvery: process.customEvery,
         customUnit: process.customUnit,
         status: process.status,
+        publishedAt: process.publishedAt ? process.publishedAt.toISOString() : null,
         steps: process.steps.map((step) => ({
           id: step.id,
           title: step.title,

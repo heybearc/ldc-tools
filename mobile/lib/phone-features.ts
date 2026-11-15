@@ -56,7 +56,7 @@ export const phoneFeatures: PhoneFeature[] = [
     steps: [
       { tap: 'More' },
       { tapId: 'link-help' },
-      { see: 'These guides stay in the app. You do not need to sign in on the website.' },
+      { see: 'Choose a topic.' },
       { seeId: 'screen-help' },
     ],
   },

@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { Choice, Field, PrimaryButton } from '@/components/fields';
+import { byTime, publishedOn } from '@/lib/published-date';
 
 type Step = { id: string; title: string; detail: string };
 type Template = {
@@ -15,6 +16,8 @@ type Template = {
   customEvery?: number | null;
   customUnit?: 'DAY' | 'WEEK' | 'MONTH' | null;
   status?: 'DRAFT' | 'PUBLISHED';
+  publishedAt?: string | null;
+  createdAt?: string;
   steps: Step[];
 };
 type Project = { id: string; name: string };
@@ -35,6 +38,7 @@ export default function ProcessesScreen() {
   const [stepDetail, setStepDetail] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState('');
+  const [newestFirst, setNewestFirst] = useState(true);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -183,6 +187,12 @@ export default function ProcessesScreen() {
         </View>
       ) : null}
       {templates.length === 0 && !error ? <Text style={styles.empty}>No processes yet.</Text> : null}
+      {templates.length > 0 ? (
+        <View style={styles.row}>
+          <Choice label="Newest" selected={newestFirst} onPress={() => setNewestFirst(true)} />
+          <Choice label="Oldest" selected={!newestFirst} onPress={() => setNewestFirst(false)} />
+        </View>
+      ) : null}
       {canManage && projects.length > 0 && templates.some((template) => template.appliesTo === 'PROJECT') ? (
         <View style={styles.row}>
           {projects.map((project) => (
@@ -190,11 +200,18 @@ export default function ProcessesScreen() {
           ))}
         </View>
       ) : null}
-      {templates.map((template) => (
+      {byTime(
+        templates,
+        (template) => (template.status === 'PUBLISHED' ? template.publishedAt : template.createdAt),
+        newestFirst,
+      ).map((template) => (
         <View key={template.id} style={styles.card}>
           <Text style={styles.title}>{template.name}</Text>
           <Text style={styles.detail}>
             {template.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+            {publishedOn(template.status === 'PUBLISHED' ? template.publishedAt : template.createdAt)
+              ? ` ${publishedOn(template.status === 'PUBLISHED' ? template.publishedAt : template.createdAt)}`
+              : ''}
             {' · '}
             {template.appliesTo === 'PROJECT' ? 'Project' : 'Standalone'}
             {' · '}

@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { Choice } from '@/components/fields';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { fetchHome, type WorkItem } from '@/lib/home';
+import { byTime, publishedOn } from '@/lib/published-date';
 
 export function AvailablePane() {
   const { apiBase, token, signOut } = useAuth();
@@ -12,6 +14,7 @@ export function AvailablePane() {
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [busyId, setBusyId] = useState('');
+  const [newestFirst, setNewestFirst] = useState(true);
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -68,10 +71,15 @@ export function AvailablePane() {
     >
       <Text style={styles.intro}>Claimable work that no one has taken yet.</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      <View style={styles.sort}>
+        <Choice label="Newest" selected={newestFirst} onPress={() => setNewestFirst(true)} />
+        <Choice label="Oldest" selected={!newestFirst} onPress={() => setNewestFirst(false)} />
+      </View>
       {items.length === 0 && !error ? <Text style={styles.empty}>No work is waiting to be claimed.</Text> : null}
-      {items.map((item) => (
+      {byTime(items, (item) => item.publishedAt, newestFirst).map((item) => (
         <View key={item.id} style={styles.card}>
           <Text style={styles.title}>{item.title}</Text>
+          {publishedOn(item.publishedAt) ? <Text style={styles.timing}>Published {publishedOn(item.publishedAt)}</Text> : null}
           {item.timing ? <Text style={styles.timing}>{item.timing}</Text> : null}
           {item.detail ? <Text style={styles.detail}>{item.detail}</Text> : null}
           <Pressable onPress={() => void claim(item.id)} disabled={Boolean(busyId)} style={styles.claim}>
@@ -86,6 +94,7 @@ export function AvailablePane() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#f9fafb' },
   content: { padding: 16, gap: 12 },
+  sort: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   intro: { color: '#4b5563', lineHeight: 20 },
   empty: { color: '#6b7280' },
   error: { color: '#b91c1c' },
