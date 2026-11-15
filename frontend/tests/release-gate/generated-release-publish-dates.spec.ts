@@ -48,13 +48,15 @@ test('work and processes show a publish date and can be sorted by it', async ({ 
   });
   expect(created.status()).toBe(201);
   const work = await created.json();
+  expect(work.id).toBeTruthy();
   expect(work.createdAt).toBeTruthy();
 
   await page.goto('/work');
   await expect(page.getByRole('button', { name: 'Newest' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Oldest' })).toBeVisible();
   await page.getByRole('button', { name: 'Newest' }).click();
-  const workRow = page.locator('article, div').filter({ has: page.getByRole('heading', { name: workTitle, exact: true }) }).first();
+  const workRow = page.locator(`#work-${work.id}`);
+  await expect(workRow.getByRole('heading', { name: workTitle, exact: true })).toBeVisible();
   await expect(workRow.getByText(/Published \w+ \d{1,2}, \d{4}/)).toBeVisible();
   await page.getByRole('button', { name: 'Oldest' }).click();
   await expect(workRow.getByText(/Published \w+ \d{1,2}, \d{4}/)).toBeVisible();
