@@ -37,6 +37,7 @@ export default async function ProcessesHelpPage() {
             Personnel can add a process. It stays a draft until you choose Publish. Give it a name and a purpose. Each task has a title. Instructions and a reference link are optional.
             Standalone work is not tied to a project. Project work asks for the project when you start it.
             How often can be one time, daily, weekly, every two weeks, monthly, quarterly, yearly, or a custom number of days, weeks, or months.
+            A draft shows the date it was saved. A published process shows the date it was published. Choose Newest or Oldest to sort each list by that date.
             Edit changes the template. Saving does not publish or unpublish it. Work already started keeps the tasks it copied. Return to draft takes a published template out of use.
           </p>
 

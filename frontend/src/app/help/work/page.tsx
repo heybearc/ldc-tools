@@ -34,6 +34,7 @@ export default async function WorkHelpPage() {
 
           <h2>Add a task</h2>
           <p>
+            Each task shows the date it was added. Choose Newest or Oldest to sort the open list by that date.
             Personnel Contact, Assistant, and Support can add work. Open Work, choose Add work, and enter a title and detail.
             Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable.
             Select all, or select several open tasks including with Shift, then assign them, mark them done, or turn the completion email on or off. The requestor checkbox on each selected task matches that choice. Choose how many tasks to show on a page.
@@ -55,7 +56,7 @@ export default async function WorkHelpPage() {
 
           <h2>Finish a task</h2>
           <p>
-            The assignee, or Personnel, can mark the task Done. The page says whether the completion email was sent. Done tasks stay in a collapsed Done section, with the date they were finished.
+            The assignee, or Personnel, can mark the task Done. The page says whether the completion email was sent. The email subject is the task title. A crew request uses “Crew request completed” plus that title. Done tasks stay in a collapsed Done section, with the date they were finished.
             A published process is listed as available. A draft is not. Claiming a standalone process keeps every task inside that process. A project process is started from Processes after you choose the project. Finishing the process marks that one work item done.
             Anyone on the work list can add a note or ask for help on a task. A help request is listed at the top of Work.
             If email is already configured, the Personnel Contact and Assistant are told. Support is not.
