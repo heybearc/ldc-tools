@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         where: accounts,
         orderBy: { name: 'asc' },
         take: 200,
-        select: { id: true, name: true, email: true, role: true, status: true },
+        select: { id: true, name: true, email: true, role: true, adminLevel: true, status: true },
       }),
       prisma.announcement.findMany({
         where: { constructionGroupId: groupId },
@@ -70,6 +70,8 @@ export async function GET(request: NextRequest) {
         at: row.timestamp.toISOString(),
         who: row.user?.name || row.user?.email || 'Someone',
       })),
+    }, {
+      headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
     console.error('Mobile admin error:', error);
@@ -141,7 +143,14 @@ async function changeRole(
     select: { id: true },
   });
   if (!user) return NextResponse.json({ error: 'That account is not in this construction group' }, { status: 404 });
-  await prisma.user.update({ where: { id: user.id }, data: { role: role as 'USER' } });
+  const data = role === 'SUPER_ADMIN'
+    ? { role: 'SUPER_ADMIN' as const, adminLevel: 'SUPER_ADMIN' as const }
+    : role === 'ADMIN'
+      ? { role: 'ADMIN' as const, adminLevel: 'ADMIN' as const }
+      : role === 'READ_ONLY'
+        ? { role: 'READ_ONLY' as const, adminLevel: null }
+        : { role: 'USER' as const, adminLevel: null };
+  await prisma.user.update({ where: { id: user.id }, data });
   return NextResponse.json({ ok: true });
 }
 
@@ -169,22 +178,24 @@ async function changeFeedback(
     },
   });
   if (current.status !== status && current.user?.email) {
-    try {
-      const html = generateFeedbackStatusChangeEmail(
-        current.title,
-        current.status,
-        status,
-        current.id,
-        current.user.name || 'User',
-      );
-      await sendEmail({
-        to: current.user.email,
-        subject: `Feedback ${current.feedbackNumber} is ${status.toLowerCase().replace('_', ' ')}`,
-        html,
-      });
-    } catch (error) {
-      console.error('Feedback status email failed:', error);
-    }
+    const recipient = current.user.email;
+    const recipientName = current.user.name || 'User';
+    const title = current.title;
+    const previous = current.status;
+    const feedbackId = current.id;
+    const feedbackNumber = current.feedbackNumber;
+    void (async () => {
+      try {
+        const html = generateFeedbackStatusChangeEmail(title, previous, status, feedbackId, recipientName);
+        await sendEmail({
+          to: recipient,
+          subject: `Feedback ${feedbackNumber} is ${status.toLowerCase().replace('_', ' ')}`,
+          html,
+        });
+      } catch (error) {
+        console.error('Feedback status email failed:', error);
+      }
+    })();
   }
-  return NextResponse.json({ ok: true, actor: actor.name });
+  return NextResponse.json({ ok: true, status, actor: actor.name });
 }

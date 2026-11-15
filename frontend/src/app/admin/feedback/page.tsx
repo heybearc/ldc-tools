@@ -5,6 +5,7 @@ import { MessageSquare, RefreshCw } from 'lucide-react';
 
 interface FeedbackItem {
   id: string;
+  feedbackNumber?: string;
   type: 'bug' | 'enhancement' | 'feature';
   title: string;
   description: string;
@@ -55,6 +56,8 @@ export default function FeedbackManagementPage() {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [newStatus, setNewStatus] = useState('');
+  const [resolutionComment, setResolutionComment] = useState('');
+  const [statusError, setStatusError] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [commentScreenshots, setCommentScreenshots] = useState<string[]>([]);
@@ -69,14 +72,17 @@ export default function FeedbackManagementPage() {
       const data = await response.json();
       
       if (data.success) {
-        setFeedback(data.data.feedback);
+        const items = data.data.feedback as FeedbackItem[];
+        setFeedback(items);
         setStats(data.data.stats);
+        return items;
       }
     } catch (error) {
       console.error('Error fetching feedback:', error);
     } finally {
       setLoading(false);
     }
+    return null;
   };
 
   const getTypeIcon = (type: string) => {
@@ -179,25 +185,37 @@ export default function FeedbackManagementPage() {
 
   const handleChangeStatus = async () => {
     if (!selectedFeedback || !newStatus) return;
+    if (newStatus === 'resolved' && !resolutionComment.trim()) {
+      setStatusError('A resolution note is required to mark this resolved.');
+      return;
+    }
     
     setUpdatingStatus(true);
+    setStatusError('');
     try {
       const response = await fetch(`/api/v1/admin/feedback/${selectedFeedback.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({
+          status: newStatus,
+          resolutionComment: resolutionComment.trim() || undefined,
+        })
       });
+      const data = await response.json().catch(() => ({}));
 
-      if (response.ok) {
-        await fetchFeedback();
+      if (response.ok && data.success !== false) {
+        const items = await fetchFeedback();
+        const updated = items?.find((item) => item.id === selectedFeedback.id);
+        if (updated) setSelectedFeedback(updated);
         setShowStatusModal(false);
+        setResolutionComment('');
       } else {
-        alert('Failed to update status');
+        setStatusError(data.error || 'Could not update the status.');
       }
     } catch (error) {
       console.error('Error updating status:', error);
-      alert('Error updating status');
+      setStatusError('Could not update the status.');
     } finally {
       setUpdatingStatus(false);
     }
@@ -329,7 +347,9 @@ export default function FeedbackManagementPage() {
                       </span>
                     </div>
                     
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">{item.title}</h4>
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">
+                      {item.feedbackNumber ? `${item.feedbackNumber} · ` : ''}{item.title}
+                    </h4>
                     <p className="text-gray-600 mb-3 line-clamp-2">{item.description}</p>
                     
                     <div className="flex items-center text-sm text-gray-500 space-x-4">
@@ -377,7 +397,9 @@ export default function FeedbackManagementPage() {
                       {selectedFeedback.status.replace('_', ' ').toUpperCase()}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedFeedback.title}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {selectedFeedback.feedbackNumber ? `${selectedFeedback.feedbackNumber} · ` : ''}{selectedFeedback.title}
+                  </h2>
                 </div>
                 <button
                   onClick={() => setShowDetailsModal(false)}
@@ -492,6 +514,8 @@ export default function FeedbackManagementPage() {
                 <button 
                   onClick={() => {
                     setNewStatus(selectedFeedback.status);
+                    setResolutionComment('');
+                    setStatusError('');
                     setShowStatusModal(true);
                   }}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
@@ -589,7 +613,9 @@ export default function FeedbackManagementPage() {
           <div className="bg-white rounded-lg max-w-md w-full">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Change Status</h3>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Change status{selectedFeedback.feedbackNumber ? ` · ${selectedFeedback.feedbackNumber}` : ''}
+                </h3>
                 <button
                   onClick={() => setShowStatusModal(false)}
                   className="text-gray-400 hover:text-gray-600 text-2xl"
@@ -601,7 +627,10 @@ export default function FeedbackManagementPage() {
               <div className="mb-6">
                 <select
                   value={newStatus}
-                  onChange={(e) => setNewStatus(e.target.value)}
+                  onChange={(e) => {
+                    setNewStatus(e.target.value);
+                    setStatusError('');
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="new">New</option>
@@ -609,6 +638,16 @@ export default function FeedbackManagementPage() {
                   <option value="resolved">Resolved</option>
                   <option value="closed">Closed</option>
                 </select>
+                {newStatus === 'resolved' && (
+                  <textarea
+                    rows={3}
+                    value={resolutionComment}
+                    onChange={(e) => setResolutionComment(e.target.value)}
+                    className="mt-3 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Resolution note (required)"
+                  />
+                )}
+                {statusError ? <p className="mt-3 text-sm text-red-600">{statusError}</p> : null}
               </div>
 
               <div className="flex justify-end space-x-3">
@@ -620,7 +659,7 @@ export default function FeedbackManagementPage() {
                 </button>
                 <button
                   onClick={handleChangeStatus}
-                  disabled={updatingStatus || newStatus === selectedFeedback.status}
+                  disabled={updatingStatus || newStatus.toLowerCase() === selectedFeedback.status.toLowerCase()}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50"
                 >
                   {updatingStatus ? 'Updating...' : 'Update Status'}

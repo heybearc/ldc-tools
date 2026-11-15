@@ -26,8 +26,9 @@ export default function AdminScreen() {
   const [activeUsers, setActiveUsers] = useState(0);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [note, setNote] = useState('');
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
+  const [feedbackError, setFeedbackError] = useState<{ id: string; message: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -58,20 +59,59 @@ export default function AdminScreen() {
   }, [load]));
 
   async function post(body: Record<string, unknown>, action: string) {
-    if (!token || busy) return;
+    if (!token || busy) return false;
     setBusy(true);
     setError('');
     try {
       await apiRequest(apiBase, '/api/v1/mobile/admin', { method: 'POST', token, body, action });
-      setTitle('');
-      setMessage('');
-      setNote('');
+      if (body.action === 'announcement') {
+        setTitle('');
+        setMessage('');
+      }
       await load();
+      return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : action);
+      const messageText = err instanceof Error ? err.message : action;
+      if (body.action === 'feedback') setFeedbackError({ id: String(body.feedbackId || ''), message: messageText });
+      else setError(messageText);
+      return false;
     } finally {
       setBusy(false);
     }
+  }
+
+  async function updateFeedback(item: FeedbackRow, status: 'IN_PROGRESS' | 'RESOLVED') {
+    const resolutionComment = (notes[item.id] || '').trim();
+    if (status === 'RESOLVED' && !resolutionComment) {
+      setFeedbackError({ id: item.id, message: 'Add a resolution note, then mark it resolved.' });
+      return;
+    }
+    setFeedbackError(null);
+    const saved = await post(
+      { action: 'feedback', feedbackId: item.id, status, resolutionComment },
+      'Could not update feedback',
+    );
+    if (!saved) return;
+    setFeedback((rows) => (
+      status === 'RESOLVED'
+        ? rows.filter((row) => row.id !== item.id)
+        : rows.map((row) => (row.id === item.id ? { ...row, status } : row))
+    ));
+    if (status === 'RESOLVED') {
+      setNotes((current) => {
+        const next = { ...current };
+        delete next[item.id];
+        return next;
+      });
+    }
+  }
+
+  function statusLabel(status: string) {
+    const value = status.toUpperCase();
+    if (value === 'IN_PROGRESS') return 'In progress';
+    if (value === 'RESOLVED') return 'Resolved';
+    if (value === 'CLOSED') return 'Closed';
+    return 'New';
   }
 
   return (
@@ -97,16 +137,29 @@ export default function AdminScreen() {
       </View>
       <View style={styles.card}>
         <Text style={styles.title}>Open feedback</Text>
-        <Field label="Resolution note" value={note} onChangeText={setNote} />
         {feedback.length === 0 ? <Text style={styles.detail}>No open feedback.</Text> : null}
         {feedback.map((item) => (
           <View key={item.id} style={styles.block}>
             <Text style={styles.detail}>{item.feedbackNumber} · {item.title}</Text>
-            <Text style={styles.detail}>{item.user.name || item.user.email}</Text>
+            <Text style={styles.detail}>{statusLabel(item.status)} · {item.user?.name || item.user?.email}</Text>
+            <Field
+              label="Resolution note"
+              value={notes[item.id] || ''}
+              onChangeText={(value) => setNotes((current) => ({ ...current, [item.id]: value }))}
+            />
             <View style={styles.row}>
-              <Choice label="In progress" selected={false} onPress={() => void post({ action: 'feedback', feedbackId: item.id, status: 'IN_PROGRESS' }, 'Could not update feedback')} />
-              <Choice label="Resolved" selected={false} onPress={() => void post({ action: 'feedback', feedbackId: item.id, status: 'RESOLVED', resolutionComment: note }, 'Could not update feedback')} />
+              <Choice
+                label="In progress"
+                selected={item.status.toUpperCase() === 'IN_PROGRESS'}
+                onPress={() => void updateFeedback(item, 'IN_PROGRESS')}
+              />
+              <Choice
+                label="Resolved"
+                selected={item.status.toUpperCase() === 'RESOLVED'}
+                onPress={() => void updateFeedback(item, 'RESOLVED')}
+              />
             </View>
+            {feedbackError?.id === item.id ? <Text style={styles.error}>{feedbackError.message}</Text> : null}
           </View>
         ))}
       </View>

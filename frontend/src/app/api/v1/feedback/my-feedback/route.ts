@@ -63,11 +63,12 @@ export async function GET(request: NextRequest) {
     // Transform data for frontend
     const transformedFeedback = feedback.map(item => ({
       id: item.id,
+      feedbackNumber: item.feedbackNumber,
       type: item.type.toLowerCase(),
       title: item.title,
       description: item.description,
       priority: item.priority.toLowerCase(),
-      status: item.status.toLowerCase().replace('_', '_'),
+      status: item.status.toLowerCase(),
       submittedAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
       comments: (item.comments || []).map((comment: any) => ({

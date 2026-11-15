@@ -5,9 +5,25 @@ import { Choice } from '@/components/fields';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
-type UserRow = { id: string; name: string | null; email: string; role: string; status: string };
+type UserRow = {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+  adminLevel?: string | null;
+  status: string;
+};
 
 const ROLES = ['ADMIN', 'USER', 'READ_ONLY'];
+
+/** Admin access can live on role or adminLevel. Super admins use the Admin chip. */
+export function selectedAccountRole(user: { role?: string | null; adminLevel?: string | null }): string {
+  const role = (user.role || '').toUpperCase();
+  const level = (user.adminLevel || '').toUpperCase();
+  if (role === 'ADMIN' || role === 'SUPER_ADMIN' || level === 'ADMIN' || level === 'SUPER_ADMIN') return 'ADMIN';
+  if (role === 'READ_ONLY' || level === 'READ_ONLY_ADMIN') return 'READ_ONLY';
+  return 'USER';
+}
 
 export function AccountList() {
   const { apiBase, token, signOut } = useAuth();
@@ -70,8 +86,11 @@ export function AccountList() {
               <Choice
                 key={role}
                 label={role === 'READ_ONLY' ? 'Read only' : role === 'ADMIN' ? 'Admin' : 'User'}
-                selected={user.role === role}
-                onPress={() => void setRole(user.id, role)}
+                selected={selectedAccountRole(user) === role}
+                onPress={() => {
+                  if (selectedAccountRole(user) === role) return;
+                  void setRole(user.id, role);
+                }}
               />
             ))}
           </View>

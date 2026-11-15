@@ -45,15 +45,16 @@ export async function GET(request: NextRequest) {
 
     const transformedFeedback = feedback.map(item => ({
       id: item.id,
+      feedbackNumber: item.feedbackNumber,
       type: item.type.toLowerCase(),
       title: item.title,
       description: item.description,
       priority: item.priority.toLowerCase(),
-      status: item.status.toLowerCase().replace('_', '_'),
+      status: item.status.toLowerCase(),
       submittedBy: {
-        name: item.user.name || `${item.user.firstName || ''} ${item.user.lastName || ''}`.trim() || 'Unknown',
-        email: item.user.email,
-        role: item.user.role
+        name: item.user?.name || `${item.user?.firstName || ''} ${item.user?.lastName || ''}`.trim() || 'Unknown',
+        email: item.user?.email || '',
+        role: item.user?.role || ''
       },
       submittedAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

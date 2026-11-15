@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 interface FeedbackItem {
   id: string;
+  feedbackNumber?: string;
   type: string;
   title: string;
   description: string;
@@ -201,7 +202,9 @@ export default function MyFeedbackPage() {
                     )}
                   </div>
                   
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">{item.title}</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {item.feedbackNumber ? `${item.feedbackNumber} · ` : ''}{item.title}
+                  </h3>
                   <p className="text-gray-600 mb-3 line-clamp-2">{item.description}</p>
                   
                   <div className="flex items-center text-sm text-gray-500 space-x-4">
@@ -249,7 +252,9 @@ export default function MyFeedbackPage() {
                       {selectedFeedback.status.replace('_', ' ').toUpperCase()}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedFeedback.title}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {selectedFeedback.feedbackNumber ? `${selectedFeedback.feedbackNumber} · ` : ''}{selectedFeedback.title}
+                  </h2>
                 </div>
                 <button
                   onClick={() => setShowDetailsModal(false)}

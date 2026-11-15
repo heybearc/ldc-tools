@@ -20,7 +20,8 @@ export async function PATCH(
     const { status, resolutionComment } = body;
 
     const validStatuses = ['NEW', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
-    if (!validStatuses.includes(status.toUpperCase())) {
+    const normalized = String(status || '').toUpperCase();
+    if (!validStatuses.includes(normalized)) {
       return NextResponse.json({ success: false, error: 'Invalid status' }, { status: 400 });
     }
 
@@ -43,7 +44,7 @@ export async function PATCH(
 
     // Require resolution comment when marking as RESOLVED (D-024 compliance)
     // Allow existing resolution comment to satisfy requirement
-    if (status.toUpperCase() === 'RESOLVED') {
+    if (normalized === 'RESOLVED') {
       const hasExistingComment = currentFeedback.resolutionComment?.trim();
       const hasNewComment = resolutionComment?.trim();
       
@@ -56,7 +57,7 @@ export async function PATCH(
     }
 
     const oldStatus = currentFeedback.status;
-    const newStatus = status.toUpperCase();
+    const newStatus = normalized as 'NEW' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
 
     const feedback = await prisma.feedback.update({
       where: { id: params.id },
@@ -67,29 +68,33 @@ export async function PATCH(
       }
     });
 
-    // Send email notification if status changed
     if (oldStatus !== newStatus && currentFeedback.user?.email) {
-      try {
-        const emailHtml = generateFeedbackStatusChangeEmail(
-          currentFeedback.title,
-          oldStatus,
-          newStatus,
-          currentFeedback.id,
-          currentFeedback.user.name || 'User'
-        );
-
-        await sendEmail({
-          to: currentFeedback.user.email,
-          subject: `Feedback Status Updated: ${currentFeedback.title}`,
-          html: emailHtml
-        });
-      } catch (emailError) {
-        console.error('Failed to send status change email:', emailError);
-        // Don't fail the request if email fails
-      }
+      const recipient = currentFeedback.user.email;
+      const recipientName = currentFeedback.user.name || 'User';
+      const title = currentFeedback.title;
+      const feedbackId = currentFeedback.id;
+      void (async () => {
+        try {
+          const emailHtml = generateFeedbackStatusChangeEmail(title, oldStatus, newStatus, feedbackId, recipientName);
+          await sendEmail({
+            to: recipient,
+            subject: `Feedback Status Updated: ${title}`,
+            html: emailHtml,
+          });
+        } catch (emailError) {
+          console.error('Failed to send status change email:', emailError);
+        }
+      })();
     }
 
-    return NextResponse.json({ success: true, data: feedback });
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...feedback,
+        status: feedback.status.toLowerCase(),
+        feedbackNumber: currentFeedback.feedbackNumber,
+      },
+    });
   } catch (error) {
     console.error('Error updating feedback status:', error);
     return NextResponse.json({ success: false, error: 'Failed to update status' }, { status: 500 });

@@ -59,6 +59,7 @@ export default function AdminDashboardPage() {
       // Fetch feedback stats
       const feedbackRes = await fetch('/api/v1/admin/feedback?limit=0');
       const feedbackData = feedbackRes.ok ? await feedbackRes.json() : null;
+      const feedbackStatsPayload = feedbackData?.data?.stats || feedbackData?.stats || null;
 
       // Fetch system info
       const systemRes = await fetch('/api/v1/admin/system/info');
@@ -72,12 +73,6 @@ export default function AdminDashboardPage() {
       const backupRes = await fetch('/api/v1/admin/backup/info');
       const backupData = backupRes.ok ? await backupRes.json() : null;
 
-      // Calculate feedback stats
-      const feedbackStats = feedbackData?.feedback || [];
-      const newFeedback = feedbackStats.filter((f: any) => f.status === 'NEW').length;
-      const inProgressFeedback = feedbackStats.filter((f: any) => f.status === 'IN_PROGRESS').length;
-      const resolvedFeedback = feedbackStats.filter((f: any) => f.status === 'RESOLVED' || f.status === 'CLOSED').length;
-
       setStats({
         users: {
           total: userStats?.stats?.total || 0,
@@ -86,10 +81,10 @@ export default function AdminDashboardPage() {
           inactive: userStats?.stats?.inactive || 0,
         },
         feedback: {
-          total: feedbackStats.length,
-          new: newFeedback,
-          inProgress: inProgressFeedback,
-          resolved: resolvedFeedback,
+          total: feedbackStatsPayload?.total || 0,
+          new: feedbackStatsPayload?.new || 0,
+          inProgress: feedbackStatsPayload?.inProgress || 0,
+          resolved: feedbackStatsPayload?.resolved || 0,
         },
         system: {
           status: 'healthy',
