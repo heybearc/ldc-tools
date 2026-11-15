@@ -17,6 +17,7 @@ export async function sendWorkCompletionEmail(input: {
   title: string;
   detail: string;
   completedByName: string;
+  crewRequest?: boolean;
 }): Promise<boolean> {
   const emailConfig = await prisma.emailConfiguration.findFirst({
     where: { isActive: true },
@@ -49,15 +50,18 @@ export async function sendWorkCompletionEmail(input: {
   }
 
   const greeting = input.requestorName || 'Hello';
+  const crewRequest = input.crewRequest === true;
+  const subject = crewRequest ? `Crew request completed — ${input.title}` : `${input.title} is done`;
+  const lead = crewRequest ? 'Your crew request is done.' : 'This work is done.';
   const transporter = nodemailer.createTransport(transportConfig);
   await transporter.sendMail({
     from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
     to: input.requestorEmail,
-    subject: `Crew request completed — ${input.title}`,
+    subject,
     text: [
       `Hello ${greeting},`,
       '',
-      'Your crew request is done.',
+      lead,
       '',
       input.title,
       input.detail,
@@ -66,7 +70,7 @@ export async function sendWorkCompletionEmail(input: {
     ].join('\n'),
     html: `
       <p>Hello ${escapeHtml(greeting)},</p>
-      <p>Your crew request is done.</p>
+      <p>${escapeHtml(lead)}</p>
       <p><strong>${escapeHtml(input.title)}</strong></p>
       <p style="white-space: pre-wrap;">${escapeHtml(input.detail)}</p>
       <p>Completed by ${escapeHtml(input.completedByName)}.</p>

@@ -9,6 +9,7 @@ const workSelect = {
   status: true,
   title: true,
   detail: true,
+  timingKind: true,
   notifyRequestor: true,
   requestorName: true,
   requestorEmail: true,
@@ -63,6 +64,7 @@ export async function applyWorkStatus(input: {
         title: item.title,
         detail: item.detail,
         completedByName: input.actorName || 'Personnel',
+        crewRequest: item.timingKind === 'CREW_REQUEST',
       });
     } catch (emailError) {
       console.error('Work completion email failed:', emailError);

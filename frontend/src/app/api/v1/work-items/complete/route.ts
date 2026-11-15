@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
         id: true,
         title: true,
         detail: true,
+        timingKind: true,
         notifyRequestor: true,
         requestorName: true,
         requestorEmail: true,
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
           title: item.title,
           detail: item.detail,
           completedByName: session.user.name || 'Personnel',
+          crewRequest: item.timingKind === 'CREW_REQUEST',
         });
         if (sent) emailed += 1;
         else emailFailed += 1;
