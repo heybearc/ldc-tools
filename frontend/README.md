@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.50.0**
+Current: **1.51.0**
 
 ## Version History
+- **v1.51.0** (2026-11-16) - Edit a task, and see a deadline labeled as the due date
 - **v1.50.0** (2026-11-15) - Help articles on the phone, publish dates you can sort, and completion email uses the task title
 - **v1.49.1** (2026-11-14) - Start a direct message from search or a person list
 - **v1.49.0** (2026-11-11) - Process templates stay drafts until published, with a schedule and a choice of standalone or project
