@@ -5,6 +5,16 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-16, v1.50.0 live)
+- Shipped v1.50.0 (`0c16ce8`). LIVE green CT135. STANDBY blue CT133 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.50.0
+- qa-01 admin gate plus the publish-date test passed on standby before the switch.
+- iOS 1.1.0 build 13 uploaded to TestFlight. Android version code 20 uploaded to the Play internal track.
+- Phone Help is a topic list of articles. Work and processes show a publish date and sort Newest or Oldest.
+- A finished task emails its title. “Crew request completed” is only for a crew request.
+- FB-016 is resolved. A photo save no longer checks the overseer limit when the role and crew stay the same. Siding still has two active overseers.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: new session before the next slice.
+
 ### Mid-day (2026-11-14, v1.49.1 live)
 - Shipped v1.49.1 (`5b4023f`). LIVE blue CT133. STANDBY green CT135 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.49.1
 - qa-01 directory gate and the chat picker test passed on standby before the switch.
