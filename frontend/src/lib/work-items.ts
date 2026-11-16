@@ -52,9 +52,9 @@ export function timingLabel(
   if (kind === 'NONE') return 'No deadline';
   const date = formatCalendarDate(dueOn);
   if (kind === 'PROJECT_DATE') {
-    return [date, projectName].filter(Boolean).join(' · ');
+    return [date ? `Due ${date}` : '', projectName].filter(Boolean).join(' · ');
   }
-  return date;
+  return date ? `Due ${date}` : '';
 }
 
 function cleanText(value: unknown): string {

@@ -14,7 +14,7 @@ const ARTICLES: Article[] = [
         heading: 'What is on My Work',
         paragraphs: [
           'My Work lists open tasks assigned to you in this construction group. It does not list someone else’s tasks or another group’s work.',
-          'Each task shows when it was published, the timing, and how many steps are done.',
+          'Each task shows when it was published, the due date when it has one, and how many steps are done.',
         ],
       },
       {

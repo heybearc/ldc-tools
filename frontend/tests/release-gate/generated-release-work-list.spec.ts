@@ -62,7 +62,7 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   });
   expect(created.status()).toBe(201);
   const deadline = await created.json();
-  expect(deadline.timingLabel).toBe('Dec 15, 2026');
+  expect(deadline.timingLabel).toBe('Due Dec 15, 2026');
 
   const missingDate = await page.request.post('/api/v1/work-items', {
     data: {
@@ -93,8 +93,10 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   expect(claimed.assigneeId).toBe(list.currentUserId);
 
   await revealWork(page, deadlineTitle);
-  await expect(page.getByRole('heading', { name: deadlineTitle })).toBeVisible();
-  await expect(page.getByText('Dec 15, 2026').first()).toBeVisible();
+  const deadlineRow = page.locator('article').filter({ hasText: deadlineTitle });
+  await expect(deadlineRow.getByRole('heading', { name: deadlineTitle })).toBeVisible();
+  await expect(deadlineRow.getByText('Due date: Dec 15, 2026')).toBeVisible();
+  await expect(deadlineRow.getByRole('button', { name: 'Edit' })).toBeVisible();
   const claimRow = page.locator('article').filter({ hasText: claimTitle });
   await expect(claimRow.getByText('Monthly')).toBeVisible();
   await expect(claimRow.getByRole('button', { name: 'Claim' })).toHaveCount(0);

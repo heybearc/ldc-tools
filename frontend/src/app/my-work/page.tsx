@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ClipboardList } from 'lucide-react';
 import { WorkRow, type WorkItem } from '@/app/work/page';
 import { userError } from '@/lib/user-error';
@@ -75,6 +76,7 @@ export default function MyWorkPage() {
     }
   }
 
+  const router = useRouter();
   const currentUserId = data?.currentUserId || '';
   const mine = (data?.items || []).filter((item) => item.assignee?.id === currentUserId);
   const openItems = mine.filter((item) => item.status === 'OPEN');
@@ -114,6 +116,7 @@ export default function MyWorkPage() {
               onClaim={() => undefined}
               onDone={() => setStatus(item.id, 'DONE')}
               onChanged={load}
+              onEdit={(item) => router.push(`/work?edit=${item.id}`)}
             />
           ))}
           {doneItems.length > 0 && (
@@ -132,6 +135,7 @@ export default function MyWorkPage() {
                     onClaim={() => undefined}
                     onDone={() => setStatus(item.id, 'OPEN')}
                     onChanged={load}
+                    onEdit={(item) => router.push(`/work?edit=${item.id}`)}
                   />
                 ))}
               </div>

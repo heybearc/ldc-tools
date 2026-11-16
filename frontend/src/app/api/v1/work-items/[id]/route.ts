@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
-import { canPostWork } from '@/lib/work-item-access';
+import { activeUserInGroup, canEditWorkItem, canPostWork, isPersonnelLead, projectInGroup } from '@/lib/work-item-access';
 import { applyWorkStatus } from '@/lib/work-item-actions';
+import { dueOnDate, validateWorkItemInput } from '@/lib/work-items';
 
 export async function PATCH(
   request: NextRequest,
@@ -24,8 +25,13 @@ export async function PATCH(
     const body = await request.json();
     const hasStatus = body.status !== undefined;
     const hasNotify = body.notifyRequestor !== undefined;
-    if (!hasStatus && !hasNotify) {
+    const hasContent = ['title', 'detail', 'explanation', 'referenceUrl', 'timingKind', 'dueOn', 'projectId', 'claimable', 'assigneeId', 'requestorName', 'requestorEmail']
+      .some((key) => body[key] !== undefined);
+    if (!hasStatus && !hasNotify && !hasContent) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
+    }
+    if (hasContent && (hasStatus || hasNotify)) {
+      return NextResponse.json({ error: 'Save the work details on their own' }, { status: 400 });
     }
     if (hasStatus && body.status !== 'DONE' && body.status !== 'OPEN') {
       return NextResponse.json({ error: 'Status must be open or done' }, { status: 400 });
@@ -43,6 +49,8 @@ export async function PATCH(
         status: true,
         title: true,
         detail: true,
+        timingKind: true,
+        createdById: true,
         notifyRequestor: true,
         requestorName: true,
         requestorEmail: true,
@@ -50,6 +58,59 @@ export async function PATCH(
     });
     if (!item || !canAccessCG(scope, item.constructionGroupId)) {
       return NextResponse.json({ error: 'Work item not found' }, { status: 404 });
+    }
+
+    if (hasContent) {
+      const lead = await isPersonnelLead(session.user.id, item.constructionGroupId);
+      if (!canEditWorkItem({
+        userId: session.user.id,
+        userEmail: session.user.email,
+        userRole: scope.userRole,
+        personnelLead: lead,
+        createdById: item.createdById,
+        requestorEmail: item.requestorEmail,
+      })) {
+        return NextResponse.json({ error: 'Only an administrator or the person who submitted this work can edit it' }, { status: 403 });
+      }
+      if (item.timingKind === 'PROCESS' || item.timingKind === 'CREW_REQUEST') {
+        body.timingKind = item.timingKind;
+        body.dueOn = null;
+      }
+      const parsed = validateWorkItemInput(body);
+      if (!parsed.ok) {
+        return NextResponse.json({ error: parsed.error }, { status: 400 });
+      }
+      const input = parsed.value;
+      if (input.projectId) {
+        const project = await projectInGroup(input.projectId, item.constructionGroupId);
+        if (!project) {
+          return NextResponse.json({ error: 'That project is not in this construction group' }, { status: 400 });
+        }
+      }
+      if (input.assigneeId) {
+        const assignee = await activeUserInGroup(input.assigneeId, item.constructionGroupId);
+        if (!assignee) {
+          return NextResponse.json({ error: 'Assignee must be signed in to this construction group' }, { status: 400 });
+        }
+      }
+      const updated = await prisma.workItem.update({
+        where: { id: item.id },
+        data: {
+          title: input.title,
+          detail: input.detail,
+          explanation: input.explanation,
+          referenceUrl: input.referenceUrl,
+          timingKind: input.timingKind,
+          dueOn: dueOnDate(input.dueOn),
+          projectId: input.projectId,
+          claimable: input.claimable,
+          assigneeId: input.assigneeId,
+          requestorName: input.requestorName,
+          requestorEmail: input.requestorEmail,
+        },
+        select: { id: true },
+      });
+      return NextResponse.json({ id: updated.id });
     }
 
     const personnel = await canPostWork(session.user.id, scope);

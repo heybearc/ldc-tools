@@ -34,8 +34,10 @@ export default async function WorkHelpPage() {
 
           <h2>Add a task</h2>
           <p>
-            Each task shows the date it was added. Choose Newest or Oldest to sort the open list by that date.
+            Each task shows the date it was added. A deadline or a project date is labeled as the due date on the task.
+            Choose Newest or Oldest to sort the open list by the date the task was added.
             Personnel Contact, Assistant, and Support can add work. Open Work, choose Add work, and enter a title and detail.
+            An administrator, a Personnel Contact or Assistant, or the person who submitted the task can choose Edit and change the title, detail, timing, and due date.
             Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable.
             Select all, or select several open tasks including with Shift, then assign them, mark them done, or turn the completion email on or off. The requestor checkbox on each selected task matches that choice. Choose how many tasks to show on a page.
           </p>

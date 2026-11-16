@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope, withCGFilter } from '@/lib/cg-scope';
-import { activeUserInGroup, canPostWork, isPersonnelLead, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
+import { activeUserInGroup, canEditWorkItem, canPostWork, isPersonnelLead, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
 import { dueOnDate, timingLabel, validateWorkItemInput } from '@/lib/work-items';
 import { hiddenReleaseCheckProcess, hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
 
@@ -96,6 +96,21 @@ function serialize(item: {
   };
 }
 
+function loadAssignLists(constructionGroupId: string) {
+  return Promise.all([
+    prisma.user.findMany({
+      where: userInGroupWhere(constructionGroupId),
+      select: { id: true, name: true, email: true },
+      orderBy: [{ name: 'asc' }, { email: 'asc' }],
+    }),
+    prisma.project.findMany({
+      where: { constructionGroupId, isActive: true },
+      select: { id: true, name: true },
+      orderBy: { name: 'asc' },
+    }),
+  ]).then(([teammates, projects]) => ({ teammates, projects }));
+}
+
 function itemHelpUnread(
   item: {
     assigneeId?: string | null;
@@ -129,7 +144,8 @@ export async function GET() {
     }
 
     const canAssign = await canPostWork(session.user.id, scope);
-    const [items, teammates, projects, processes] = await Promise.all([
+    const groupId = scope.constructionGroupId;
+    const [items, assignedLists, processes, lead] = await Promise.all([
       prisma.workItem.findMany({
         where: {
           AND: [
@@ -146,28 +162,28 @@ export async function GET() {
         include: itemInclude,
         orderBy: [{ status: 'asc' }, { dueOn: 'asc' }, { createdAt: 'desc' }],
       }),
-      canAssign
-        ? prisma.user.findMany({
-            where: userInGroupWhere(scope.constructionGroupId),
-            select: { id: true, name: true, email: true },
-            orderBy: [{ name: 'asc' }, { email: 'asc' }],
-          })
-        : Promise.resolve([]),
-      canAssign
-        ? prisma.project.findMany({
-            where: { constructionGroupId: scope.constructionGroupId, isActive: true },
-            select: { id: true, name: true },
-            orderBy: { name: 'asc' },
-          })
-        : Promise.resolve([]),
+      canAssign ? loadAssignLists(groupId) : Promise.resolve(null),
       prisma.processTemplate.findMany({
         where: { ...withCGFilter(scope), isActive: true, status: 'PUBLISHED', ...hiddenReleaseCheckProcess },
         include: { steps: { orderBy: { position: 'asc' } } },
         orderBy: { name: 'asc' },
       }),
+      isPersonnelLead(session.user.id, groupId),
     ]);
 
-    const lead = await isPersonnelLead(session.user.id, scope.constructionGroupId);
+    const editor = {
+      userId: session.user.id,
+      userEmail: session.user.email,
+      userRole: scope.userRole,
+      personnelLead: lead,
+    };
+    const canEditAny = items.some((item) => canEditWorkItem({
+      ...editor,
+      createdById: item.createdById,
+      requestorEmail: item.requestorEmail,
+    }));
+    const lists = assignedLists || (canEditAny ? await loadAssignLists(groupId) : { teammates: [], projects: [] });
+    const { teammates, projects } = lists;
     const reads = await prisma.workHelpRead.findMany({
       where: { userId: session.user.id, workItemId: { in: items.map((item) => item.id) } },
       select: { workItemId: true, readAt: true },
@@ -177,10 +193,17 @@ export async function GET() {
     return NextResponse.json({
       canAssign,
       currentUserId: session.user.id,
-      items: items.map((item) => serialize(
-        item,
-        itemHelpUnread(item, session.user.id, lead, readAtByItem.get(item.id) || null),
-      )),
+      items: items.map((item) => ({
+        ...serialize(
+          item,
+          itemHelpUnread(item, session.user.id, lead, readAtByItem.get(item.id) || null),
+        ),
+        canEdit: canEditWorkItem({
+          ...editor,
+          createdById: item.createdById,
+          requestorEmail: item.requestorEmail,
+        }),
+      })),
       teammates,
       projects,
       processes: processes.map((process) => ({

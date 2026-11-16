@@ -41,6 +41,22 @@ export async function isPersonnelLead(userId: string, constructionGroupId: strin
   return Boolean(contact || volunteerRole);
 }
 
+export function canEditWorkItem(input: {
+  userId: string;
+  userEmail: string | null | undefined;
+  userRole: string;
+  personnelLead: boolean;
+  createdById: string;
+  requestorEmail: string | null;
+}): boolean {
+  if (input.userRole === 'SUPER_ADMIN' || input.userRole === 'ADMIN') return true;
+  if (input.personnelLead) return true;
+  if (input.createdById === input.userId) return true;
+  const email = (input.userEmail || '').trim().toLowerCase();
+  const requestor = (input.requestorEmail || '').trim().toLowerCase();
+  return Boolean(email && requestor && email === requestor);
+}
+
 export async function canPostWork(userId: string, scope: CGScope): Promise<boolean> {
   if (!scope.constructionGroupId) return false;
   if (scope.userRole === 'SUPER_ADMIN' || scope.userRole === 'ADMIN') return true;

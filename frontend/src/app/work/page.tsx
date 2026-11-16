@@ -7,6 +7,7 @@ import { isAirgappedEmail } from '@/lib/reachable-email';
 import { scheduleLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
 import { byTime, publishedOn } from '@/lib/published-date';
 import { userError } from '@/lib/user-error';
+import { formatCalendarDate } from '@/lib/work-items';
 
 interface Person {
   id: string;
@@ -40,6 +41,8 @@ export interface WorkItem {
   referenceUrl: string | null;
   timingKind: 'DEADLINE' | 'PROJECT_DATE' | 'MONTHLY' | 'YEARLY' | 'PROCESS' | 'CREW_REQUEST' | 'NONE';
   timingLabel: string;
+  dueOn: string | null;
+  canEdit?: boolean;
   project: { id: string; name: string } | null;
   claimable: boolean;
   status: 'OPEN' | 'DONE';
@@ -123,6 +126,7 @@ export default function WorkPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -186,13 +190,47 @@ export default function WorkPage() {
 
   const needsDate = form.timingKind === 'DEADLINE' || form.timingKind === 'PROJECT_DATE';
 
+  function beginEdit(item: WorkItem) {
+    setForm({
+      title: item.title,
+      detail: item.detail,
+      explanation: item.explanation || '',
+      referenceUrl: item.referenceUrl || '',
+      timingKind: item.timingKind,
+      dueOn: item.dueOn || '',
+      projectId: item.project?.id || '',
+      claimable: item.claimable,
+      assigneeId: item.assignee?.id || '',
+      requestorName: item.requestorName || '',
+      requestorEmail: item.requestorEmail || '',
+    });
+    setEditingId(item.id);
+    setShowForm(true);
+    setError('');
+    window.setTimeout(() => {
+      document.getElementById('work-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
+
+  const openedEdit = useRef(false);
+  useEffect(() => {
+    if (!data || openedEdit.current) return;
+    const id = new URLSearchParams(window.location.search).get('edit');
+    if (!id) return;
+    const item = data.items.find((candidate) => candidate.id === id);
+    if (!item?.canEdit) return;
+    openedEdit.current = true;
+    beginEdit(item);
+  }, [data]);
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setSaving(true);
     setError('');
+    const editing = Boolean(editingId);
     try {
-      const response = await fetch('/api/v1/work-items', {
-        method: 'POST',
+      const response = await fetch(editing ? `/api/v1/work-items/${editingId}` : '/api/v1/work-items', {
+        method: editing ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
@@ -204,10 +242,11 @@ export default function WorkPage() {
       });
       const body = await response.json();
       if (!response.ok) {
-        setError(userError(response.status, body.error, 'Could not add the work'));
+        setError(userError(response.status, body.error, editing ? 'Could not save the work' : 'Could not add the work'));
         return;
       }
       setForm(EMPTY_FORM);
+      setEditingId(null);
       setShowForm(false);
       await load();
     } finally {
@@ -481,7 +520,15 @@ export default function WorkPage() {
             </button>
             <button
               type="button"
-              onClick={() => setShowForm((open) => !open)}
+              onClick={() => {
+                if (showForm && !editingId) {
+                  setShowForm(false);
+                  return;
+                }
+                setEditingId(null);
+                setForm(EMPTY_FORM);
+                setShowForm(true);
+              }}
               className="inline-flex items-center justify-center px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -498,8 +545,9 @@ export default function WorkPage() {
         <p className="rounded-md bg-green-50 text-green-800 px-4 py-3 text-sm">{notice}</p>
       )}
 
-      {showForm && data?.canAssign && (
-        <form onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">
+      {showForm && data && (data.canAssign || editingId) && (
+        <form id="work-form" onSubmit={onSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900">{editingId ? 'Edit work' : 'Add work'}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label className="block md:col-span-2">
               <span className="text-sm font-medium text-gray-700">Title</span>
@@ -543,14 +591,17 @@ export default function WorkPage() {
               <span className="text-sm font-medium text-gray-700">Timing</span>
               <select
                 value={form.timingKind}
+                disabled={form.timingKind === 'PROCESS' || form.timingKind === 'CREW_REQUEST'}
                 onChange={(event) => setForm({ ...form, timingKind: event.target.value })}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white disabled:bg-gray-100"
               >
                 <option value="DEADLINE">Deadline</option>
                 <option value="NONE">No deadline</option>
                 <option value="PROJECT_DATE">Date on a project</option>
                 <option value="MONTHLY">Monthly</option>
                 <option value="YEARLY">Yearly</option>
+                {form.timingKind === 'CREW_REQUEST' && <option value="CREW_REQUEST">Crew request</option>}
+                {form.timingKind === 'PROCESS' && <option value="PROCESS">Process</option>}
               </select>
             </label>
             {needsDate && (
@@ -576,7 +627,7 @@ export default function WorkPage() {
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
               >
                 <option value="">None</option>
-                {data.projects.map((project) => (
+                {(data.projects || []).map((project) => (
                   <option key={project.id} value={project.id}>{project.name}</option>
                 ))}
               </select>
@@ -589,7 +640,7 @@ export default function WorkPage() {
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 bg-white"
               >
                 <option value="">Unassigned</option>
-                {data.teammates.map((person) => (
+                {(data.teammates || []).map((person) => (
                   <option key={person.id} value={person.id}>{personName(person)}</option>
                 ))}
               </select>
@@ -626,11 +677,15 @@ export default function WorkPage() {
               disabled={saving}
               className="px-4 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
             >
-              {saving ? 'Saving…' : 'Save work'}
+              {saving ? 'Saving…' : editingId ? 'Save changes' : 'Save work'}
             </button>
             <button
               type="button"
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                setShowForm(false);
+                setEditingId(null);
+                setForm(EMPTY_FORM);
+              }}
               className="px-4 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700"
             >
               Cancel
@@ -815,6 +870,7 @@ export default function WorkPage() {
                   onDone={() => setStatus(item.id, 'DONE')}
                   onChanged={load}
                   onEmailChange={rememberEmail}
+                  onEdit={beginEdit}
                 />
               );
             })}
@@ -855,6 +911,7 @@ export default function WorkPage() {
                     onDone={() => setStatus(item.id, 'OPEN')}
                     onChanged={load}
                     onEmailChange={rememberEmail}
+                    onEdit={beginEdit}
                   />
                 ))}
                 <Pager
@@ -1115,6 +1172,7 @@ export function WorkRow({
   onDone,
   onChanged,
   onEmailChange,
+  onEdit,
 }: {
   item: WorkItem;
   currentUserId: string;
@@ -1126,6 +1184,7 @@ export function WorkRow({
   onDone: () => void;
   onChanged: () => Promise<void>;
   onEmailChange?: (id: string, notifyRequestor: boolean) => void;
+  onEdit?: (item: WorkItem) => void;
 }) {
   const [note, setNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
@@ -1241,6 +1300,9 @@ export function WorkRow({
             )}
           </div>
           <p className="mt-2 text-gray-700 whitespace-pre-wrap">{item.detail}</p>
+          {item.dueOn && formatCalendarDate(item.dueOn) && (
+            <p className="mt-2 text-sm text-gray-800">Due date: {formatCalendarDate(item.dueOn)}</p>
+          )}
           {item.explanation && (
             <p className="mt-2 text-sm text-gray-600 whitespace-pre-wrap">{item.explanation}</p>
           )}
@@ -1315,6 +1377,15 @@ export function WorkRow({
           </div>
         </div>
         <div className="flex shrink-0 gap-2">
+          {item.canEdit && onEdit && (
+            <button
+              type="button"
+              onClick={() => onEdit(item)}
+              className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700"
+            >
+              Edit
+            </button>
+          )}
           {canClaim && (
             <button
               type="button"
