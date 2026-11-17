@@ -23,7 +23,7 @@
           "sms"
         ]
       },
-      "buildNumber": "15"
+      "buildNumber": "16"
     },
     "android": {
       "package": "com.ldctools.mobile",
@@ -39,7 +39,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "versionCode": 22
+      "versionCode": 23
     },
     "plugins": [
       "expo-router",
