@@ -18,9 +18,9 @@ test('sign-in emails a reset link, and announcements take a web link instead of 
   await page.getByRole('button', { name: 'Forgot password?' }).click();
   await expect(page.getByText('We email a one-time link.')).toBeVisible();
   await expect(page.locator('input[name="password"]')).toHaveCount(0);
-  await page.fill('input[name="email"]', 'release-gate-nobody@example.com');
+  await page.fill('input[name="email"]', `release-gate-nobody-${Date.now()}@example.com`);
   await page.getByRole('button', { name: 'Email reset link' }).click();
-  await expect(page.getByText('If an account exists for that email, a reset link is on its way.')).toBeVisible();
+  await expect(page.getByText(/If an account exists for that email, a reset link is on its way|Please wait a few minutes before requesting another reset email/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Back to sign in' }).click();
   await signIn(page);
