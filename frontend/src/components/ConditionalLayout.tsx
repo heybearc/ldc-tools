@@ -35,6 +35,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
   const isAuthPage = pathname?.startsWith('/auth');
   const isPublicPage = pathname === '/privacy' || pathname === '/support';
   const isHelpPage = pathname?.startsWith('/help') || pathname?.startsWith('/release-notes');
+  const isAdminRoute = Boolean(pathname?.startsWith('/admin'));
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -399,10 +400,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
       )}
 
       <FeedbackUpdateBanner />
-      <main className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8">
-        <AnnouncementBanner />
+      <main className={isAdminRoute ? 'min-w-0' : 'max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8'}>
+        <div className={isAdminRoute ? 'px-4 pt-4 sm:px-6 lg:px-8' : undefined}>
+          <AnnouncementBanner />
+        </div>
         {children}
       </main>
+      {isAdminRoute ? null : (
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
@@ -429,6 +433,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
           </div>
         </div>
       </footer>
+      )}
     </div>
   );
 }

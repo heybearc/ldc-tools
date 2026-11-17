@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { AdminPageHeader, AdminTableFrame } from '@/components/admin/shell';
 
 interface Announcement {
   id: string;
@@ -32,7 +32,6 @@ interface ConstructionGroup {
 }
 
 export default function AnnouncementsPage() {
-  const router = useRouter();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [constructionGroups, setConstructionGroups] = useState<ConstructionGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -188,112 +187,116 @@ export default function AnnouncementsPage() {
     }
   };
 
+  const formatWindow = (announcement: Announcement) => {
+    if (!announcement.startDate && !announcement.endDate) return 'Always';
+    const fmt = (value: string) =>
+      new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    const start = announcement.startDate ? fmt(announcement.startDate) : 'Open';
+    const end = announcement.endDate ? fmt(announcement.endDate) : 'Open';
+    return `${start} – ${end}`;
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 sm:py-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Announcements</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage site-wide and CG-specific announcements</p>
-        </div>
-        <button
-          onClick={() => {
-            resetForm();
-            setShowModal(true);
-          }}
-          className="bg-blue-600 text-white px-4 py-2 min-h-[44px] rounded-md hover:bg-blue-700 flex items-center justify-center w-full sm:w-auto"
-        >
-          <span className="mr-2">+</span>
-          New Announcement
-        </button>
-      </div>
+    <div>
+      <AdminPageHeader
+        title="Announcements"
+        description="Manage site-wide and construction-group announcements"
+        actions={
+          <button
+            onClick={() => {
+              resetForm();
+              setShowModal(true);
+            }}
+            className="inline-flex min-h-[40px] w-full items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:w-auto"
+          >
+            New Announcement
+          </button>
+        }
+      />
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+      <AdminTableFrame>
+          <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Scope</th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Status</th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Dates</th>
-                <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Title</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Type</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:table-cell">Scope</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 md:table-cell">Status</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 lg:table-cell">Dates</th>
+                <th className="sticky right-0 bg-gray-50 px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Actions</th>
               </tr>
             </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 bg-white">
             {announcements.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                  No announcements yet. Create your first announcement!
+                <td colSpan={6} className="px-4 py-10 text-center text-sm text-gray-500">
+                  No announcements yet. Create your first announcement.
                 </td>
               </tr>
             ) : (
               announcements.map((announcement) => (
-                <tr key={announcement.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{announcement.title}</div>
-                    <div className="text-sm text-gray-500 truncate max-w-xs">{announcement.message}</div>
+                <tr key={announcement.id} className="group hover:bg-gray-50">
+                  <td className="w-full max-w-0 px-4 py-3">
+                    <div className="truncate text-sm font-medium text-gray-900">{announcement.title}</div>
+                    <div className="truncate text-sm text-gray-500">{announcement.message}</div>
                     {announcement.linkUrl && (
-                      <div className="text-xs text-blue-700 truncate max-w-xs">{announcement.linkUrl}</div>
+                      <div className="truncate text-xs text-blue-700">{announcement.linkUrl}</div>
                     )}
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded ${getTypeColor(announcement.type)}`}>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    <span className={`rounded px-2 py-1 text-xs font-semibold ${getTypeColor(announcement.type)}`}>
                       {announcement.type}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {announcement.constructionGroup ? announcement.constructionGroup.name : 'Global'}
+                  <td className="hidden whitespace-nowrap px-4 py-3 text-sm text-gray-600 sm:table-cell">
+                    {announcement.constructionGroup
+                      ? announcement.constructionGroup.code || announcement.constructionGroup.name
+                      : 'Global'}
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded ${
+                  <td className="hidden whitespace-nowrap px-4 py-3 md:table-cell">
+                    <span className={`rounded px-2 py-1 text-xs font-semibold ${
                       announcement.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                     }`}>
                       {announcement.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {announcement.startDate && (
-                      <div>Start: {new Date(announcement.startDate).toLocaleDateString()}</div>
-                    )}
-                    {announcement.endDate && (
-                      <div>End: {new Date(announcement.endDate).toLocaleDateString()}</div>
-                    )}
-                    {!announcement.startDate && !announcement.endDate && 'Always'}
+                  <td className="hidden whitespace-nowrap px-4 py-3 text-sm text-gray-600 lg:table-cell">
+                    {formatWindow(announcement)}
                   </td>
-                  <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
-                    <button
-                      onClick={() => handleEdit(announcement)}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(announcement.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
+                  <td className="sticky right-0 bg-white px-4 py-3 text-right text-sm font-medium group-hover:bg-gray-50">
+                    <div className="inline-flex gap-3 whitespace-nowrap">
+                      <button
+                        onClick={() => handleEdit(announcement)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(announcement.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-        </div>
-      </div>
+      </AdminTableFrame>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6">
             <h2 className="text-2xl font-bold mb-4">
               {editingId ? 'Edit Announcement' : 'New Announcement'}
             </h2>
