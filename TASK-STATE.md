@@ -2,18 +2,20 @@
 
 **Last updated:** 2026-11-17  
 **Current branch:** main  
-**Working on:** v1.53.0 is LIVE on green (CT135). STANDBY blue (CT133) is synced at `1ce5f63`. Hub dates stay paused.
+**Working on:** v1.54.1 is LIVE on green (CT135). STANDBY blue (CT133) is synced at `e6b7385`. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.53.0 is LIVE on green CT135. Announcements are global or one construction group and can include a web link. Sign-in emails a one-time password reset. Hub dates stay paused.
+v1.54.1 is LIVE on green CT135. Signed-in users open the phone app from the footer store badges. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress. STANDBY blue CT133 is synced at `1ce5f63`. Hub assignment dates stay paused.
+Nothing in progress. STANDBY blue CT133 is synced at `e6b7385`. Hub assignment dates stay paused.
 
 ### Recent completions
-- ✅ Shipped v1.53.0 (`d0793d4`, store numbers `1ce5f63`). qa-01 full suite 104 passed, plus the announcement-link test. LIVE green CT135. STANDBY blue CT133 synced. iOS build 16 is on TestFlight. Android version code 23 is on the Play internal track. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.53.0
+- ✅ Shipped v1.54.1 (`e6b7385`). Official App Store and Google Play badges in the footer and on the mobile page. qa-01 directory gate plus the mobile-install test. LIVE green CT135. STANDBY blue CT133 synced. No new store build. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.1
+- ✅ Shipped v1.54.0 (`d293de5`). Signed-in Mobile app page. TestFlight https://testflight.apple.com/join/U1qScvxu. Play https://play.google.com/apps/test/com.ldctools.mobile/23. LIVE was blue CT133. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.0
+- ✅ Shipped v1.53.0 (`d0793d4`, store numbers `1ce5f63`). qa-01 full suite 104 passed, plus the announcement-link test. LIVE was green CT135. iOS build 16 is on TestFlight. Android version code 23 is on the Play internal track. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.53.0
 - ✅ Shipped v1.51.0 (`2b5fa31`, store numbers `0d9d4eb`). qa-01 admin gate plus the edit test passed. LIVE was blue CT133. iOS build 14 is on TestFlight. Android version code 21 is on the Play internal track. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.51.0
 - ✅ Shipped v1.50.0 (`0c16ce8`). qa-01 admin gate plus the publish-date test passed. LIVE was green CT135. iOS build 13. Android version code 20. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.50.0
 - ✅ FB-016 resolved. Saving a photo no longer checks the Trade Crew Overseer limit when the role and crew stay the same. Siding still has two active overseers. Those assignments were not changed.
@@ -67,7 +69,7 @@ Nothing in progress. STANDBY blue CT133 is synced at `1ce5f63`. Hub assignment d
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Hub assignment dates stay paused. New testers need the Play internal opt-in link. New session before the next slice.
+Hub assignment dates stay paused. Android testers use https://play.google.com/apps/test/com.ldctools.mobile/23. New session before the next slice.
 
 ---
 
@@ -85,4 +87,4 @@ Hub assignment dates stay paused. New testers need the Play internal opt-in link
 ---
 
 ## Exact Next Command
-Hub assignment dates stay paused. New session before the next slice.
+Hub assignment dates stay paused. Android testers use https://play.google.com/apps/test/com.ldctools.mobile/23. New session before the next slice.

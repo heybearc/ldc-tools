@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-17  
 **Current phase:** Region work queue  
-**Status:** v1.53.0 is LIVE on green (CT135). STANDBY blue (CT133) is synced at `1ce5f63`. Hub dates are paused.
+**Status:** v1.54.1 is LIVE on green (CT135). STANDBY blue (CT133) is synced at `e6b7385`. Hub dates are paused.
 
 ---
 
@@ -43,7 +43,9 @@
 - [x] Phone Help articles, publish dates and date sort, completion email uses the task title. `/ship` v1.50.0 (`0c16ce8`). LIVE was green CT135. iOS build 13. Android version code 20.
 - [x] Edit a task and label the due date. `/ship` v1.51.0 (`2b5fa31`). LIVE was blue CT133. iOS build 14. Android version code 21.
 - [x] Remove a task, edit or remove a project date, drop the Trade teams dashboard card (`6abd487`). Included in the live release.
-- [x] Announcements are global or one construction group, with an optional web link. Sign-in emails a password reset. `/ship` v1.53.0 (`d0793d4`). LIVE green CT135. STANDBY blue CT133 synced at `1ce5f63`. iOS build 16. Android version code 23.
+- [x] Announcements are global or one construction group, with an optional web link. Sign-in emails a password reset. `/ship` v1.53.0 (`d0793d4`). LIVE was green CT135. iOS build 16. Android version code 23.
+- [x] Signed-in mobile install page. `/ship` v1.54.0 (`d293de5`). LIVE was blue CT133.
+- [x] Footer uses the official App Store and Google Play badges. `/ship` v1.54.1 (`e6b7385`). LIVE green CT135. STANDBY blue CT133 synced. No new store build.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

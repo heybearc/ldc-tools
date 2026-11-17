@@ -5,6 +5,14 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-17, v1.54.1 live)
+- Shipped v1.54.0 (`d293de5`) then v1.54.1 (`e6b7385`). LIVE green CT135. STANDBY blue CT133 synced at `e6b7385`. Tags https://github.com/heybearc/ldc-tools/releases/tag/v1.54.0 and https://github.com/heybearc/ldc-tools/releases/tag/v1.54.1
+- Signed-in users install from the footer. Badges are Download on the App Store and Get it on Google Play. The same badges are on the Mobile app page.
+- iOS stays TestFlight build 16: https://testflight.apple.com/join/U1qScvxu. Android stays version code 23: https://play.google.com/apps/test/com.ldctools.mobile/23. No new store upload.
+- qa-01 directory gate plus the mobile-install test passed on standby before the v1.54.1 switch. The first run matched an announcement heading; the test now requires the exact page title.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: new session before the next slice.
+
 ### Mid-day (2026-11-17, v1.53.0 live)
 - Shipped v1.53.0 (`d0793d4`). LIVE green CT135. STANDBY blue CT133 synced at `1ce5f63`. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.53.0
 - qa-01 full suite 104 passed, plus the announcement-link test, on green before the switch. The first two gate runs failed and were fixed.
