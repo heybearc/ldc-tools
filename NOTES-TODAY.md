@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-17, v1.53.0 live)
+- Shipped v1.53.0 (`d0793d4`). LIVE green CT135. STANDBY blue CT133 synced at `1ce5f63`. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.53.0
+- qa-01 full suite 104 passed, plus the announcement-link test, on green before the switch. The first two gate runs failed and were fixed.
+- iOS build 16 is on TestFlight. Android version code 23 is on the Play internal track. Play does not email new testers; send the opt-in link.
+- Announcements are global or one construction group and can include an https link. Role targeting is no longer saved.
+- Forgot password emails a one-time link. The screen does not say whether the address has an account.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: new session before the next slice.
+
 ### Mid-day (2026-11-17)
 - Shipped v1.51.0 (`2b5fa31`). LIVE blue CT133. STANDBY green CT135 was synced at `0d9d4eb`. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.51.0
 - qa-01 admin gate plus the work-edit test passed on standby before the switch.
