@@ -7,11 +7,13 @@ import { useWideLayout } from '@/lib/useWideLayout';
 export default function TabLayout() {
   const wide = useWideLayout();
   const [unread, setUnread] = useState(0);
+  const [available, setAvailable] = useState(0);
   const onUnread = useCallback((count: number) => setUnread(count), []);
+  const onAvailable = useCallback((count: number) => setAvailable(count), []);
 
   return (
     <>
-    <PhoneAlerts onUnread={onUnread} />
+    <PhoneAlerts onUnread={onUnread} onAvailable={onAvailable} />
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#1e40af',
@@ -33,6 +35,7 @@ export default function TabLayout() {
         name="available"
         options={{
           title: 'Available',
+          tabBarBadge: available > 0 ? available : undefined,
           tabBarIcon: ({ color }) => (
             <SymbolView name={{ ios: 'tray', android: 'inbox', web: 'inbox' }} tintColor={color} size={24} />
           ),

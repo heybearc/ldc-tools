@@ -455,6 +455,7 @@ export default function WorkPage() {
 
   const items = data?.items || [];
   const openItems = byTime(items.filter((item) => item.status === 'OPEN'), (item) => item.createdAt, newestFirst);
+  const availableCount = openItems.filter((item) => item.claimable && !item.assignee).length;
   const doneItems = byTime(items.filter((item) => item.status === 'DONE'), (item) => item.createdAt, newestFirst);
   const processes = byTime(data?.processes || [], (process) => process.publishedAt, newestFirst);
   const helpItems = openItems.filter((item) => (item.notes || []).some((note) => note.kind === 'HELP'));
@@ -472,6 +473,22 @@ export default function WorkPage() {
     if (processPage !== processView.current) setProcessPage(processView.current);
   }, [page, donePage, processPage, openView.current, doneView.current, processView.current]);
 
+  useEffect(() => {
+    if (loading || !data) return;
+    const hash = window.location.hash;
+    if (!hash.startsWith('#work-')) return;
+    const id = decodeURIComponent(hash.slice('#work-'.length));
+    const ordered = byTime(data.items.filter((item) => item.status === 'OPEN'), (item) => item.createdAt, newestFirst);
+    const index = ordered.findIndex((item) => item.id === id);
+    if (index < 0) return;
+    const target = Math.floor(index / pageSize);
+    if (page !== target) {
+      setPage(target);
+      return;
+    }
+    document.getElementById(`work-${id}`)?.scrollIntoView({ block: 'start' });
+  }, [loading, data, newestFirst, page, pageSize]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -480,6 +497,11 @@ export default function WorkPage() {
           <p className="mt-2 text-gray-600 max-w-3xl">
             Tasks for this construction group. A process is one claimable item, and its tasks stay inside it. Personnel add and assign work.
           </p>
+          {availableCount > 0 ? (
+            <p className="mt-2 text-sm font-medium text-blue-800">
+              {availableCount === 1 ? '1 task is available to claim.' : `${availableCount} tasks are available to claim.`}
+            </p>
+          ) : null}
           <div className="mt-3 flex gap-2">
             <button
               type="button"

@@ -45,6 +45,7 @@ export default async function WorkHelpPage() {
           <h2>Claim a task</h2>
           <p>
             When a claimable task has no assignee, anyone signed in to this construction group can choose Claim. That assigns the task to you.
+            The Personnel Contact and Assistant get a phone alert, and a browser alert if they allowed notifications. The Work link shows how many tasks are waiting.
             Open the task to check off its steps. Choose Done when the whole task is finished. Choose Return to pool when you cannot get to it. It becomes claimable again.
           </p>
 

@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { enteredClaimPool, workAvailableAlert } from './work-available-notice.ts';
+
+test('new unassigned claimable work enters the pool', () => {
+  assert.equal(enteredClaimPool(null, { status: 'OPEN', claimable: true, assigneeId: null }), true);
+  assert.equal(enteredClaimPool(null, { status: 'OPEN', claimable: true, assigneeId: 'user' }), false);
+  assert.equal(enteredClaimPool(null, { status: 'OPEN', claimable: false, assigneeId: null }), false);
+});
+
+test('returning assigned work to the pool notifies once', () => {
+  const before = { status: 'OPEN', claimable: true, assigneeId: 'user' };
+  const after = { status: 'OPEN', claimable: true, assigneeId: null };
+  assert.equal(enteredClaimPool(before, after), true);
+  assert.equal(enteredClaimPool(after, after), false);
+});
+
+test('one task names itself and several tasks share one alert', () => {
+  assert.deepEqual(workAvailableAlert([{ id: 'w1', title: 'Set up chairs' }]), {
+    title: 'Work available',
+    body: 'Set up chairs',
+    url: '/work#work-w1',
+    workItemId: 'w1',
+  });
+  const many = workAvailableAlert([
+    { id: 'w1', title: 'Set up chairs' },
+    { id: 'w2', title: 'Unlock the hall' },
+  ]);
+  assert.equal(many?.body, '2 tasks are available');
+  assert.equal(many?.url, '/work');
+  assert.equal(many?.workItemId, '');
+});
+
+test('release-check titles stay quiet', () => {
+  assert.equal(workAvailableAlert([{ id: 'w1', title: 'QA Volunteer request' }]), null);
+});

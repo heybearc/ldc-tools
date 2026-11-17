@@ -55,6 +55,7 @@ export async function GET(
       timing: timingLabel(item.timingKind, dueOn, item.project?.name || null, item.processCadence, item.processSchedule),
       status: item.status,
       claimable: item.claimable,
+      available: item.status === 'OPEN' && item.claimable && !item.assigneeId,
       mine: item.assigneeId === actor.id,
       steps: item.steps.map((step) => ({
         id: step.id,

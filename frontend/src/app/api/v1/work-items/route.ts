@@ -6,6 +6,8 @@ import { getCGScope, withCGFilter } from '@/lib/cg-scope';
 import { activeUserInGroup, canEditWorkItem, canPostWork, isPersonnelLead, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
 import { dueOnDate, timingLabel, validateWorkItemInput } from '@/lib/work-items';
 import { hiddenReleaseCheckProcess, hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
+import { enteredClaimPool } from '@/lib/work-available-notice';
+import { queueWorkAvailable } from '@/lib/work-available-notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -288,6 +290,14 @@ export async function POST(request: NextRequest) {
       },
       include: itemInclude,
     });
+
+    if (enteredClaimPool(null, { status: created.status, claimable: created.claimable, assigneeId: created.assigneeId })) {
+      queueWorkAvailable({
+        constructionGroupId: scope.constructionGroupId,
+        excludeUserId: session.user.id,
+        items: [{ id: created.id, title: created.title }],
+      });
+    }
 
     return NextResponse.json(serialize(created), { status: 201 });
   } catch (error) {

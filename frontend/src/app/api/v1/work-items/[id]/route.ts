@@ -6,6 +6,8 @@ import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { activeUserInGroup, canEditWorkItem, canPostWork, isPersonnelLead, projectInGroup } from '@/lib/work-item-access';
 import { applyWorkStatus } from '@/lib/work-item-actions';
 import { dueOnDate, validateWorkItemInput } from '@/lib/work-items';
+import { enteredClaimPool } from '@/lib/work-available-notice';
+import { queueWorkAvailable } from '@/lib/work-available-notify';
 
 export async function PATCH(
   request: NextRequest,
@@ -54,6 +56,7 @@ export async function PATCH(
         notifyRequestor: true,
         requestorName: true,
         requestorEmail: true,
+        claimable: true,
       },
     });
     if (!item || !canAccessCG(scope, item.constructionGroupId)) {
@@ -112,6 +115,16 @@ export async function PATCH(
         },
         select: { id: true },
       });
+      if (enteredClaimPool(
+        { status: item.status, claimable: item.claimable, assigneeId: item.assigneeId },
+        { status: item.status, claimable: input.claimable, assigneeId: input.assigneeId },
+      )) {
+        queueWorkAvailable({
+          constructionGroupId: item.constructionGroupId,
+          excludeUserId: session.user.id,
+          items: [{ id: item.id, title: input.title }],
+        });
+      }
       return NextResponse.json({ id: updated.id });
     }
 

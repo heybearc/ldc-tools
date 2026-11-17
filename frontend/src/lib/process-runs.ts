@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { cadenceLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
+import { enteredClaimPool } from '@/lib/work-available-notice';
+import { queueWorkAvailable } from '@/lib/work-available-notify';
 
 export async function setProcessPublished(input: {
   id: string;
@@ -48,7 +50,7 @@ export async function createProcessRun(input: {
 }) {
   const count = input.steps.length;
   const taskLine = count === 1 ? '1 task' : `${count} tasks`;
-  return prisma.workItem.create({
+  const item = await prisma.workItem.create({
     data: {
       constructionGroupId: input.constructionGroupId,
       title: input.name,
@@ -79,4 +81,12 @@ export async function createProcessRun(input: {
       steps: { orderBy: { position: 'asc' } },
     },
   });
+  if (enteredClaimPool(null, { status: item.status, claimable: item.claimable, assigneeId: item.assigneeId })) {
+    queueWorkAvailable({
+      constructionGroupId: input.constructionGroupId,
+      excludeUserId: input.createdById,
+      items: [{ id: item.id, title: item.title }],
+    });
+  }
+  return item;
 }

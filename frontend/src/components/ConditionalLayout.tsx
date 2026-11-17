@@ -30,6 +30,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatUnread, setChatUnread] = useState(0);
+  const [availableCount, setAvailableCount] = useState(0);
   const isAuthPage = pathname?.startsWith('/auth');
   const isPublicPage = pathname === '/privacy' || pathname === '/support';
   const isHelpPage = pathname?.startsWith('/help') || pathname?.startsWith('/release-notes');
@@ -66,7 +67,21 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
       if (typeof total === 'number') setChatUnread(total);
     };
     window.addEventListener('ldc-chat-unread', onUnread);
-    const timer = window.setInterval(loadUnread, 20000);
+    async function loadAvailable() {
+      try {
+        const response = await fetch('/api/v1/work-items/available-count', { cache: 'no-store' });
+        if (!response.ok) return;
+        const body = await response.json();
+        if (!cancelled) setAvailableCount(typeof body.count === 'number' ? body.count : 0);
+      } catch {
+        if (!cancelled) setAvailableCount(0);
+      }
+    }
+    void loadAvailable();
+    const timer = window.setInterval(() => {
+      void loadUnread();
+      void loadAvailable();
+    }, 20000);
     return () => {
       cancelled = true;
       window.removeEventListener('ldc-chat-unread', onUnread);
@@ -136,7 +151,12 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                   Directory
                 </Link>
                 <Link href="/work" className={navClass(pathname === '/work')}>
-                  Work
+                  <span className="inline-flex items-center gap-1.5">
+                    Work
+                    {availableCount > 0 ? (
+                      <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-blue-100 px-1.5 text-xs font-semibold text-blue-900">{availableCount}</span>
+                    ) : null}
+                  </span>
                 </Link>
                 <Link href="/chat" className={navClass(pathname === '/chat')}>
                   <span className="inline-flex items-center gap-1.5">
@@ -248,10 +268,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
               </Link>
               <Link
                 href="/work"
-                className="block px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
+                className="flex items-center justify-between px-4 py-3 text-base font-medium text-gray-900 hover:bg-gray-100 rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Work
+                <span>Work</span>
+                {availableCount > 0 ? (
+                  <span className="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-blue-100 px-1.5 text-xs font-semibold text-blue-900">{availableCount}</span>
+                ) : null}
               </Link>
               <Link
                 href="/chat"

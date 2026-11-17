@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { canEmailAddress } from '@/lib/reachable-email';
 import { sendWorkCompletionEmail } from '@/lib/work-completion-email';
+import { enteredClaimPool } from '@/lib/work-available-notice';
+import { queueWorkAvailable } from '@/lib/work-available-notify';
 
 const workSelect = {
   id: true,
@@ -71,6 +73,17 @@ export async function applyWorkStatus(input: {
     }
   }
 
+  if (enteredClaimPool(
+    { status: item.status, claimable: item.claimable, assigneeId: item.assigneeId },
+    { status: input.status, claimable: item.claimable, assigneeId: item.assigneeId },
+  )) {
+    queueWorkAvailable({
+      constructionGroupId: input.constructionGroupId,
+      excludeUserId: input.actorId,
+      items: [{ id: item.id, title: item.title }],
+    });
+  }
+
   return {
     id: updated.id,
     status: updated.status,
@@ -99,6 +112,11 @@ export async function releaseWorkToPool(input: {
     where: { id: item.id },
     data: { assigneeId: null, claimedAt: null, claimable: true },
     select: { id: true, assigneeId: true, claimable: true },
+  });
+  queueWorkAvailable({
+    constructionGroupId: input.constructionGroupId,
+    excludeUserId: input.actorId,
+    items: [{ id: item.id, title: item.title }],
   });
   return updated;
 }

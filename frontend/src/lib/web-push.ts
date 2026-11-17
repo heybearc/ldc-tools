@@ -34,6 +34,8 @@ export async function sendChatPush(input: {
   body: string;
   url: string;
   constructionGroupId?: string;
+  kind?: string;
+  data?: Record<string, string>;
 }) {
   const targets = input.userIds.filter((id) => id && id !== input.excludeUserId);
   if (targets.length === 0) return;
@@ -66,6 +68,6 @@ export async function sendChatPush(input: {
     title: input.title,
     body: input.body,
     constructionGroupId: input.constructionGroupId,
-    data: { url: input.url, kind: 'chat' },
+    data: { url: input.url, kind: input.kind || 'chat', ...input.data },
   });
 }

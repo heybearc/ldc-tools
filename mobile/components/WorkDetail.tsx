@@ -21,6 +21,8 @@ type WorkDetail = {
   referenceUrl: string | null;
   timing: string;
   status: 'OPEN' | 'DONE';
+  claimable: boolean;
+  available: boolean;
   mine: boolean;
   steps: Step[];
 };
@@ -132,7 +134,15 @@ export function WorkDetail({ id }: { id: string }) {
               ))}
             </View>
           ) : null}
-          {open ? (
+          {item.available ? (
+            <Pressable
+              disabled={Boolean(busy)}
+              onPress={() => void run('Could not claim the work', `/api/v1/mobile/work/${id}/claim`, { method: 'POST' })}
+              style={styles.primary}
+            >
+              {busy.startsWith('Could not claim') ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryText}>Claim</Text>}
+            </Pressable>
+          ) : open ? (
             <View style={styles.actions}>
               <Pressable
                 disabled={Boolean(busy)}

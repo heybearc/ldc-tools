@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
 import { parseCrewRequestRows } from '@/lib/crew-request-import';
+import { queueWorkAvailable } from '@/lib/work-available-notify';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -85,6 +86,20 @@ export async function POST(request: NextRequest) {
           notifyRequestor: Boolean(row.requestorEmail),
           importKey: row.importKey,
           createdById: session.user.id,
+        })),
+      });
+      const created = fresh.length === 1 && fresh[0].importKey
+        ? await prisma.workItem.findFirst({
+            where: { constructionGroupId, importKey: fresh[0].importKey },
+            select: { id: true },
+          })
+        : null;
+      queueWorkAvailable({
+        constructionGroupId,
+        excludeUserId: session.user.id,
+        items: fresh.map((row) => ({
+          id: fresh.length === 1 ? created?.id : undefined,
+          title: row.title,
         })),
       });
     }

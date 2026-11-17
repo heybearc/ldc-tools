@@ -35,6 +35,7 @@ const ARTICLES: Article[] = [
         heading: 'Claim a task',
         paragraphs: [
           'Available lists claimable work that no one has taken. Claim assigns that task to you and moves it to My Work.',
+          'A number on Available is how many tasks are waiting. The Personnel Contact and Assistant also get an alert when work becomes available.',
           'A published process can appear here as one claimable item. Its tasks stay inside that item.',
         ],
       },
@@ -114,12 +115,12 @@ const ARTICLES: Article[] = [
   {
     id: 'alerts',
     title: 'Alerts',
-    summary: 'Chat and announcements',
+    summary: 'Chat, announcements, and available work',
     sections: [
       {
         heading: 'Allow alerts',
         paragraphs: [
-          'Allow alerts when the phone asks. The app can show an alert, a badge, and a sound for a chat message or an announcement.',
+          'Allow alerts when the phone asks. The app can show an alert, a badge, and a sound for a chat message, an announcement, or work that is available to claim.',
           'If alerts stay off, open the phone’s settings for LDC Tools and allow notifications.',
         ],
       },
