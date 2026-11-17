@@ -201,6 +201,9 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                   </button>
                   {openDropdown === 'help' && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                      <Link href="/mobile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Mobile app
+                      </Link>
                       <Link href="/help" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         Help Center
                       </Link>
@@ -336,6 +339,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
                 <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Help & Support
                 </div>
+                <Link
+                  href="/mobile"
+                  className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Mobile app
+                </Link>
                 <Link 
                   href="/help" 
                   className="block px-4 py-3 text-base text-gray-700 hover:bg-gray-100 rounded-lg"
@@ -402,6 +412,9 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
               <ServerIndicator />
             </div>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm">
+              <Link href="/mobile" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
+                Mobile app
+              </Link>
               <Link href="/help/feedback" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
                 💡 Send Feedback
               </Link>

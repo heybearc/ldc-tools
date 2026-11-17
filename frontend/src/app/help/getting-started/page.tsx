@@ -55,10 +55,10 @@ export default async function GettingStartedPage() {
               <li><strong>Directory</strong> → Trade and crew leadership, search, and export</li>
               <li><strong>Trade Teams</strong> → The teams and the crews under them</li>
               <li><strong>Admin</strong> → Admin Control Center (administrators only)</li>
-              <li><strong>Help</strong> → Help Center, My Feedback, Release Notes</li>
+              <li><strong>Help</strong> → Mobile app, Help Center, My Feedback, Release Notes</li>
             </ul>
             <p className="text-green-800 mt-3 mb-0">
-              Admin opens the Admin Control Center. Help opens the help pages.
+              Admin opens the Admin Control Center. Help includes the mobile app install links and the help pages.
             </p>
           </div>
 
@@ -127,6 +127,7 @@ export default async function GettingStartedPage() {
           <h2>🧭 Navigation Tips</h2>
           <ul>
             <li><strong>Menu</strong> - On a phone, use the menu button at the top. On a wider screen, the same links stay in the header.</li>
+            <li><strong>Install the app</strong> - Help, then Mobile app, has the App Store and Google Play links. Sign in on the phone with the same account.</li>
             <li><strong>Phone and tablet app</strong> - The LDC Tools app has My Work, Available, Projects, Processes, Trade teams, and Directory. Available is claimable work you can take. Projects lists this construction group&apos;s projects, with status, dates, Personnel, and the schedule. Open a project to see those details. Processes starts a process onto the work list. Trade teams lists crews. Directory starts with Construction group, Personnel, Ancillary, or a trade team and crew. Open a person to see the photo, email, and phone. The app can alert you for a chat message, an announcement, or work that is available to claim. On a tablet, My Work and the directory sit side by side.</li>
             <li><strong>When something fails</strong> - The page says what failed and asks you to try again. If the session has ended, it asks you to sign in again.</li>
             <li><strong>Top Bar</strong> - User menu, notifications, and quick actions</li>

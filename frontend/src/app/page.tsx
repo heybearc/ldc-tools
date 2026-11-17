@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ComponentType } from 'react';
 import Link from 'next/link';
-import { BookOpen, Building2, ClipboardList, Users, Wrench } from 'lucide-react';
+import { BookOpen, Building2, ClipboardList, Smartphone, Users, Wrench } from 'lucide-react';
 
 interface OverviewPerson {
   user: { id: string };
@@ -183,6 +183,20 @@ export default function HomePage() {
           </div>
           <p className="text-gray-600">
             Tasks for this construction group. Personnel assign them. Claimable tasks and processes can be taken by the team.
+          </p>
+        </Link>
+        <Link
+          href="/mobile"
+          className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 block"
+        >
+          <div className="flex items-center mb-3">
+            <div className="bg-blue-800 p-3 rounded-lg">
+              <Smartphone className="h-6 w-6 text-white" />
+            </div>
+            <h2 className="ml-4 text-lg font-semibold text-gray-900">Mobile app</h2>
+          </div>
+          <p className="text-gray-600">
+            Install the iPhone, iPad, or Android app and sign in with this account to test it.
           </p>
         </Link>
         <Link
