@@ -31,8 +31,8 @@ export default async function MobileHelpPage() {
           <h2>Install it</h2>
           <ol>
             <li>Open Help and choose Mobile app, or open it from the dashboard.</li>
-            <li>On an iPhone or iPad, choose Install from App Store. Accept the test in TestFlight, then install LDC Tools.</li>
-            <li>On an Android phone, choose Install from Google Play. Sign in with the Google account that was added to the test, then install LDC Tools.</li>
+            <li>On an iPhone or iPad, choose Download on the App Store. Accept the test in TestFlight, then install LDC Tools.</li>
+            <li>On an Android phone, choose Get it on Google Play. Sign in with the Google account that was added to the test, then install LDC Tools.</li>
             <li>Open the app and sign in with the same LDC Tools account. Leave the server at ldctools.com.</li>
           </ol>
           <p>

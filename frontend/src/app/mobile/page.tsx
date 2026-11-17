@@ -51,14 +51,20 @@ export default function MobileInstallPage() {
                 <li key={step}>{step}</li>
               ))}
             </ol>
-            <a
-              href={store.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-center font-semibold text-white hover:bg-blue-700"
-            >
-              Install from {store.store}
-            </a>
+            <div className="mt-6">
+              <a
+                href={store.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[44px] items-center rounded-md transition-opacity hover:opacity-80"
+              >
+                <img
+                  src={store.name === 'Android' ? '/store/google-play.png' : '/store/app-store.svg'}
+                  alt={store.name === 'Android' ? 'Get it on Google Play' : 'Download on the App Store'}
+                  className="h-10 w-auto"
+                />
+              </a>
+            </div>
           </section>
         ))}
       </div>

@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import SignOutButton from './SignOutButton';
+import StoreBadges from './StoreBadges';
 import ReleaseBanner from './ReleaseBanner';
 import CGSelector from './CGSelector';
 import ServerIndicator from './ServerIndicator';
@@ -404,26 +405,26 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
       </main>
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-3">
               <div className="text-sm text-gray-500">
                 <p>LDC Tools v{APP_VERSION}</p>
               </div>
               <ServerIndicator />
             </div>
-            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm">
-              <Link href="/mobile" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
-                Mobile app
-              </Link>
-              <Link href="/help/feedback" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
-                💡 Send Feedback
-              </Link>
-              <Link href="/help" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
-                Help Center
-              </Link>
-              <Link href="/release-notes" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
-                Release Notes
-              </Link>
+            <div className="flex flex-col items-center gap-3 sm:items-end">
+              <StoreBadges />
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm">
+                <Link href="/help/feedback" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
+                  💡 Send Feedback
+                </Link>
+                <Link href="/help" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
+                  Help Center
+                </Link>
+                <Link href="/release-notes" className="text-gray-600 hover:text-blue-600 whitespace-nowrap">
+                  Release Notes
+                </Link>
+              </div>
             </div>
           </div>
         </div>
