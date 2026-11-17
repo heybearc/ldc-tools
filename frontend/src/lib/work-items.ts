@@ -139,3 +139,18 @@ export function dueOnDate(value: string | null): Date | null {
   if (!value) return null;
   return new Date(`${value}T00:00:00.000Z`);
 }
+
+export function calendarToday(now = new Date()): string {
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+export function isOverdue(dueOn: string | null | undefined, today = calendarToday()): boolean {
+  if (!dueOn || !/^\d{4}-\d{2}-\d{2}/.test(dueOn)) return false;
+  return dueOn.slice(0, 10) < today;
+}
+
+export function completionEmailOff(item: { requestorEmail?: string | null; notifyRequestor?: boolean }): boolean {
+  return Boolean(item.requestorEmail) && item.notifyRequestor === false;
+}

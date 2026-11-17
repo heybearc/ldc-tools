@@ -7,7 +7,7 @@ import { isAirgappedEmail } from '@/lib/reachable-email';
 import { scheduleLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
 import { byTime, publishedOn } from '@/lib/published-date';
 import { userError } from '@/lib/user-error';
-import { formatCalendarDate } from '@/lib/work-items';
+import { calendarToday, completionEmailOff, formatCalendarDate, isOverdue } from '@/lib/work-items';
 
 interface Person {
   id: string;
@@ -140,6 +140,9 @@ export default function WorkPage() {
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(0);
   const [newestFirst, setNewestFirst] = useState(true);
+  const [projectFilter, setProjectFilter] = useState('');
+  const [overdueOnly, setOverdueOnly] = useState(false);
+  const [emailOffOnly, setEmailOffOnly] = useState(false);
   const [donePage, setDonePage] = useState(0);
   const [processPage, setProcessPage] = useState(0);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -454,9 +457,28 @@ export default function WorkPage() {
   }
 
   const items = data?.items || [];
-  const openItems = byTime(items.filter((item) => item.status === 'OPEN'), (item) => item.createdAt, newestFirst);
-  const availableCount = openItems.filter((item) => item.claimable && !item.assignee).length;
-  const doneItems = byTime(items.filter((item) => item.status === 'DONE'), (item) => item.createdAt, newestFirst);
+  const today = calendarToday();
+  const openBase = items.filter((item) => item.status === 'OPEN');
+  const overdueCount = openBase.filter((item) => isOverdue(item.dueOn, today)).length;
+  const emailOffCount = openBase.filter((item) => completionEmailOff(item)).length;
+  const viewActive = Boolean(projectFilter || overdueOnly || emailOffOnly);
+  const matchesProject = (item: WorkItem) => !projectFilter || item.project?.id === projectFilter;
+  const openItems = byTime(
+    openBase.filter((item) => {
+      if (!matchesProject(item)) return false;
+      if (overdueOnly && !isOverdue(item.dueOn, today)) return false;
+      if (emailOffOnly && !completionEmailOff(item)) return false;
+      return true;
+    }),
+    (item) => item.createdAt,
+    newestFirst,
+  );
+  const availableCount = openBase.filter((item) => item.claimable && !item.assignee).length;
+  const doneItems = byTime(
+    items.filter((item) => item.status === 'DONE' && matchesProject(item)),
+    (item) => item.createdAt,
+    newestFirst,
+  );
   const processes = byTime(data?.processes || [], (process) => process.publishedAt, newestFirst);
   const helpItems = openItems.filter((item) => (item.notes || []).some((note) => note.kind === 'HELP'));
   const currentUserId = data?.currentUserId || '';
@@ -518,6 +540,57 @@ export default function WorkPage() {
               Oldest
             </button>
           </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <label className="block">
+              <span className="sr-only">Project</span>
+              <select
+                value={projectFilter}
+                onChange={(event) => {
+                  setProjectFilter(event.target.value);
+                  setPage(0);
+                  setDonePage(0);
+                  setSelectedIds([]);
+                }}
+                className="rounded-md border border-gray-300 bg-white px-3 py-2 min-h-[44px] text-sm text-gray-900"
+              >
+                <option value="">All projects</option>
+                {(data?.projects || []).map((project) => (
+                  <option key={project.id} value={project.id}>{project.name}</option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              aria-pressed={overdueOnly}
+              onClick={() => {
+                setOverdueOnly((current) => !current);
+                setPage(0);
+                setSelectedIds([]);
+              }}
+              className={`px-3 py-2 min-h-[44px] rounded-md text-sm font-medium ${overdueOnly ? 'bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+            >
+              Overdue{overdueCount > 0 ? ` (${overdueCount})` : ''}
+            </button>
+            <button
+              type="button"
+              aria-pressed={emailOffOnly}
+              onClick={() => {
+                setEmailOffOnly((current) => !current);
+                setPage(0);
+                setSelectedIds([]);
+              }}
+              className={`px-3 py-2 min-h-[44px] rounded-md text-sm font-medium ${emailOffOnly ? 'bg-blue-600 text-white' : 'border border-gray-300 text-gray-700'}`}
+            >
+              Email off{emailOffCount > 0 ? ` (${emailOffCount})` : ''}
+            </button>
+          </div>
+          {emailOffCount > 0 && !emailOffOnly ? (
+            <p className="mt-2 text-sm text-gray-700">
+              {emailOffCount === 1
+                ? '1 open task will not email the requestor when it is marked done.'
+                : `${emailOffCount} open tasks will not email the requestor when they are marked done.`}
+            </p>
+          ) : null}
         </div>
         {data?.canAssign && (
           <div className="flex flex-wrap gap-2">
@@ -911,7 +984,10 @@ export default function WorkPage() {
                 }}
               />
             )}
-            {openItems.length === 0 && processes.length > 0 && (
+            {openItems.length === 0 && viewActive && (
+              <p className="text-sm text-gray-500">No open tasks match this view.</p>
+            )}
+            {openItems.length === 0 && !viewActive && processes.length > 0 && (
               <p className="text-sm text-gray-500">No open tasks.</p>
             )}
           </section>
@@ -1315,6 +1391,11 @@ export function WorkRow({
             {item.helpUnread && (
               <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-900">
                 Unread
+              </span>
+            )}
+            {item.status === 'OPEN' && isOverdue(item.dueOn) && (
+              <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                Overdue
               </span>
             )}
             {item.claimable && item.status === 'OPEN' && (

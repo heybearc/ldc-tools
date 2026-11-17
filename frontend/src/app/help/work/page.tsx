@@ -40,6 +40,7 @@ export default async function WorkHelpPage() {
             An administrator, a Personnel Contact or Assistant, or the person who submitted the task can choose Edit and change the title, detail, timing, and due date. The same people can choose Remove to take the task off the list. Personnel can also edit or remove a date on a project.
             Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable.
             Select all, or select several open tasks including with Shift, then assign them, mark them done, or turn the completion email on or off. The requestor checkbox on each selected task matches that choice. Choose how many tasks to show on a page.
+            Choose a project to see only that project's tasks, including finished ones. Overdue lists open tasks whose date is before today. Email off lists open tasks that have a requestor and will not email that person when the task is marked done. Select those tasks and choose Email on to turn the message back on.
           </p>
 
           <h2>Claim a task</h2>
