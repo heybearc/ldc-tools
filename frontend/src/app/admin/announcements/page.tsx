@@ -12,6 +12,7 @@ interface Announcement {
   startDate: string | null;
   endDate: string | null;
   constructionGroupId: string | null;
+  linkUrl: string | null;
   targetRoles: string[];
   createdAt: string;
   creator: {
@@ -45,6 +46,7 @@ export default function AnnouncementsPage() {
     startDate: '',
     endDate: '',
     constructionGroupId: '',
+    linkUrl: '',
   });
 
   useEffect(() => {
@@ -86,8 +88,22 @@ export default function AnnouncementsPage() {
       constructionGroupId: formData.constructionGroupId || null,
       startDate: formData.startDate || undefined,
       endDate: formData.endDate || undefined,
+      linkUrl: formData.linkUrl.trim() || null,
       targetRoles: [],
     };
+
+    if (payload.linkUrl) {
+      try {
+        const url = new URL(payload.linkUrl);
+        if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+          alert('The link must start with https://');
+          return;
+        }
+      } catch {
+        alert('Enter a full web link, starting with https://');
+        return;
+      }
+    }
 
     try {
       const url = editingId
@@ -126,6 +142,7 @@ export default function AnnouncementsPage() {
       startDate: announcement.startDate ? announcement.startDate.split('T')[0] : '',
       endDate: announcement.endDate ? announcement.endDate.split('T')[0] : '',
       constructionGroupId: announcement.constructionGroupId || '',
+      linkUrl: announcement.linkUrl || '',
     });
     setShowModal(true);
   };
@@ -159,6 +176,7 @@ export default function AnnouncementsPage() {
       startDate: '',
       endDate: '',
       constructionGroupId: '',
+      linkUrl: '',
     });
   };
 
@@ -223,6 +241,9 @@ export default function AnnouncementsPage() {
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">{announcement.title}</div>
                     <div className="text-sm text-gray-500 truncate max-w-xs">{announcement.message}</div>
+                    {announcement.linkUrl && (
+                      <div className="text-xs text-blue-700 truncate max-w-xs">{announcement.linkUrl}</div>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 text-xs font-semibold rounded ${getTypeColor(announcement.type)}`}>
@@ -300,6 +321,20 @@ export default function AnnouncementsPage() {
                   rows={4}
                   maxLength={2000}
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Web link (optional)</label>
+                <input
+                  type="url"
+                  inputMode="url"
+                  value={formData.linkUrl}
+                  onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://"
+                  maxLength={500}
+                />
+                <p className="text-xs text-gray-500 mt-1">Shown as a link under the message. Leave blank for no link.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

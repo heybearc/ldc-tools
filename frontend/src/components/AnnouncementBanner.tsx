@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { announcementLinkLabel } from '@/lib/announcement-link';
 
 interface Announcement {
   id: string;
   title: string;
   message: string;
+  linkUrl?: string | null;
   type: 'INFO' | 'WARNING' | 'URGENT';
   createdAt: string;
   constructionGroup?: {
@@ -114,6 +116,16 @@ export default function AnnouncementBanner() {
                 <p className="text-sm whitespace-pre-wrap">
                   {announcement.message}
                 </p>
+                {announcement.linkUrl && (
+                  <a
+                    href={announcement.linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-block mt-2 text-sm font-semibold underline ${styles.titleColor}`}
+                  >
+                    {announcementLinkLabel(announcement.linkUrl)}
+                  </a>
+                )}
                 {announcement.constructionGroup && (
                   <p className="text-xs mt-2 opacity-75">
                     {announcement.constructionGroup.name}

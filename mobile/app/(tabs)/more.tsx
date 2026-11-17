@@ -5,7 +5,7 @@ import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { PRIVACY_URL, SUPPORT_URL } from '@/lib/support';
 
-type Notice = { id: string; title: string; message: string; type: string };
+type Notice = { id: string; title: string; message: string; type: string; linkUrl?: string | null };
 
 const LINKS = [
   { title: 'Processes', detail: 'Templates and starting work', href: '/processes' },
@@ -66,6 +66,11 @@ export default function MoreScreen() {
           <Text style={styles.kicker}>{notice.type === 'URGENT' ? 'Urgent' : notice.type === 'WARNING' ? 'Warning' : 'Announcement'}</Text>
           <Text style={styles.title}>{notice.title}</Text>
           <Text style={styles.detail}>{notice.message}</Text>
+          {notice.linkUrl ? (
+            <Pressable onPress={() => void Linking.openURL(notice.linkUrl!)}>
+              <Text style={styles.link}>Open link</Text>
+            </Pressable>
+          ) : null}
         </View>
       ))}
       {items.map((item) => (
@@ -100,4 +105,5 @@ const styles = StyleSheet.create({
   kicker: { color: '#1e40af', fontSize: 12, fontWeight: '700' },
   title: { fontSize: 17, fontWeight: '700', color: '#111827' },
   detail: { color: '#4b5563', fontSize: 15 },
+  link: { color: '#1e40af', fontWeight: '700', marginTop: 6 },
 });

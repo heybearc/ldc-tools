@@ -26,6 +26,7 @@ export default function AdminScreen() {
   const [activeUsers, setActiveUsers] = useState(0);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const [feedbackError, setFeedbackError] = useState<{ id: string; message: string } | null>(null);
@@ -67,6 +68,7 @@ export default function AdminScreen() {
       if (body.action === 'announcement') {
         setTitle('');
         setMessage('');
+        setLinkUrl('');
       }
       await load();
       return true;
@@ -126,9 +128,10 @@ export default function AdminScreen() {
         <Text style={styles.title}>Announcement</Text>
         <Field label="Title" value={title} onChangeText={setTitle} />
         <Field label="Message" value={message} onChangeText={setMessage} multiline />
+        <Field label="Web link (optional)" value={linkUrl} onChangeText={setLinkUrl} />
         <PrimaryButton
           label={busy ? 'Saving…' : 'Post announcement'}
-          onPress={() => void post({ action: 'announcement', title, message, type: 'INFO' }, 'Could not post the announcement')}
+          onPress={() => void post({ action: 'announcement', title, message, linkUrl, type: 'INFO' }, 'Could not post the announcement')}
           disabled={busy}
         />
         {notices.map((item) => (

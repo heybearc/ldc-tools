@@ -14,6 +14,7 @@ The announcements system allows administrators to post important updates, warnin
 2. Fill in the announcement form:
    - **Title:** Brief, attention-grabbing headline (max 200 characters)
    - **Message:** Detailed announcement text (max 2000 characters)
+   - **Web link:** Optional full address, starting with https://. It appears under the message.
    - **Type:** Choose the urgency level
    - **Construction Group:** Leave on Global for the whole app, or pick one construction group
    - **Start Date:** Optional - when to start showing the announcement

@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { isAdmin } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { announcementLinkSchema } from '@/lib/announcement-link';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ const updateAnnouncementSchema = z.object({
   endDate: z.string().optional().nullable(),
   constructionGroupId: z.string().optional().nullable(),
   targetRoles: z.array(z.string()).optional(),
+  linkUrl: announcementLinkSchema,
   isActive: z.boolean().optional(),
 });
 
@@ -56,6 +58,7 @@ export async function PATCH(
       updateData.constructionGroupId = data.constructionGroupId;
     }
     updateData.targetRoles = [];
+    if (data.linkUrl !== undefined) updateData.linkUrl = data.linkUrl;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
     const announcement = await prisma.announcement.update({

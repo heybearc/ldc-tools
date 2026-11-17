@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { createdAt: 'desc' },
       take: 8,
-      select: { id: true, title: true, message: true, type: true },
+      select: { id: true, title: true, message: true, type: true, linkUrl: true },
     });
     return NextResponse.json({
       announcements: rows,

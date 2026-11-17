@@ -5,6 +5,7 @@ import { isAdmin } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { notifyGroupPhones } from '@/lib/expo-push';
 import { z } from 'zod';
+import { announcementLinkSchema } from '@/lib/announcement-link';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,7 @@ const createAnnouncementSchema = z.object({
   endDate: z.string().optional(),
   constructionGroupId: z.string().optional().nullable(),
   targetRoles: z.array(z.string()).default([]),
+  linkUrl: announcementLinkSchema,
   isActive: z.boolean().default(true),
 });
 
@@ -101,6 +103,7 @@ export async function POST(request: NextRequest) {
         endDate: data.endDate ? new Date(data.endDate) : null,
         constructionGroupId: data.constructionGroupId || null,
         targetRoles: [],
+        linkUrl: data.linkUrl ?? null,
         isActive: data.isActive,
         createdBy: user.id,
       },
@@ -125,7 +128,7 @@ export async function POST(request: NextRequest) {
         constructionGroupId: announcement.constructionGroupId,
         excludeUserId: user.id,
         title: announcement.title,
-        body: announcement.message,
+        body: announcement.linkUrl ? `${announcement.message}\n${announcement.linkUrl}` : announcement.message,
       }).catch((error) => console.error('Announcement push failed:', error));
     }
 

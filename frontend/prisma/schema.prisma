@@ -869,6 +869,7 @@ model Announcement {
   id                    String              @id @default(cuid())
   title                 String
   message               String              @db.Text
+  linkUrl               String?
   type                  AnnouncementType    @default(INFO)
   isActive              Boolean             @default(true)
   startDate             DateTime?

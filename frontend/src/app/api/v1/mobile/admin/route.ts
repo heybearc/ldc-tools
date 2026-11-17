@@ -4,6 +4,7 @@ import { isMobileAdmin, requireMobileActor } from '@/lib/mobile-actor';
 import { mobileSignInAccountWhere } from '@/lib/personnel-accounts';
 import { notifyGroupPhones } from '@/lib/expo-push';
 import { sendEmail, generateFeedbackStatusChangeEmail } from '@/lib/email';
+import { announcementLinkSchema } from '@/lib/announcement-link';
 
 const STATUSES = new Set(['NEW', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']);
 
@@ -108,11 +109,16 @@ async function createAnnouncement(
   if (!['INFO', 'WARNING', 'URGENT'].includes(type)) {
     return NextResponse.json({ error: 'Choose an announcement type' }, { status: 400 });
   }
+  const link = announcementLinkSchema.safeParse(body.linkUrl);
+  if (!link.success) {
+    return NextResponse.json({ error: link.error.issues[0]?.message || 'Enter a full web link, starting with https://' }, { status: 400 });
+  }
   const created = await prisma.announcement.create({
     data: {
       title,
       message,
       type: type as 'INFO',
+      linkUrl: link.data ?? null,
       constructionGroupId: actor.constructionGroupId,
       createdBy: actor.id,
       isActive: true,
@@ -123,7 +129,7 @@ async function createAnnouncement(
     constructionGroupId: actor.constructionGroupId,
     excludeUserId: actor.id,
     title,
-    body: message,
+    body: link.data ? `${message}\n${link.data}` : message,
   }).catch((error) => console.error('Announcement push failed:', error));
   return NextResponse.json(created, { status: 201 });
 }
