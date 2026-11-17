@@ -5,6 +5,15 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.53.0] - 2026-11-17
+
+### Added
+- Announcements can include an optional https link, shown on the site banner and in the phone app
+- Sign-in can email a one-time password reset link. The same message is returned whether or not the address matches an account
+
+### Changed
+- Announcements are for the whole app or one construction group. Role targeting is no longer saved
+
 ## [1.48.5] - 2026-11-11
 
 ### Fixed

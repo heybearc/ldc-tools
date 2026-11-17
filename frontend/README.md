@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.52.0**
+Current: **1.53.0**
 
 ## Version History
+- **v1.53.0** (2026-11-17) - Announcements reach everyone or one construction group, can include a web link, and sign-in can email a password reset
 - **v1.52.0** (2026-11-17) - Tell Personnel when work is available to claim, remove a task, and edit a project date
 - **v1.51.0** (2026-11-16) - Edit a task, and see a deadline labeled as the due date
 - **v1.50.0** (2026-11-15) - Help articles on the phone, publish dates you can sort, and completion email uses the task title
