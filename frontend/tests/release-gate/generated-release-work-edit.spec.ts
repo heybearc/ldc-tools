@@ -58,7 +58,11 @@ test('an administrator can edit a task and the due date is labeled', async ({ pa
   await expect(form.getByRole('heading', { name: 'Edit work' })).toBeVisible();
   await form.locator('input').first().fill(updatedTitle);
   await form.locator('input[type="date"]').fill('2026-12-20');
+  const saved = page.waitForResponse((response) =>
+    response.url().includes('/api/v1/work-items/') && response.request().method() === 'PATCH' && response.ok(),
+  );
   await form.getByRole('button', { name: 'Save changes' }).click();
+  await saved;
 
   await revealWork(page, updatedTitle);
   const updated = page.locator('article').filter({ hasText: updatedTitle });

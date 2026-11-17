@@ -6,7 +6,7 @@ export async function revealWork(page: Page, title: string) {
   const sizes = open.getByLabel('How many to show');
   if (await sizes.count()) await sizes.first().selectOption('100');
   const heading = open.getByRole('heading', { name: title, exact: true });
-  for (let pageTurn = 0; pageTurn < 8; pageTurn += 1) {
+  for (let pageTurn = 0; pageTurn < 20; pageTurn += 1) {
     if (await heading.count()) break;
     const next = open.getByRole('button', { name: 'Next' });
     if (!(await next.count()) || !(await next.first().isEnabled())) break;
