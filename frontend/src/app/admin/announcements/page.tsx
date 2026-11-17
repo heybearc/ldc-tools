@@ -324,8 +324,9 @@ export default function AnnouncementsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Web link (optional)</label>
+                <label htmlFor="announcement-link" className="block text-sm font-medium text-gray-700 mb-1">Web link (optional)</label>
                 <input
+                  id="announcement-link"
                   type="url"
                   inputMode="url"
                   value={formData.linkUrl}

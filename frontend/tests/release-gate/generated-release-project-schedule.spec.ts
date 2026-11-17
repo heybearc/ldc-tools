@@ -92,7 +92,7 @@ test('a dated project item shows on the project and on the work list', async ({ 
   await revealWork(page, title);
   const workRow = page.locator('article').filter({ hasText: title });
   await expect(workRow.getByRole('heading', { name: title })).toBeVisible();
-  await expect(workRow.getByText(/Dec 15, 2026/)).toBeVisible();
+  await expect(workRow.getByText('Due date: Dec 15, 2026')).toBeVisible();
 
   const done = await page.request.patch(`/api/v1/work-items/${item.id}`, {
     data: { status: 'DONE' },
