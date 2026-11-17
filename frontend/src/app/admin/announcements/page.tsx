@@ -45,17 +45,7 @@ export default function AnnouncementsPage() {
     startDate: '',
     endDate: '',
     constructionGroupId: '',
-    targetRoles: [] as string[],
   });
-
-  const userRoles = [
-    'SUPER_ADMIN',
-    'ZONE_OVERSEER',
-    'CONSTRUCTION_GROUP_OVERSEER',
-    'TRADE_TEAM_OVERSEER',
-    'PERSONNEL_CONTACT',
-    'READ_ONLY'
-  ];
 
   useEffect(() => {
     fetchAnnouncements();
@@ -96,6 +86,7 @@ export default function AnnouncementsPage() {
       constructionGroupId: formData.constructionGroupId || null,
       startDate: formData.startDate || undefined,
       endDate: formData.endDate || undefined,
+      targetRoles: [],
     };
 
     try {
@@ -135,7 +126,6 @@ export default function AnnouncementsPage() {
       startDate: announcement.startDate ? announcement.startDate.split('T')[0] : '',
       endDate: announcement.endDate ? announcement.endDate.split('T')[0] : '',
       constructionGroupId: announcement.constructionGroupId || '',
-      targetRoles: announcement.targetRoles || [],
     });
     setShowModal(true);
   };
@@ -169,17 +159,7 @@ export default function AnnouncementsPage() {
       startDate: '',
       endDate: '',
       constructionGroupId: '',
-      targetRoles: [],
     });
-  };
-
-  const toggleRole = (role: string) => {
-    setFormData(prev => ({
-      ...prev,
-      targetRoles: prev.targetRoles.includes(role)
-        ? prev.targetRoles.filter(r => r !== role)
-        : [...prev.targetRoles, role]
-    }));
   };
 
   const getTypeColor = (type: string) => {
@@ -343,11 +323,12 @@ export default function AnnouncementsPage() {
                     onChange={(e) => setFormData({ ...formData, constructionGroupId: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Global (All CGs)</option>
+                    <option value="">Global (whole app)</option>
                     {constructionGroups.map(cg => (
                       <option key={cg.id} value={cg.id}>{cg.name}</option>
                     ))}
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">Global reaches everyone. A construction group reaches only that group.</p>
                 </div>
               </div>
 
@@ -371,24 +352,6 @@ export default function AnnouncementsPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Target Roles (Optional)</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {userRoles.map(role => (
-                    <label key={role} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.targetRoles.includes(role)}
-                        onChange={() => toggleRole(role)}
-                        className="mr-2"
-                      />
-                      <span className="text-sm">{role.replace(/_/g, ' ')}</span>
-                    </label>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Leave empty to show to all roles</p>
               </div>
 
               <div className="flex items-center">

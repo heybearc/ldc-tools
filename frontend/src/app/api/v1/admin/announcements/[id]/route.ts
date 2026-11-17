@@ -55,7 +55,7 @@ export async function PATCH(
     if (data.constructionGroupId !== undefined) {
       updateData.constructionGroupId = data.constructionGroupId;
     }
-    if (data.targetRoles !== undefined) updateData.targetRoles = data.targetRoles;
+    updateData.targetRoles = [];
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
     const announcement = await prisma.announcement.update({

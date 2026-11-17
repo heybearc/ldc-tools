@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { useAuth } from '@/lib/auth';
+import { apiRequest } from '@/lib/api';
 import { PRIVACY_URL, SUPPORT_URL } from '@/lib/support';
 import { useWideLayout } from '@/lib/useWideLayout';
 
@@ -23,6 +24,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [resetting, setResetting] = useState(false);
   async function submit() {
     setBusy(true);
     setError('');
@@ -32,6 +35,24 @@ export default function LoginScreen() {
       setError(err instanceof Error ? err.message : 'Could not sign in');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function requestReset() {
+    setResetting(true);
+    setError('');
+    setNotice('');
+    try {
+      const result = await apiRequest<{ message: string }>(apiBase, '/api/v1/auth/forgot-password', {
+        method: 'POST',
+        body: { email },
+        action: 'Could not send a reset email',
+      });
+      setNotice(result.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send a reset email');
+    } finally {
+      setResetting(false);
     }
   }
 
@@ -70,9 +91,14 @@ export default function LoginScreen() {
         />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
+        {notice ? <Text style={styles.notice}>{notice}</Text> : null}
 
-        <Pressable testID="sign-in-submit" onPress={submit} disabled={busy || !apiBase.trim() || !email.trim() || !password} style={styles.button}>
+        <Pressable testID="sign-in-submit" onPress={submit} disabled={busy || resetting || !apiBase.trim() || !email.trim() || !password} style={styles.button}>
           {busy ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign in</Text>}
+        </Pressable>
+
+        <Pressable onPress={() => void requestReset()} disabled={resetting || !email.trim()}>
+          <Text style={styles.link}>{resetting ? 'Sending reset link...' : 'Forgot password?'}</Text>
         </Pressable>
 
         <View style={styles.links}>
@@ -111,6 +137,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   error: { color: '#b91c1c', marginTop: 8 },
+  notice: { color: '#166534', marginTop: 8, lineHeight: 20 },
   button: {
     marginTop: 20,
     backgroundColor: '#1e40af',

@@ -163,18 +163,18 @@ export default async function AuthenticationPage() {
 
           {/* Password Reset */}
           <h2>🔑 Password Reset</h2>
-          <p>If you've forgotten your password or need to reset it:</p>
+          <p>If you've forgotten your password:</p>
           <ol>
-            <li>Contact your system administrator</li>
-            <li>Provide your email address</li>
-            <li>They will reset your password</li>
-            <li>You'll receive new credentials</li>
+            <li>On the sign-in screen, choose <strong>Forgot password?</strong></li>
+            <li>Enter the email on your account</li>
+            <li>Open the reset link in that inbox. It expires in one hour</li>
+            <li>Choose a new password, then sign in</li>
           </ol>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-4">
-            <p className="font-semibold text-blue-900 mb-2">💡 Coming Soon</p>
+            <p className="font-semibold text-blue-900 mb-2">The reset link is the proof</p>
             <p className="text-blue-800 mb-0">
-              Self-service password reset via email is planned for a future release!
+              The sign-in screen never lets someone type a new password directly. Only the person who can open the email can change it.
             </p>
           </div>
 

@@ -1,12 +1,14 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { passwordStamp } from '@/lib/password-reset';
 
 type MobilePayload = {
   id: string;
   email: string;
   role: string;
   exp: number;
+  ph?: string;
 };
 
 function secret() {
@@ -15,12 +17,13 @@ function secret() {
   return value;
 }
 
-export function signMobileToken(user: { id: string; email: string; role: string }) {
+export function signMobileToken(user: { id: string; email: string; role: string; passwordHash?: string | null }) {
   const body = Buffer.from(JSON.stringify({
     id: user.id,
     email: user.email,
     role: user.role,
     exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
+    ph: user.passwordHash ? passwordStamp(user.passwordHash) : undefined,
   })).toString('base64url');
   const sig = createHmac('sha256', secret()).update(body).digest('base64url');
   return `${body}.${sig}`;
@@ -69,6 +72,6 @@ export async function signInForMobile(email: string, password: string) {
     email: user.email,
     name: user.name,
     role: user.role,
-    token: signMobileToken({ id: user.id, email: user.email, role: user.role }),
+    token: signMobileToken({ id: user.id, email: user.email, role: user.role, passwordHash: user.passwordHash }),
   };
 }

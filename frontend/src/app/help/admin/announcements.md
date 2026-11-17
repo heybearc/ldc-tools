@@ -15,10 +15,9 @@ The announcements system allows administrators to post important updates, warnin
    - **Title:** Brief, attention-grabbing headline (max 200 characters)
    - **Message:** Detailed announcement text (max 2000 characters)
    - **Type:** Choose the urgency level
-   - **Construction Group:** Optional - target specific CG or leave blank for global
+   - **Construction Group:** Leave on Global for the whole app, or pick one construction group
    - **Start Date:** Optional - when to start showing the announcement
    - **End Date:** Optional - when to stop showing the announcement
-   - **Target Roles:** Optional - select specific user roles to show this to
    - **Active:** Toggle to enable/disable the announcement
 
 3. Click **Create Announcement**
@@ -54,12 +53,6 @@ The announcements system allows administrators to post important updates, warnin
 - Select a specific **Construction Group**
 - Only users in that CG will see it
 - Use for CG-specific information
-
-### Role-Based Targeting
-- Select one or more **Target Roles**
-- Only users with those roles will see it
-- Leave empty to show to all roles
-- Combine with CG targeting for precise control
 
 ## Scheduling Announcements
 
@@ -161,17 +154,11 @@ The announcements system allows administrators to post important updates, warnin
 
 1. **Start Global, Then Narrow**
    - Test with global announcements first
-   - Use CG/role targeting for specific needs
+   - Pick one construction group when the notice is only for that group
 
 2. **Avoid Over-Targeting**
    - Don't create multiple similar announcements for different groups
    - Consider if a global announcement would work
-
-3. **Role Targeting Examples**
-   - SUPER_ADMIN: System changes, technical updates
-   - PERSONNEL_CONTACT: Volunteer-related announcements
-   - TRADE_TEAM_OVERSEER: Project and crew updates
-   - READ_ONLY: General information only
 
 ## Troubleshooting
 
@@ -179,8 +166,7 @@ The announcements system allows administrators to post important updates, warnin
 - Check that **Active** is enabled
 - Verify **Start Date** hasn't been set to future
 - Confirm **End Date** hasn't passed
-- Check **Target Roles** includes the user's role
-- Verify **Construction Group** matches user's CG
+- Verify **Construction Group** is Global, or matches the user's group
 
 ### Too Many Announcements
 - Review and deactivate outdated announcements

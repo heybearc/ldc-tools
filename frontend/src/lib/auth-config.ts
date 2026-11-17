@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
 import { logUserLogin, logUserLogout } from "./audit"
+import { passwordStamp } from "./password-reset"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -95,11 +96,28 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role
         token.adminLevel = user.adminLevel
         token.volunteerId = user.volunteerId
+        const row = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { passwordHash: true },
+        })
+        token.passwordStamp = row?.passwordHash ? passwordStamp(row.passwordHash) : undefined
+      } else if (token.passwordStamp && token.id) {
+        const row = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { passwordHash: true, status: true },
+        })
+        const stamp = row?.passwordHash ? passwordStamp(row.passwordHash) : ''
+        if (!row || row.status === 'INACTIVE' || row.status === 'SUSPENDED' || stamp !== token.passwordStamp) {
+          token.invalid = true
+        }
       }
       return token
     },
 
     async session({ session, token }) {
+      if (token.invalid) {
+        return { ...session, user: undefined as unknown as typeof session.user }
+      }
       // Add token data to session
       if (session.user) {
         session.user.id = token.id as string

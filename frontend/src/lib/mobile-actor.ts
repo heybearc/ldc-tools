@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { closedMobileAccount, readMobileToken } from '@/lib/mobile-session';
+import { passwordStamp } from '@/lib/password-reset';
 import type { CGScope } from '@/lib/cg-scope';
 import { canPostWork } from '@/lib/work-item-access';
 import { canAssignProjectPersonnel } from '@/lib/project-personnel';
@@ -87,8 +88,11 @@ export async function requireMobileActor(request: NextRequest): Promise<
   }
   const user = await prisma.user.findUnique({
     where: { id: token.id },
-    select: { id: true, name: true, email: true, role: true, status: true, constructionGroupId: true },
+    select: { id: true, name: true, email: true, role: true, status: true, constructionGroupId: true, passwordHash: true },
   });
+  if (user && token.ph && user.passwordHash && token.ph !== passwordStamp(user.passwordHash)) {
+    return { error: NextResponse.json({ error: 'Sign in again. This session is no longer valid.' }, { status: 401 }) };
+  }
   const denied = mobileGateResponse(user);
   if (denied || !user?.constructionGroupId) {
     return { error: denied || NextResponse.json({ error: 'No construction group assigned' }, { status: 403 }) };

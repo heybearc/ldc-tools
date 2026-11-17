@@ -30,7 +30,7 @@ export async function createScheduleChangeAnnouncement(
       type: 'INFO',
       isActive: true,
       createdBy: details.changedBy,
-      targetRoles: notifyRoles
+      targetRoles: []
     }
   });
 

@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
         constructionGroupId: data.constructionGroupId || null,
-        targetRoles: data.targetRoles,
+        targetRoles: [],
         isActive: data.isActive,
         createdBy: user.id,
       },

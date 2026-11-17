@@ -26,5 +26,7 @@ declare module "next-auth/jwt" {
     role: string
     adminLevel?: string
     volunteerId?: string
+    passwordStamp?: string
+    invalid?: boolean
   }
 }

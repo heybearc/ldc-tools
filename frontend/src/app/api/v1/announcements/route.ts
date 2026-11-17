@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
-import { getCGScope } from '@/lib/cg-scope';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +18,6 @@ export async function GET(request: NextRequest) {
       where: { email: session.user.email },
       select: { 
         id: true, 
-        role: true,
         constructionGroupId: true 
       }
     });
@@ -80,17 +78,9 @@ export async function GET(request: NextRequest) {
       ]
     });
 
-    // Filter by target roles if specified
-    const filteredAnnouncements = announcements.filter(announcement => {
-      if (!announcement.targetRoles || announcement.targetRoles.length === 0) {
-        return true; // No role targeting, show to everyone
-      }
-      return announcement.targetRoles.includes(user.role);
-    });
-
     return NextResponse.json({
       success: true,
-      data: filteredAnnouncements
+      data: announcements
     });
 
   } catch (error) {
