@@ -17,6 +17,13 @@ interface HelpTopic {
 
 const helpTopics: HelpTopic[] = [
   {
+    id: 'mobile',
+    title: 'Mobile app',
+    description: 'Install the iPhone, iPad, or Android app after you sign in',
+    roles: ['SUPER_ADMIN', 'ZONE_OVERSEER', 'PERSONNEL_CONTACT', 'READ_ONLY'],
+    icon: '📱'
+  },
+  {
     id: 'getting-started',
     title: 'Getting Started',
     description: 'Learn the basics of using LDC Tools',
