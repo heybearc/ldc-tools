@@ -5,6 +5,16 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-17)
+- Shipped v1.51.0 (`2b5fa31`). LIVE blue CT133. STANDBY green CT135 was synced at `0d9d4eb`. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.51.0
+- qa-01 admin gate plus the work-edit test passed on standby before the switch.
+- iOS build 14 is on TestFlight. Android version code 21 is on the Play internal track.
+- An administrator, a Personnel Contact or Assistant, or the submitter can edit a task. A deadline is labeled as the due date.
+- Decision: keep the requestor completion email and the help email to Personnel Contact and Assistant. Do not email the group when work is added. A later phone alert should go only to the assignee.
+- `6abd487` removes a task, edits or removes a project date, and drops the Trade teams dashboard card. On STANDBY green CT135. Not shipped.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: new session before the next slice.
+
 ### Mid-day (2026-11-16, v1.50.0 live)
 - Shipped v1.50.0 (`0c16ce8`). LIVE green CT135. STANDBY blue CT133 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.50.0
 - qa-01 admin gate plus the publish-date test passed on standby before the switch.

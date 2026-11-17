@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-16  
+**Last updated:** 2026-11-17  
 **Current phase:** Region work queue  
-**Status:** v1.50.0 is LIVE on green (CT135). STANDBY blue (CT133) is synced at `0c16ce8`. Hub dates are paused.
+**Status:** v1.51.0 is LIVE on blue (CT133). STANDBY green (CT135) is `6abd487`. Hub dates are paused.
 
 ---
 
@@ -40,7 +40,9 @@
 - [x] Phone numbers, QA-task hide, and completion email for a selection; `/ship` v1.48.8
 - [x] Project search assigns several Personnel people. Chat is the Personnel team only (`81ff84c`, included in the unshipped range).
 - [x] Process drafts, publish, and schedule. `/ship` v1.49.0 (`6ed30e6`). LIVE green CT135. STANDBY blue CT133 synced. Chat lists the Personnel team.
-- [x] Phone Help articles, publish dates and date sort, completion email uses the task title. `/ship` v1.50.0 (`0c16ce8`). LIVE green CT135. STANDBY blue CT133 synced. iOS build 13. Android version code 20.
+- [x] Phone Help articles, publish dates and date sort, completion email uses the task title. `/ship` v1.50.0 (`0c16ce8`). LIVE was green CT135. iOS build 13. Android version code 20.
+- [x] Edit a task and label the due date. `/ship` v1.51.0 (`2b5fa31`). LIVE blue CT133. STANDBY green CT135 synced at `0d9d4eb`. iOS build 14. Android version code 21.
+- [x] Remove a task, edit or remove a project date, drop the Trade teams dashboard card (`6abd487`). On STANDBY green CT135. Not shipped.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

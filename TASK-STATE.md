@@ -1,19 +1,20 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-16  
+**Last updated:** 2026-11-17  
 **Current branch:** main  
-**Working on:** v1.50.0 is LIVE on green (CT135). STANDBY blue (CT133) is synced. Hub dates stay paused.
+**Working on:** v1.51.0 is LIVE on blue (CT133). STANDBY green (CT135) has `6abd487`. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.50.0 is LIVE. Phone Help is articles. Work and processes show a publish date and sort newest or oldest. A finished task emails its title. Hub dates stay paused.
+v1.51.0 is LIVE on blue CT133. Edit a task and label the due date. Keep completion email to the requestor and help email to Personnel Contact and Assistant. Do not email the group for new work. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress. Hub assignment dates stay paused.
+Nothing in progress. `6abd487` is on STANDBY green CT135. Hub assignment dates stay paused.
 
 ### Recent completions
-- ✅ Shipped v1.50.0 (`0c16ce8`). qa-01 admin gate plus the publish-date test passed. LIVE green CT135. STANDBY blue CT133 synced. iOS build 13 is on TestFlight. Android version code 20 is on the Play internal track. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.50.0
+- ✅ Shipped v1.51.0 (`2b5fa31`, store numbers `0d9d4eb`). qa-01 admin gate plus the edit test passed. LIVE blue CT133. STANDBY green CT135 synced at `0d9d4eb`. iOS build 14 is on TestFlight. Android version code 21 is on the Play internal track. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.51.0
+- ✅ Shipped v1.50.0 (`0c16ce8`). qa-01 admin gate plus the publish-date test passed. LIVE was green CT135. iOS build 13. Android version code 20. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.50.0
 - ✅ FB-016 resolved. Saving a photo no longer checks the Trade Crew Overseer limit when the role and crew stay the same. Siding still has two active overseers. Those assignments were not changed.
 - ✅ Shipped v1.49.1 (`5b4023f`). qa-01 directory gate and the chat picker test passed. LIVE was blue CT133. iOS build 12. Android version code 19. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.49.1
 - ⏸ The first v1.49.1 attempt stopped when actool hung. The archive watcher now opens the handshake and retries a stuck catalog compile (`da45232`).
@@ -70,7 +71,7 @@ Hub assignment dates stay paused. New session before the next slice.
 ---
 
 ## Known Issues
-- iOS 1.1.0 build 13 is in App Store Connect. Android version code 20 is on the Play internal track. Xcode 27 can deadlock in actool; `mobile/scripts/hold-asset-catalog-pipes.py` unblocks that pipe during the store lanes.
+- iOS 1.1.0 build 14 is in App Store Connect. Android version code 21 is on the Play internal track. Xcode 27 can deadlock in actool; `mobile/scripts/hold-asset-catalog-pipes.py` unblocks that pipe during the store lanes.
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
 - Phone feature flows passed 10/10 on the Android emulator. iOS Simulator 27.2 is installed. Those flows were not rerun on iOS.
 - 37 open crew requests have completion email turned off.
