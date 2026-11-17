@@ -32,6 +32,7 @@ export default function ProjectScreen() {
   const [dateTitle, setDateTitle] = useState('');
   const [dateDetail, setDateDetail] = useState('');
   const [date, setDate] = useState('');
+  const [editingDateId, setEditingDateId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -103,18 +104,45 @@ export default function ProjectScreen() {
     setBusy(true);
     setError('');
     try {
-      await apiRequest(apiBase, `/api/v1/mobile/projects/${id}/dates`, {
-        method: 'POST',
+      await apiRequest(apiBase, editingDateId
+        ? `/api/v1/mobile/projects/${id}/dates/${editingDateId}`
+        : `/api/v1/mobile/projects/${id}/dates`, {
+        method: editingDateId ? 'PATCH' : 'POST',
         token,
         body: { title: dateTitle, detail: dateDetail, date },
-        action: 'Could not add the date',
+        action: editingDateId ? 'Could not save the date' : 'Could not add the date',
       });
+      setEditingDateId(null);
       setDateTitle('');
       setDateDetail('');
       setDate('');
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not add the date');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeDate(dateId: string) {
+    if (!token || busy || creating) return;
+    setBusy(true);
+    setError('');
+    try {
+      await apiRequest(apiBase, `/api/v1/mobile/projects/${id}/dates/${dateId}`, {
+        method: 'DELETE',
+        token,
+        action: 'Could not remove the date',
+      });
+      if (editingDateId === dateId) {
+        setEditingDateId(null);
+        setDateTitle('');
+        setDateDetail('');
+        setDate('');
+      }
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not remove the date');
     } finally {
       setBusy(false);
     }
@@ -172,14 +200,27 @@ export default function ProjectScreen() {
           <Text style={styles.title}>Schedule</Text>
           {project.schedule.length === 0 ? <Text style={styles.detail}>No dated work yet.</Text> : null}
           {project.schedule.map((item) => (
-            <Text key={item.id} style={styles.detail}>{[item.date, item.title].filter(Boolean).join(' · ')}</Text>
+            <View key={item.id} style={styles.row}>
+              <Text style={styles.detail}>{[item.date, item.title].filter(Boolean).join(' · ')}</Text>
+              {canManage ? (
+                <>
+                  <Choice label="Edit" selected={editingDateId === item.id} onPress={() => {
+                    setEditingDateId(item.id);
+                    setDateTitle(item.title);
+                    setDateDetail(item.detail);
+                    setDate(item.dueOn || '');
+                  }} />
+                  <Choice label="Remove" selected={false} onPress={() => void removeDate(item.id)} />
+                </>
+              ) : null}
+            </View>
           ))}
           {canManage ? (
             <>
               <Field label="Date title" value={dateTitle} onChangeText={setDateTitle} />
               <Field label="Detail" value={dateDetail} onChangeText={setDateDetail} />
               <Field label="Date" value={date} onChangeText={setDate} />
-              <PrimaryButton label="Add date" onPress={() => void addDate()} disabled={busy} />
+              <PrimaryButton label={busy ? 'Saving…' : editingDateId ? 'Save date' : 'Add date'} onPress={() => void addDate()} disabled={busy} />
             </>
           ) : null}
         </View>

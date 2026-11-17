@@ -199,20 +199,6 @@ export default function HomePage() {
             Projects for this construction group, with the people and dates on each one.
           </p>
         </Link>
-        <Link
-          href="/trade-teams"
-          className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 block"
-        >
-          <div className="flex items-center mb-3">
-            <div className="bg-gray-800 p-3 rounded-lg">
-              <Wrench className="h-6 w-6 text-white" />
-            </div>
-            <h2 className="ml-4 text-lg font-semibold text-gray-900">Trade teams</h2>
-          </div>
-          <p className="text-gray-600">
-            The teams and the crews under them. Use this when the structure itself needs a change.
-          </p>
-        </Link>
       </div>
     </div>
   );

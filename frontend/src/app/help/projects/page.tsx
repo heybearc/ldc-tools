@@ -55,6 +55,7 @@ export default async function ProjectsHelpPage() {
           <p>
             Personnel can add dated work on a project, such as meeting prep. Enter a title, detail, and date, then choose Add date.
             That date stays on the project and also appears on the work list.
+            Choose Edit on a date to change its title, detail, or date. Choose Remove to take that date off the project and off the work list.
           </p>
 
           <h2>Assign Personnel</h2>

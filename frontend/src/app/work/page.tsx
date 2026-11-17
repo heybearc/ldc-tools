@@ -1190,6 +1190,7 @@ export function WorkRow({
   const [savingNote, setSavingNote] = useState(false);
   const [noteError, setNoteError] = useState('');
   const [noteNotice, setNoteNotice] = useState('');
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const canClaim = item.status === 'OPEN' && item.claimable && !item.assignee;
   const canFinish = item.status === 'OPEN' && (canAssign || item.assignee?.id === currentUserId);
   const canReopen = item.status === 'DONE' && (canAssign || item.assignee?.id === currentUserId);
@@ -1207,6 +1208,17 @@ export function WorkRow({
     const body = await response.json().catch(() => ({}));
     if (!response.ok) {
       setNoteError(userError(response.status, body.error, 'Could not update the step'));
+      return;
+    }
+    await onChanged();
+  }
+
+  async function removeItem() {
+    setNoteError('');
+    const response = await fetch(`/api/v1/work-items/${item.id}`, { method: 'DELETE' });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setNoteError(userError(response.status, body.error, 'Could not remove the work'));
       return;
     }
     await onChanged();
@@ -1384,6 +1396,24 @@ export function WorkRow({
               className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700"
             >
               Edit
+            </button>
+          )}
+          {item.canEdit && !confirmRemove && (
+            <button
+              type="button"
+              onClick={() => setConfirmRemove(true)}
+              className="px-3 py-2 min-h-[44px] rounded-md border border-red-300 text-sm font-medium text-red-800"
+            >
+              Remove
+            </button>
+          )}
+          {item.canEdit && confirmRemove && (
+            <button
+              type="button"
+              onClick={() => { removeItem().catch(() => undefined); }}
+              className="px-3 py-2 min-h-[44px] rounded-md bg-red-700 text-white text-sm font-medium"
+            >
+              Remove this task
             </button>
           )}
           {canClaim && (

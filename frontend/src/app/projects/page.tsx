@@ -231,6 +231,8 @@ export default function ProjectsPage() {
   const [saving, setSaving] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: '', number: '', location: '' });
   const [notice, setNotice] = useState('');
+  const [dateEdit, setDateEdit] = useState<{ id: string; projectId: string; title: string; detail: string; date: string } | null>(null);
+  const [dateRemoveId, setDateRemoveId] = useState<string | null>(null);
 
   const loadGeneration = useRef(0);
 
@@ -320,6 +322,52 @@ export default function ProjectsPage() {
         return;
       }
       setDrafts((current) => ({ ...current, [projectId]: EMPTY_DATE }));
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function saveDate() {
+    if (!dateEdit) return;
+    setBusyId(dateEdit.projectId);
+    setError('');
+    try {
+      const response = await fetch(`/api/v1/work-items/${dateEdit.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: dateEdit.title,
+          detail: dateEdit.detail,
+          timingKind: 'PROJECT_DATE',
+          dueOn: dateEdit.date,
+          projectId: dateEdit.projectId,
+          claimable: false,
+        }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not save the date'));
+        return;
+      }
+      setDateEdit(null);
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function removeDate(projectId: string, itemId: string) {
+    setBusyId(projectId);
+    setError('');
+    try {
+      const response = await fetch(`/api/v1/work-items/${itemId}`, { method: 'DELETE' });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not remove the date'));
+        return;
+      }
+      if (dateEdit?.id === itemId) setDateEdit(null);
       await load();
     } finally {
       setBusyId(null);
@@ -690,12 +738,96 @@ export default function ProjectsPage() {
                   <ul className="mt-2 space-y-2">
                     {project.schedule.map((item) => (
                       <li key={item.id} className="text-sm text-gray-800">
-                        <span className="font-medium">{item.date}</span>
-                        <span> · {item.title}</span>
-                        {item.status === 'DONE' && (
-                          <span className="ml-2 text-xs font-medium text-gray-500">Done</span>
+                        {dateEdit?.id === item.id ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <label className="block sm:col-span-2">
+                              <span className="text-sm text-gray-700">Title</span>
+                              <input
+                                value={dateEdit.title}
+                                onChange={(event) => setDateEdit({ ...dateEdit, title: event.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                              />
+                            </label>
+                            <label className="block sm:col-span-2">
+                              <span className="text-sm text-gray-700">Detail</span>
+                              <input
+                                value={dateEdit.detail}
+                                onChange={(event) => setDateEdit({ ...dateEdit, detail: event.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                              />
+                            </label>
+                            <label className="block">
+                              <span className="text-sm text-gray-700">Date</span>
+                              <input
+                                type="date"
+                                value={dateEdit.date}
+                                onChange={(event) => setDateEdit({ ...dateEdit, date: event.target.value })}
+                                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm min-h-[44px]"
+                              />
+                            </label>
+                            <div className="flex items-end gap-2">
+                              <button
+                                type="button"
+                                disabled={!dateEdit.title || !dateEdit.detail || !dateEdit.date || busyId === project.id}
+                                onClick={() => { saveDate().catch(() => undefined); }}
+                                className="px-3 py-2 min-h-[44px] rounded-md bg-blue-600 text-white text-sm font-medium disabled:opacity-60"
+                              >
+                                Save date
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDateEdit(null)}
+                                className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="font-medium">{item.date}</span>
+                            <span> · {item.title}</span>
+                            {item.status === 'DONE' && (
+                              <span className="ml-2 text-xs font-medium text-gray-500">Done</span>
+                            )}
+                            <p className="text-gray-600">{item.detail}</p>
+                            {canAddDate && (
+                              <div className="mt-1 flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setDateEdit({
+                                    id: item.id,
+                                    projectId: project.id,
+                                    title: item.title,
+                                    detail: item.detail,
+                                    date: item.dueOn || '',
+                                  })}
+                                  className="text-sm font-medium text-blue-700 hover:underline"
+                                >
+                                  Edit
+                                </button>
+                                {dateRemoveId === item.id ? (
+                                  <button
+                                    type="button"
+                                    disabled={busyId === project.id}
+                                    onClick={() => { removeDate(project.id, item.id).catch(() => undefined); }}
+                                    className="text-sm font-medium text-red-800 hover:underline disabled:opacity-60"
+                                  >
+                                    Remove this date
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setDateRemoveId(item.id)}
+                                    className="text-sm font-medium text-red-800 hover:underline"
+                                  >
+                                    Remove
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </>
                         )}
-                        <p className="text-gray-600">{item.detail}</p>
                       </li>
                     ))}
                   </ul>

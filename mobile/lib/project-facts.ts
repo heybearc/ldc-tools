@@ -8,6 +8,7 @@ export type ProjectDate = {
   title: string;
   detail: string;
   date: string | null;
+  dueOn?: string;
   status: string;
 };
 

@@ -62,14 +62,16 @@ export async function PATCH(
 
     if (hasContent) {
       const lead = await isPersonnelLead(session.user.id, item.constructionGroupId);
-      if (!canEditWorkItem({
+      const personnel = await canPostWork(session.user.id, scope);
+      const allowed = canEditWorkItem({
         userId: session.user.id,
         userEmail: session.user.email,
         userRole: scope.userRole,
         personnelLead: lead,
         createdById: item.createdById,
         requestorEmail: item.requestorEmail,
-      })) {
+      }) || (item.timingKind === 'PROJECT_DATE' && personnel);
+      if (!allowed) {
         return NextResponse.json({ error: 'Only an administrator or the person who submitted this work can edit it' }, { status: 403 });
       }
       if (item.timingKind === 'PROCESS' || item.timingKind === 'CREW_REQUEST') {
@@ -149,5 +151,54 @@ export async function PATCH(
   } catch (error) {
     console.error('Update work item error:', error);
     return NextResponse.json({ error: 'Failed to update work' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const scope = await getCGScope();
+    if (!scope) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const item = await prisma.workItem.findUnique({
+      where: { id: params.id },
+      select: {
+        id: true,
+        constructionGroupId: true,
+        timingKind: true,
+        createdById: true,
+        requestorEmail: true,
+      },
+    });
+    if (!item || !canAccessCG(scope, item.constructionGroupId)) {
+      return NextResponse.json({ error: 'Work item not found' }, { status: 404 });
+    }
+    const [lead, personnel] = await Promise.all([
+      isPersonnelLead(session.user.id, item.constructionGroupId),
+      canPostWork(session.user.id, scope),
+    ]);
+    const allowed = canEditWorkItem({
+      userId: session.user.id,
+      userEmail: session.user.email,
+      userRole: scope.userRole,
+      personnelLead: lead,
+      createdById: item.createdById,
+      requestorEmail: item.requestorEmail,
+    }) || (item.timingKind === 'PROJECT_DATE' && personnel);
+    if (!allowed) {
+      return NextResponse.json({ error: 'Only an administrator or the person who submitted this work can remove it' }, { status: 403 });
+    }
+    await prisma.workItem.delete({ where: { id: item.id } });
+    return NextResponse.json({ id: item.id });
+  } catch (error) {
+    console.error('Delete work item error:', error);
+    return NextResponse.json({ error: 'Failed to remove work' }, { status: 500 });
   }
 }

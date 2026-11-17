@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
           title: item.title,
           detail: item.detail,
           date: item.dueOn ? formatCalendarDate(item.dueOn.toISOString()) : null,
+          dueOn: item.dueOn ? item.dueOn.toISOString().slice(0, 10) : '',
           status: item.status,
         })),
       })),
