@@ -75,6 +75,7 @@ test('turning email off for selected work clears the requestor checkbox', async 
       contentType: 'application/json',
       body: JSON.stringify({
         canAssign: true,
+        canRun: true,
         currentUserId: 'user-1',
         items: [{ ...task, notifyRequestor: true }],
         teammates: [],

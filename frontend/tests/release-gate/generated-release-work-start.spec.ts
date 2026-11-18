@@ -76,8 +76,9 @@ test('a task shows Start, then Finished, and a later claim starts over', async (
   await expect(openSection.getByRole('heading', { name: buttonTitle, exact: true })).toHaveCount(0);
   const finishedSection = page.locator('details').filter({ has: page.getByText(/^Finished \(/) });
   await finishedSection.locator('summary').click();
-  await expect(finishedSection.getByRole('heading', { name: buttonTitle, exact: true })).toBeVisible();
-  await expect(finishedSection.getByRole('button', { name: 'Reopen', exact: true })).toBeVisible();
+  const finishedRow = finishedSection.locator('article').filter({ has: page.getByRole('heading', { name: buttonTitle, exact: true }) });
+  await expect(finishedRow.getByRole('heading', { name: buttonTitle, exact: true })).toBeVisible();
+  await expect(finishedRow.getByRole('button', { name: 'Reopen', exact: true })).toBeVisible();
 
   const started = await page.request.patch(`/api/v1/work-items/${created[1].id}`, { data: { start: true } });
   expect(started.ok()).toBeTruthy();
