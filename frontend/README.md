@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.54.2**
+Current: **1.54.3**
 
 ## Version History
+- **v1.54.3** (2026-11-18) - Work can be limited to a project, overdue dates, or tasks that will not email the requestor
 - **v1.54.2** (2026-11-17) - Admin pages use the full window, and announcement actions stay visible
 - **v1.54.1** (2026-11-17) - App Store and Google Play badges in the footer
 - **v1.54.0** (2026-11-17) - Install the phone app from the website after you sign in
