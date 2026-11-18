@@ -1,18 +1,21 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-17  
+**Last updated:** 2026-11-18  
 **Current branch:** main  
-**Working on:** v1.54.1 is LIVE on green (CT135). STANDBY blue (CT133) is synced at `e6b7385`. Hub dates stay paused.
+**Working on:** v1.54.3 is LIVE on green (CT135, `8c1c190`). STANDBY blue (CT133) has Start/Finished at `d38ccb2`. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.54.1 is LIVE on green CT135. Signed-in users open the phone app from the footer store badges. Hub dates stay paused.
+v1.54.3 is LIVE on green CT135. Start then Finished is on STANDBY blue CT133 and is not shipped. Hub dates stay paused.
 
 ### What I'm doing right now
-Nothing in progress. STANDBY blue CT133 is synced at `e6b7385`. Hub assignment dates stay paused.
+Start then Finished is on STANDBY blue CT133 (`d38ccb2`). Not shipped. The installed phone app still shows Done until the next store build. Hub assignment dates stay paused.
 
 ### Recent completions
+- ✅ Start then Finished, and chat no longer jumps the page (`d38ccb2`). Migration `startedAt` applied. STANDBY blue CT133 http://10.92.3.34:3001. Not shipped.
+- ✅ Shipped v1.54.3 (`8c1c190`). Work filters: project, Overdue, Email off. LIVE green CT135. STANDBY was synced, then blue took `d38ccb2`. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.3
+- ✅ Shipped v1.54.2 (`7edec05`). Admin shell fits the window. LIVE was green CT135. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.2
 - ✅ Shipped v1.54.1 (`e6b7385`). Official App Store and Google Play badges in the footer and on the mobile page. qa-01 directory gate plus the mobile-install test. LIVE green CT135. STANDBY blue CT133 synced. No new store build. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.1
 - ✅ Shipped v1.54.0 (`d293de5`). Signed-in Mobile app page. TestFlight https://testflight.apple.com/join/U1qScvxu. Play https://play.google.com/apps/test/com.ldctools.mobile/23. LIVE was blue CT133. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.0
 - ✅ Shipped v1.53.0 (`d0793d4`, store numbers `1ce5f63`). qa-01 full suite 104 passed, plus the announcement-link test. LIVE was green CT135. iOS build 16 is on TestFlight. Android version code 23 is on the Play internal track. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.53.0
@@ -69,7 +72,7 @@ Nothing in progress. STANDBY blue CT133 is synced at `e6b7385`. Hub assignment d
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Hub assignment dates stay paused. Android testers use https://play.google.com/apps/test/com.ldctools.mobile/23. New session before the next slice.
+Test Start then Finished on https://blue.ldctools.com. `/ship` when it should go live. Phone UI waits for the next store build. Hub assignment dates stay paused.
 
 ---
 
@@ -87,4 +90,4 @@ Hub assignment dates stay paused. Android testers use https://play.google.com/ap
 ---
 
 ## Exact Next Command
-Hub assignment dates stay paused. Android testers use https://play.google.com/apps/test/com.ldctools.mobile/23. New session before the next slice.
+Test Start then Finished on https://blue.ldctools.com. `/ship` when it should go live. Phone UI waits for the next store build. Hub assignment dates stay paused.

@@ -108,6 +108,11 @@ For shared architectural decisions that apply to all apps, see `.cloudy-work/_cl
 - **Decision:** Fastlane builds and uploads the phone app locally. Android uses the existing Expo upload key and the TheoShift Play service account. A paid Expo plan is not required for that upload.
 - **Why:** The free Expo plan's Android cloud builds were used up until 2026-12-01.
 
+## D-LDC-018: Start then Finished replaces the Done button
+- **Date:** 2026-11-18
+- **Decision:** A task or process shows Start, then Finished. An admin, overseer, assistant, claimer, or assignee can use it. Support cannot unless the work is theirs. The stored status stays OPEN or DONE. `startedAt` records the start. Chat polls do not scroll the page.
+- **Why:** Done was one click. The button should show that the work has started, then that it is finished.
+
 ## D-LDC-013: Team chat is separate from help
 - **Date:** 2026-10-30
 - **Decision:** Each construction group has one team room and direct messages, with browser notifications after the person turns them on. Help stays a note on the work item and emails only the Personnel Contact and Assistant.

@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-18, hard budget)
+- Shipped v1.54.2 (`7edec05`) and v1.54.3 (`8c1c190`). LIVE green CT135. Tags on GitHub.
+- Work list can filter by project, Overdue, and Email off.
+- Decision D-LDC-018: the button is Start, then Finished. Admin, overseer, assistant, claimer, or assignee. Support only if the work is theirs. Status stays OPEN or DONE. `startedAt` is the start time.
+- Chat polls no longer rebuild the thread or scroll the page when nothing new arrived.
+- `d38ccb2` is on STANDBY blue CT133 (http://10.92.3.34:3001). Migration applied. Not shipped. Installed phones still show Done until the next store build.
+- Urgent feedback was not rechecked. Hub dates stay paused.
+- Next: new chat. Test Start then Finished on standby, then `/ship`.
+
 ### Mid-day (2026-11-17, v1.54.1 live)
 - Shipped v1.54.0 (`d293de5`) then v1.54.1 (`e6b7385`). LIVE green CT135. STANDBY blue CT133 synced at `e6b7385`. Tags https://github.com/heybearc/ldc-tools/releases/tag/v1.54.0 and https://github.com/heybearc/ldc-tools/releases/tag/v1.54.1
 - Signed-in users install from the footer. Badges are Download on the App Store and Get it on Google Play. The same badges are on the Mobile app page.
