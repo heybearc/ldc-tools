@@ -90,7 +90,7 @@ test('turning email off for selected work clears the requestor checkbox', async 
   const emailBox = row.getByRole('checkbox', { name: 'Email the requestor when this is finished' });
   await expect(emailBox).toBeChecked();
   await row.getByRole('checkbox', { name: `Select ${task.title}` }).click();
-  await page.getByRole('button', { name: 'Email off' }).click();
+  await page.locator('section').filter({ has: page.getByRole('button', { name: 'Select all' }) }).getByRole('button', { name: 'Email off', exact: true }).click();
   await expect(page.getByText('Completion email is off for 1 task.')).toBeVisible();
   await expect(emailBox).not.toBeChecked();
 });

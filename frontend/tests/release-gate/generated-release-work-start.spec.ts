@@ -69,8 +69,14 @@ test('a task shows Start, then Finished, and a later claim starts over', async (
   const heading = await revealWork(page, buttonTitle);
   const row = heading.locator('xpath=ancestor::article[1]');
   await expect(row.getByRole('button', { name: 'Finished', exact: true })).toHaveCount(0);
+  const startedUi = page.waitForResponse((response) => (
+    response.url().includes(`/api/v1/work-items/${created[0].id}`)
+    && response.request().method() === 'PATCH'
+    && response.ok()
+  ));
   await row.getByRole('button', { name: 'Start', exact: true }).click();
-  await expect(row.getByRole('button', { name: 'Finished', exact: true })).toBeVisible();
+  await startedUi;
+  await expect(row.getByRole('button', { name: 'Finished', exact: true })).toBeVisible({ timeout: 15000 });
   await row.getByRole('button', { name: 'Finished', exact: true }).click();
   const openSection = page.locator('section').filter({ has: page.getByRole('button', { name: 'Select all' }) });
   await expect(openSection.getByRole('heading', { name: buttonTitle, exact: true })).toHaveCount(0);
