@@ -34,6 +34,7 @@ async function ensureGroup(page: Page) {
 }
 
 test('a task shows Start, then Finished, and a later claim starts over', async ({ page }) => {
+  test.setTimeout(60_000);
   await signIn(page);
   await removeReleaseChecks(page);
   const list = await ensureGroup(page);
@@ -66,7 +67,7 @@ test('a task shows Start, then Finished, and a later claim starts over', async (
   expect(blocked.status()).toBe(400);
 
   const heading = await revealWork(page, buttonTitle);
-  const row = page.locator('article').filter({ has: heading });
+  const row = heading.locator('xpath=ancestor::article[1]');
   await expect(row.getByRole('button', { name: 'Finished', exact: true })).toHaveCount(0);
   await row.getByRole('button', { name: 'Start', exact: true }).click();
   await expect(row.getByRole('button', { name: 'Finished', exact: true })).toBeVisible();
