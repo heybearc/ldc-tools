@@ -81,8 +81,8 @@ test('work can be limited to a project, to overdue dates, and to email that is o
     await page.getByLabel('Project').selectOption('');
   }
 
-  await page.getByRole('button', { name: /Overdue/ }).click();
-  await page.getByRole('button', { name: /Email off/ }).click();
+  await page.getByRole('button', { name: /Overdue/, pressed: true }).click();
+  await page.getByRole('button', { name: /Email off \(\d+\)/ }).click();
   await expect(page.getByRole('heading', { name: emailTitle, exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: overdueTitle, exact: true })).toHaveCount(0);
 
