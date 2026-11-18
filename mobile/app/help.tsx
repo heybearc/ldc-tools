@@ -20,7 +20,7 @@ const ARTICLES: Article[] = [
       {
         heading: 'Open a task',
         paragraphs: [
-          'Tap a task to see its steps and notes. Check off a step as you finish it. Mark the whole task Done when the work is finished.',
+          'Tap a task to see its steps and notes. Check off a step as you finish it. Choose Start, then Finished, when the work is complete.',
           'Return it to the pool when you cannot get to it. It becomes claimable again on Available.',
         ],
       },

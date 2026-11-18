@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
-import { activeUserInGroup, canEditWorkItem, canPostWork, isPersonnelLead, projectInGroup } from '@/lib/work-item-access';
-import { applyWorkStatus } from '@/lib/work-item-actions';
+import { activeUserInGroup, canEditWorkItem, canPostWork, canRunWork, isPersonnelLead, projectInGroup } from '@/lib/work-item-access';
+import { applyWorkStatus, startWork } from '@/lib/work-item-actions';
 import { dueOnDate, validateWorkItemInput } from '@/lib/work-items';
 import { enteredClaimPool } from '@/lib/work-available-notice';
 import { queueWorkAvailable } from '@/lib/work-available-notify';
@@ -26,14 +26,18 @@ export async function PATCH(
 
     const body = await request.json();
     const hasStatus = body.status !== undefined;
+    const hasStart = body.start === true;
     const hasNotify = body.notifyRequestor !== undefined;
     const hasContent = ['title', 'detail', 'explanation', 'referenceUrl', 'timingKind', 'dueOn', 'projectId', 'claimable', 'assigneeId', 'requestorName', 'requestorEmail']
       .some((key) => body[key] !== undefined);
-    if (!hasStatus && !hasNotify && !hasContent) {
+    if (!hasStatus && !hasNotify && !hasContent && !hasStart) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
     }
-    if (hasContent && (hasStatus || hasNotify)) {
+    if (hasContent && (hasStatus || hasNotify || hasStart)) {
       return NextResponse.json({ error: 'Save the work details on their own' }, { status: 400 });
+    }
+    if (hasStart && (hasStatus || hasNotify)) {
+      return NextResponse.json({ error: 'Start the work on its own' }, { status: 400 });
     }
     if (hasStatus && body.status !== 'DONE' && body.status !== 'OPEN') {
       return NextResponse.json({ error: 'Status must be open or done' }, { status: 400 });
@@ -128,6 +132,19 @@ export async function PATCH(
       return NextResponse.json({ id: updated.id });
     }
 
+    if (hasStart) {
+      const result = await startWork({
+        id: item.id,
+        actorId: session.user.id,
+        canRun: await canRunWork(session.user.id, scope),
+        constructionGroupId: item.constructionGroupId,
+      });
+      if ('error' in result) {
+        return NextResponse.json({ error: result.error }, { status: result.httpStatus });
+      }
+      return NextResponse.json(result);
+    }
+
     const personnel = await canPostWork(session.user.id, scope);
     if (!hasStatus) {
       const isAssignee = item.assigneeId === session.user.id;
@@ -154,7 +171,7 @@ export async function PATCH(
       status: body.status,
       actorId: session.user.id,
       actorName: session.user.name || 'Personnel',
-      personnel,
+      personnel: await canRunWork(session.user.id, scope),
       constructionGroupId: item.constructionGroupId,
     });
     if ('error' in updated) {

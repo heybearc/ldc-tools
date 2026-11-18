@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope, withCGFilter } from '@/lib/cg-scope';
-import { activeUserInGroup, canEditWorkItem, canPostWork, isPersonnelLead, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
+import { activeUserInGroup, canEditWorkItem, canPostWork, canRunWork, isPersonnelLead, projectInGroup, userInGroupWhere } from '@/lib/work-item-access';
 import { dueOnDate, timingLabel, validateWorkItemInput } from '@/lib/work-items';
 import { hiddenReleaseCheckProcess, hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
 import { enteredClaimPool } from '@/lib/work-available-notice';
@@ -35,6 +35,7 @@ function serialize(item: {
   requestorEmail: string | null;
   notifyRequestor?: boolean;
   claimedAt: Date | null;
+  startedAt: Date | null;
   completedAt: Date | null;
   createdAt: Date;
   processCadence?: 'ONCE' | 'DAILY' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'CUSTOM' | null;
@@ -76,6 +77,7 @@ function serialize(item: {
     requestorEmail: item.requestorEmail,
     notifyRequestor: item.notifyRequestor !== false,
     claimedAt: item.claimedAt?.toISOString() || null,
+    startedAt: item.startedAt?.toISOString() || null,
     completedAt: item.completedAt?.toISOString() || null,
     createdAt: item.createdAt.toISOString(),
     steps: (item.steps || []).map((step) => ({
@@ -146,6 +148,7 @@ export async function GET() {
     }
 
     const canAssign = await canPostWork(session.user.id, scope);
+    const canRun = await canRunWork(session.user.id, scope);
     const groupId = scope.constructionGroupId;
     const [items, assignedLists, processes, lead] = await Promise.all([
       prisma.workItem.findMany({
@@ -194,6 +197,7 @@ export async function GET() {
 
     return NextResponse.json({
       canAssign,
+      canRun,
       currentUserId: session.user.id,
       items: items.map((item) => ({
         ...serialize(

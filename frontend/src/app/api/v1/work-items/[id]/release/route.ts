@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
-import { canPostWork } from '@/lib/work-item-access';
+import { canRunWork } from '@/lib/work-item-access';
 import { loadGroupWork, releaseWorkToPool } from '@/lib/work-item-actions';
 
 export async function POST(
@@ -25,7 +25,7 @@ export async function POST(
     const result = await releaseWorkToPool({
       id: item.id,
       actorId: session.user.id,
-      personnel: await canPostWork(session.user.id, scope),
+      personnel: await canRunWork(session.user.id, scope),
       constructionGroupId: item.constructionGroupId,
     });
     if ('error' in result) return NextResponse.json({ error: result.error }, { status: result.httpStatus });

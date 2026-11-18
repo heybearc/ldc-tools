@@ -45,7 +45,7 @@ export default async function ProcessesHelpPage() {
           <p>
             Add a standalone process to Work, or add a project process after you choose the project.
             Work lists it as one claimable item. The tasks stay inside it. Claiming it assigns the whole process.
-            The assignee can check off each task, mark the process Done, or return it to the pool.
+            The assignee can check off each task, choose Start and then Finished, or return it to the pool. An admin, overseer, or assistant can do the same.
           </p>
         </div>
       </div>

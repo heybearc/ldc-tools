@@ -788,7 +788,7 @@ export default function ProjectsPage() {
                             <span className="font-medium">{item.date}</span>
                             <span> · {item.title}</span>
                             {item.status === 'DONE' && (
-                              <span className="ml-2 text-xs font-medium text-gray-500">Done</span>
+                              <span className="ml-2 text-xs font-medium text-gray-500">Finished</span>
                             )}
                             <p className="text-gray-600">{item.detail}</p>
                             {canAddDate && (

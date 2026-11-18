@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMobileActor, scopeForActor } from '@/lib/mobile-actor';
-import { canPostWork } from '@/lib/work-item-access';
+import { canRunWork } from '@/lib/work-item-access';
 import { releaseWorkToPool } from '@/lib/work-item-actions';
 
 export async function POST(
@@ -14,7 +14,7 @@ export async function POST(
     const result = await releaseWorkToPool({
       id: params.id,
       actorId: actor.id,
-      personnel: await canPostWork(actor.id, scopeForActor(actor)),
+      personnel: await canRunWork(actor.id, scopeForActor(actor)),
       constructionGroupId: actor.constructionGroupId,
     });
     if ('error' in result) return NextResponse.json({ error: result.error }, { status: result.httpStatus });

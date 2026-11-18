@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
-import { canPostWork } from '@/lib/work-item-access';
+import { canRunWork } from '@/lib/work-item-access';
 import { sendWorkCompletionEmail } from '@/lib/work-completion-email';
 import { canEmailAddress } from '@/lib/reachable-email';
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Select at least one task' }, { status: 400 });
     }
 
-    const personnel = await canPostWork(session.user.id, scope);
+    const personnel = await canRunWork(session.user.id, scope);
     const openItems = await prisma.workItem.findMany({
       where: {
         id: { in: ids },
@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
         notifyRequestor: true,
         requestorName: true,
         requestorEmail: true,
+        startedAt: true,
       },
     });
     if (openItems.length === 0) {
@@ -48,10 +49,10 @@ export async function POST(request: NextRequest) {
     }
 
     const completedAt = new Date();
-    await prisma.workItem.updateMany({
-      where: { id: { in: openItems.map((item) => item.id) } },
-      data: { status: 'DONE', completedAt },
-    });
+    await prisma.$transaction(openItems.map((item) => prisma.workItem.update({
+      where: { id: item.id },
+      data: { status: 'DONE', completedAt, startedAt: item.startedAt || completedAt },
+    })));
 
     let emailed = 0;
     let emailFailed = 0;
@@ -82,6 +83,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Complete work items error:', error);
-    return NextResponse.json({ error: 'Failed to mark work done' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to finish the work' }, { status: 500 });
   }
 }

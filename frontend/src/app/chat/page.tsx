@@ -86,7 +86,8 @@ function ChatScreen() {
   const [notice, setNotice] = useState('');
   const [notificationsOn, setNotificationsOn] = useState(false);
   const [sending, setSending] = useState(false);
-  const bottom = useRef<HTMLDivElement>(null);
+  const thread = useRef<HTMLDivElement>(null);
+  const stickToBottom = useRef(true);
   const newest = useRef<string | null>(null);
   const messageRequest = useRef(0);
   const holdUnread = useRef<string | null>(null);
@@ -130,9 +131,16 @@ function ChatScreen() {
     }
     const incoming: Message[] = body.messages || [];
     setMessages((current) => {
-      if (!after) return incoming;
+      if (!after) {
+        if (current.length === incoming.length && current.every((message, index) => message.id === incoming[index]?.id)) {
+          return current;
+        }
+        return incoming;
+      }
       const seen = new Set(current.map((message) => message.id));
-      return [...current, ...incoming.filter((message) => !seen.has(message.id))];
+      const added = incoming.filter((message) => !seen.has(message.id));
+      if (added.length === 0) return current;
+      return [...current, ...added];
     });
     if (requestId !== messageRequest.current) return;
     if (incoming.length > 0) newest.current = incoming[incoming.length - 1].createdAt;
@@ -151,7 +159,9 @@ function ChatScreen() {
     }
     if (!readResponse.ok || requestId !== messageRequest.current) return;
     setChannels((current) => {
-      const next = current.map((channel) => channel.id === channelId ? { ...channel, unread: 0 } : channel);
+      const channel = current.find((item) => item.id === channelId);
+      if (!channel || channel.unread === 0) return current;
+      const next = current.map((item) => item.id === channelId ? { ...item, unread: 0 } : item);
       publishUnread(next);
       return next;
     });
@@ -186,6 +196,7 @@ function ChatScreen() {
     if (!selectedId) return;
     messageRequest.current += 1;
     newest.current = null;
+    stickToBottom.current = true;
     setMessages([]);
     loadMessages(selectedId);
     const timer = window.setInterval(() => {
@@ -195,7 +206,9 @@ function ChatScreen() {
   }, [selectedId, loadMessages]);
 
   useEffect(() => {
-    bottom.current?.scrollIntoView({ block: 'end' });
+    const pane = thread.current;
+    if (!pane || !stickToBottom.current) return;
+    pane.scrollTop = pane.scrollHeight;
   }, [messages]);
 
   async function send(event: FormEvent) {
@@ -551,7 +564,15 @@ function ChatScreen() {
               </span>
             </span>
           </div>
-          <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 px-4 py-4">
+          <div
+            ref={thread}
+            onScroll={() => {
+              const pane = thread.current;
+              if (!pane) return;
+              stickToBottom.current = pane.scrollHeight - pane.scrollTop - pane.clientHeight < 80;
+            }}
+            className="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 px-4 py-4"
+          >
             {!selected && (
               <div className="flex h-full flex-col items-center justify-center px-6 text-center">
                 <p className="text-base font-semibold text-slate-800">Choose a conversation</p>
@@ -572,7 +593,7 @@ function ChatScreen() {
                 <time className="mt-1 px-1 text-[11px] text-slate-400" dateTime={message.createdAt}>{formatWhen(message.createdAt)}</time>
               </article>
             ))}
-            <div ref={bottom} />
+            <div />
           </div>
           <form onSubmit={send} className="flex gap-2 border-t border-slate-200 bg-white p-3">
             <input

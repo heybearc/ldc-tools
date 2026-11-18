@@ -50,6 +50,7 @@ export interface WorkItem {
   requestorName: string | null;
   requestorEmail: string | null;
   notifyRequestor?: boolean;
+  startedAt?: string | null;
   completedAt: string | null;
   createdAt: string;
   steps: Step[];
@@ -71,6 +72,7 @@ interface ProcessOffer {
 
 interface WorkResponse {
   canAssign: boolean;
+  canRun?: boolean;
   currentUserId: string;
   items: WorkItem[];
   teammates: Person[];
@@ -422,12 +424,33 @@ export default function WorkPage() {
       const failNote = failed > 0
         ? ` ${failed} completion email${failed === 1 ? '' : 's'} did not send.`
         : '';
-      setNotice(`Marked ${body.completed} done.${mailNote}${failNote}`);
+      setNotice(`Marked ${body.completed} finished.${mailNote}${failNote}`);
       setSelectedIds([]);
       setLastSelectedIndex(null);
       await load();
     } finally {
       setCompleting(false);
+    }
+  }
+
+  async function startWorkItem(id: string) {
+    setBusyId(id);
+    setError('');
+    try {
+      const response = await fetch(`/api/v1/work-items/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ start: true }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not start the work'));
+        return;
+      }
+      setNotice('Started.');
+      await load();
+    } finally {
+      setBusyId(null);
     }
   }
 
@@ -446,9 +469,9 @@ export default function WorkPage() {
         return;
       }
       if (status === 'DONE' && body.emailSent === false && body.requestorEmail) {
-        setNotice('Marked done. The completion email was not sent.');
+        setNotice('Marked finished. The completion email was not sent.');
       } else if (status === 'DONE' && body.emailSent) {
-        setNotice(`Marked done. Emailed ${body.requestorEmail}.`);
+        setNotice(`Marked finished. Emailed ${body.requestorEmail}.`);
       }
       await load();
     } finally {
@@ -483,7 +506,8 @@ export default function WorkPage() {
   const helpItems = openItems.filter((item) => (item.notes || []).some((note) => note.kind === 'HELP'));
   const currentUserId = data?.currentUserId || '';
   const canAssign = Boolean(data?.canAssign);
-  const canSelect = (item: WorkItem) => canAssign || item.assignee?.id === currentUserId;
+  const canRun = Boolean(data?.canRun);
+  const canSelect = (item: WorkItem) => canRun || item.assignee?.id === currentUserId;
   const selectableIds = openItems.filter(canSelect).map((item) => item.id);
   const openView = pageSlice(openItems, page, pageSize);
   const doneView = pageSlice(doneItems, donePage, pageSize);
@@ -904,7 +928,7 @@ export default function WorkPage() {
                     onClick={markSelectedDone}
                     className="px-3 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
                   >
-                    {completing ? 'Marking done…' : 'Mark selected done'}
+                    {completing ? 'Finishing…' : 'Mark selected finished'}
                   </button>
                   <button
                     type="button"
@@ -958,10 +982,12 @@ export default function WorkPage() {
                   item={item}
                   currentUserId={currentUserId}
                   canAssign={canAssign}
+                  canRun={canRun}
                   busy={busyId === item.id}
                   selected={selectedIds.includes(item.id)}
                   onToggle={canSelect(item) ? (shiftKey) => toggleSelected(item.id, index, shiftKey) : undefined}
                   onClaim={() => claim(item.id)}
+                  onStart={() => startWorkItem(item.id)}
                   onDone={() => setStatus(item.id, 'DONE')}
                   onChanged={load}
                   onEmailChange={rememberEmail}
@@ -995,7 +1021,7 @@ export default function WorkPage() {
           {doneItems.length > 0 && (
             <details className="bg-white rounded-lg shadow">
               <summary className="cursor-pointer px-5 py-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
-                Done ({doneItems.length})
+                Finished ({doneItems.length})
               </summary>
               <div className="space-y-3 px-3 pb-4">
                 {doneView.slice.map((item) => (
@@ -1004,8 +1030,10 @@ export default function WorkPage() {
                     item={item}
                     currentUserId={currentUserId}
                     canAssign={canAssign}
+                    canRun={canRun}
                     busy={busyId === item.id}
                     onClaim={() => claim(item.id)}
+                    onStart={() => startWorkItem(item.id)}
                     onDone={() => setStatus(item.id, 'OPEN')}
                     onChanged={load}
                     onEmailChange={rememberEmail}
@@ -1263,10 +1291,12 @@ export function WorkRow({
   item,
   currentUserId,
   canAssign,
+  canRun = false,
   busy,
   selected,
   onToggle,
   onClaim,
+  onStart,
   onDone,
   onChanged,
   onEmailChange,
@@ -1275,10 +1305,12 @@ export function WorkRow({
   item: WorkItem;
   currentUserId: string;
   canAssign: boolean;
+  canRun?: boolean;
   busy: boolean;
   selected?: boolean;
   onToggle?: (shiftKey: boolean) => void;
   onClaim: () => void;
+  onStart: () => void;
   onDone: () => void;
   onChanged: () => Promise<void>;
   onEmailChange?: (id: string, notifyRequestor: boolean) => void;
@@ -1290,10 +1322,10 @@ export function WorkRow({
   const [noteNotice, setNoteNotice] = useState('');
   const [confirmRemove, setConfirmRemove] = useState(false);
   const canClaim = item.status === 'OPEN' && item.claimable && !item.assignee;
-  const canFinish = item.status === 'OPEN' && (canAssign || item.assignee?.id === currentUserId);
-  const canReopen = item.status === 'DONE' && (canAssign || item.assignee?.id === currentUserId);
-  const canCheckSteps = item.status === 'OPEN' && (canAssign || item.assignee?.id === currentUserId);
-  const canRelease = item.status === 'OPEN' && Boolean(item.assignee) && (item.assignee?.id === currentUserId || canAssign);
+  const canProgress = item.status === 'OPEN' && (canRun || item.assignee?.id === currentUserId);
+  const canReopen = item.status === 'DONE' && (canRun || item.assignee?.id === currentUserId);
+  const canCheckSteps = item.status === 'OPEN' && (canRun || item.assignee?.id === currentUserId);
+  const canRelease = item.status === 'OPEN' && Boolean(item.assignee) && (item.assignee?.id === currentUserId || canRun);
   const doneOn = item.status === 'DONE' ? formatDone(item.completedAt) : '';
 
   async function toggleStep(stepId: string, done: boolean) {
@@ -1410,7 +1442,7 @@ export function WorkRow({
             )}
             {doneOn && (
               <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
-                Done {doneOn}
+                Finished {doneOn}
               </span>
             )}
           </div>
@@ -1442,7 +1474,7 @@ export function WorkRow({
               />
               {isAirgappedEmail(item.requestorEmail)
                 ? 'This address is on the Bethel network and cannot be emailed'
-                : 'Email the requestor when this is done'}
+                : 'Email the requestor when this is finished'}
             </label>
           )}
           <p className="mt-3 text-sm text-gray-500">
@@ -1529,14 +1561,24 @@ export function WorkRow({
               Claim
             </button>
           )}
-          {canFinish && (
+          {canProgress && !item.startedAt && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onStart}
+              className="px-3 py-2 min-h-[44px] rounded-md bg-gray-900 text-white text-sm font-medium disabled:opacity-60"
+            >
+              Start
+            </button>
+          )}
+          {canProgress && item.startedAt && (
             <button
               type="button"
               disabled={busy}
               onClick={onDone}
               className="px-3 py-2 min-h-[44px] rounded-md border border-gray-300 text-sm font-medium text-gray-700 disabled:opacity-60"
             >
-              Done
+              Finished
             </button>
           )}
           {canRelease && (

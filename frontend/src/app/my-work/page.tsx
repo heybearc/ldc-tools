@@ -9,6 +9,7 @@ import { userError } from '@/lib/user-error';
 
 interface WorkResponse {
   canAssign: boolean;
+  canRun?: boolean;
   currentUserId: string;
   items: WorkItem[];
 }
@@ -55,6 +56,26 @@ export default function MyWorkPage() {
       window.clearInterval(refresh);
     };
   }, [load]);
+
+  async function startWorkItem(id: string) {
+    setBusyId(id);
+    setError('');
+    try {
+      const response = await fetch(`/api/v1/work-items/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ start: true }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setError(userError(response.status, body.error, 'Could not start the work'));
+        return;
+      }
+      await load();
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   async function setStatus(id: string, status: 'OPEN' | 'DONE') {
     setBusyId(id);
@@ -112,8 +133,10 @@ export default function MyWorkPage() {
               item={item}
               currentUserId={currentUserId}
               canAssign={canAssign}
+              canRun={Boolean(data?.canRun)}
               busy={busyId === item.id}
               onClaim={() => undefined}
+              onStart={() => startWorkItem(item.id)}
               onDone={() => setStatus(item.id, 'DONE')}
               onChanged={load}
               onEdit={(item) => router.push(`/work?edit=${item.id}`)}
@@ -122,7 +145,7 @@ export default function MyWorkPage() {
           {doneItems.length > 0 && (
             <details className="bg-white rounded-lg shadow">
               <summary className="cursor-pointer px-5 py-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
-                Done ({doneItems.length})
+                Finished ({doneItems.length})
               </summary>
               <div className="space-y-3 px-3 pb-4">
                 {doneItems.map((item) => (
@@ -131,8 +154,10 @@ export default function MyWorkPage() {
                     item={item}
                     currentUserId={currentUserId}
                     canAssign={canAssign}
+                    canRun={Boolean(data?.canRun)}
                     busy={busyId === item.id}
                     onClaim={() => undefined}
+                    onStart={() => startWorkItem(item.id)}
                     onDone={() => setStatus(item.id, 'OPEN')}
                     onChanged={load}
                     onEdit={(item) => router.push(`/work?edit=${item.id}`)}

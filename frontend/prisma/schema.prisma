@@ -1098,6 +1098,7 @@ model WorkItem {
   processCadence      ProcessCadence?
   processSchedule     String?
   claimedAt           DateTime?
+  startedAt           DateTime?
   completedAt         DateTime?
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt

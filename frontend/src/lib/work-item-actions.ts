@@ -16,6 +16,7 @@ const workSelect = {
   requestorName: true,
   requestorEmail: true,
   claimable: true,
+  startedAt: true,
 } as const;
 
 export async function loadGroupWork(id: string, constructionGroupId: string) {
@@ -39,7 +40,7 @@ export async function applyWorkStatus(input: {
   }
   const isAssignee = item.assigneeId === input.actorId;
   if (!input.personnel && !isAssignee) {
-    return { error: 'Only Personnel or the assignee can update this work', httpStatus: 403 as const };
+    return { error: 'Only an admin, overseer, assistant, or the assigned person can update this work', httpStatus: 403 as const };
   }
 
   const updated = await prisma.workItem.update({
@@ -47,6 +48,7 @@ export async function applyWorkStatus(input: {
     data: {
       status: input.status,
       completedAt: input.status === 'DONE' ? new Date() : null,
+      startedAt: input.status === 'DONE' ? (item.startedAt || new Date()) : null,
     },
     select: {
       id: true,
@@ -94,6 +96,30 @@ export async function applyWorkStatus(input: {
   };
 }
 
+export async function startWork(input: {
+  id: string;
+  actorId: string;
+  canRun: boolean;
+  constructionGroupId: string;
+}) {
+  const item = await loadGroupWork(input.id, input.constructionGroupId);
+  if (!item) return { error: 'Work item not found', httpStatus: 404 as const };
+  if (item.status !== 'OPEN') return { error: 'This work is already finished', httpStatus: 400 as const };
+  const isAssignee = item.assigneeId === input.actorId;
+  if (!input.canRun && !isAssignee) {
+    return { error: 'Only an admin, overseer, assistant, or the assigned person can start this work', httpStatus: 403 as const };
+  }
+  if (item.startedAt) {
+    return { id: item.id, startedAt: item.startedAt.toISOString() };
+  }
+  const updated = await prisma.workItem.update({
+    where: { id: item.id },
+    data: { startedAt: new Date() },
+    select: { id: true, startedAt: true },
+  });
+  return { id: updated.id, startedAt: updated.startedAt?.toISOString() || null };
+}
+
 export async function releaseWorkToPool(input: {
   id: string;
   actorId: string;
@@ -110,7 +136,7 @@ export async function releaseWorkToPool(input: {
 
   const updated = await prisma.workItem.update({
     where: { id: item.id },
-    data: { assigneeId: null, claimedAt: null, claimable: true },
+    data: { assigneeId: null, claimedAt: null, startedAt: null, claimable: true },
     select: { id: true, assigneeId: true, claimable: true },
   });
   queueWorkAvailable({

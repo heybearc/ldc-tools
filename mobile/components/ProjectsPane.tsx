@@ -71,7 +71,7 @@ export function ProjectsPane() {
             {project.schedule.map((item) => (
               <Text key={item.id} style={styles.body}>
                 {[item.date, item.title].filter(Boolean).join(' · ')}
-                {item.status === 'DONE' ? ' · Done' : ''}
+                {item.status === 'DONE' ? ' · Finished' : ''}
                 {item.detail ? `\n${item.detail}` : ''}
               </Text>
             ))}

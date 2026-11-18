@@ -39,7 +39,7 @@ export default async function WorkHelpPage() {
             Personnel Contact, Assistant, and Support can add work. Open Work, choose Add work, and enter a title and detail.
             An administrator, a Personnel Contact or Assistant, or the person who submitted the task can choose Edit and change the title, detail, timing, and due date. The same people can choose Remove to take the task off the list. Personnel can also edit or remove a date on a project.
             Timing is a deadline, no deadline, a date on a project, or a repeat of monthly or yearly. You can assign someone in this group, and you can mark the task claimable.
-            Select all, or select several open tasks including with Shift, then assign them, mark them done, or turn the completion email on or off. The requestor checkbox on each selected task matches that choice. Choose how many tasks to show on a page.
+            Select all, or select several open tasks including with Shift, then assign them, mark them finished, or turn the completion email on or off. The requestor checkbox on each selected task matches that choice. Choose how many tasks to show on a page.
             Choose a project to see only that project's tasks, including finished ones. Overdue lists open tasks whose date is before today. Email off lists open tasks that have a requestor and will not email that person when the task is marked done. Select those tasks and choose Email on to turn the message back on.
           </p>
 
@@ -47,20 +47,20 @@ export default async function WorkHelpPage() {
           <p>
             When a claimable task has no assignee, anyone signed in to this construction group can choose Claim. That assigns the task to you.
             The Personnel Contact and Assistant get a phone alert, and a browser alert if they allowed notifications. The Work link shows how many tasks are waiting.
-            Open the task to check off its steps. Choose Done when the whole task is finished. Choose Return to pool when you cannot get to it. It becomes claimable again.
+            Open the task to check off its steps. Choose Start, then Finished, when the whole task is finished. Choose Return to pool when you cannot get to it. It becomes claimable again.
           </p>
 
           <h2>Import crew requests</h2>
           <p>
             Personnel can import the Microsoft Form spreadsheet from Work. Each row becomes a claimable task
             with the requestor, volunteer, crew, project roster, and comments. Importing the same spreadsheet again
-            does not add those rows a second time. Marking the task Done keeps the requestor on it. If email is
+            does not add those rows a second time. Marking the task Finished keeps the requestor on it. If email is
             already configured, the requestor is told. A Bethel or jwpub.org address is not emailed.
           </p>
 
           <h2>Finish a task</h2>
           <p>
-            The assignee, or Personnel, can mark the task Done. The page says whether the completion email was sent. The email subject is the task title. A crew request uses “Crew request completed” plus that title. Done tasks stay in a collapsed Done section, with the date they were finished.
+            An admin, an overseer, an assistant, or the assigned person can choose Start, then Finished. The page says whether the completion email was sent. The email subject is the task title. A crew request uses “Crew request completed” plus that title. Finished tasks stay in a collapsed Finished section, with the date they were finished.
             A published process is listed as available. A draft is not. Claiming a standalone process keeps every task inside that process. A project process is started from Processes after you choose the project. Finishing the process marks that one work item done.
             Anyone on the work list can add a note or ask for help on a task. A help request is listed at the top of Work.
             If email is already configured, the Personnel Contact and Assistant are told. Support is not.

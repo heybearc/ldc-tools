@@ -57,6 +57,7 @@ export function ChatPane() {
   const holdUnread = useRef<string | null>(null);
   const readGeneration = useRef(0);
   const listRef = useRef<FlatList<Message>>(null);
+  const stickToEnd = useRef(true);
   const screenRef = useRef<View>(null);
   const keyboardInsetRef = useRef(0);
 
@@ -104,9 +105,16 @@ export function ChatPane() {
       if (requestId !== messageRequest.current) return;
       const incoming = body.messages || [];
       setMessages((current) => {
-        if (!after) return incoming;
+        if (!after) {
+          if (current.length === incoming.length && current.every((message, index) => message.id === incoming[index]?.id)) {
+            return current;
+          }
+          return incoming;
+        }
         const seen = new Set(current.map((message) => message.id));
-        return [...current, ...incoming.filter((message) => !seen.has(message.id))];
+        const added = incoming.filter((message) => !seen.has(message.id));
+        if (added.length === 0) return current;
+        return [...current, ...added];
       });
       if (requestId !== messageRequest.current) return;
       if (incoming.length > 0) newest.current = incoming[incoming.length - 1].createdAt;
@@ -181,6 +189,7 @@ export function ChatPane() {
     if (!selectedId) return;
     messageRequest.current += 1;
     newest.current = null;
+    stickToEnd.current = true;
     setMessages([]);
     void loadMessages(selectedId);
   }, [selectedId, loadMessages]);
@@ -195,7 +204,7 @@ export function ChatPane() {
   }, [selectedId, loadMessages, appActive]);
 
   useEffect(() => {
-    if (messages.length === 0) return;
+    if (messages.length === 0 || !stickToEnd.current) return;
     requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: false }));
   }, [messages, keyboardInset]);
 
@@ -417,7 +426,14 @@ export function ChatPane() {
             data={messages}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.messages}
-            onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
+            onScroll={(event) => {
+              const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+              stickToEnd.current = contentSize.height - contentOffset.y - layoutMeasurement.height < 80;
+            }}
+            scrollEventThrottle={16}
+            onContentSizeChange={() => {
+              if (stickToEnd.current) listRef.current?.scrollToEnd({ animated: false });
+            }}
             renderItem={({ item }) => (
               <View style={[styles.bubble, item.mine ? styles.mine : styles.theirs]}>
                 {!item.mine ? <Text style={styles.author}>{personName(item.author)}</Text> : null}

@@ -57,6 +57,41 @@ export function canEditWorkItem(input: {
   return Boolean(email && requestor && email === requestor);
 }
 
+const RUN_ROLE_CODES = ['PC', 'PCA', 'CGO', 'ACGO', 'CGOA', 'TTO', 'TTOA', 'TCO', 'TCOA'] as const;
+
+/** Admin, overseer, or assistant. Support is not included. The assignee is checked separately. */
+export async function canRunWork(userId: string, scope: CGScope): Promise<boolean> {
+  if (scope.userRole === 'SUPER_ADMIN' || scope.userRole === 'ADMIN') return true;
+  if (!scope.constructionGroupId) return false;
+  const constructionGroupId = scope.constructionGroupId;
+  const [contact, volunteerRole] = await Promise.all([
+    prisma.personnelContact.findFirst({
+      where: {
+        userId,
+        constructionGroupId,
+        isActive: true,
+        endDate: null,
+        role: { in: ['PC', 'PCA'] },
+      },
+      select: { id: true },
+    }),
+    prisma.volunteerRole.findFirst({
+      where: {
+        isActive: true,
+        endDate: null,
+        roleCode: { in: [...RUN_ROLE_CODES] },
+        volunteer: {
+          isActive: true,
+          constructionGroupId,
+          user: { id: userId },
+        },
+      },
+      select: { id: true },
+    }),
+  ]);
+  return Boolean(contact || volunteerRole);
+}
+
 export async function canPostWork(userId: string, scope: CGScope): Promise<boolean> {
   if (!scope.constructionGroupId) return false;
   if (scope.userRole === 'SUPER_ADMIN' || scope.userRole === 'ADMIN') return true;

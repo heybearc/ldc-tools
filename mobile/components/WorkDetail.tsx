@@ -21,6 +21,8 @@ type WorkDetail = {
   referenceUrl: string | null;
   timing: string;
   status: 'OPEN' | 'DONE';
+  startedAt: string | null;
+  canRun?: boolean;
   claimable: boolean;
   available: boolean;
   mine: boolean;
@@ -62,7 +64,7 @@ export function WorkDetail({ id }: { id: string }) {
     setError('');
     try {
       await apiRequest(apiBase, path, { ...options, token, action });
-      if (action === 'Could not return the work to the pool' || action === 'Could not mark the work done') {
+      if (action === 'Could not return the work to the pool' || action === 'Could not finish the work') {
         router.back();
         return;
       }
@@ -142,17 +144,23 @@ export function WorkDetail({ id }: { id: string }) {
             >
               {busy.startsWith('Could not claim') ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryText}>Claim</Text>}
             </Pressable>
-          ) : open ? (
+          ) : open && (item.mine || item.canRun) ? (
             <View style={styles.actions}>
               <Pressable
                 disabled={Boolean(busy)}
-                onPress={() => void run('Could not mark the work done', `/api/v1/mobile/work/${id}`, {
-                  method: 'PATCH',
-                  body: { status: 'DONE' },
-                })}
+                onPress={() => void run(
+                  item.startedAt ? 'Could not finish the work' : 'Could not start the work',
+                  `/api/v1/mobile/work/${id}`,
+                  {
+                    method: 'PATCH',
+                    body: item.startedAt ? { status: 'DONE' } : { start: true },
+                  },
+                )}
                 style={styles.primary}
               >
-                {busy.startsWith('Could not mark') ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryText}>Done</Text>}
+                {busy.startsWith('Could not') ? <ActivityIndicator color="#fff" /> : (
+                  <Text style={styles.primaryText}>{item.startedAt ? 'Finished' : 'Start'}</Text>
+                )}
               </Pressable>
               <Pressable
                 disabled={Boolean(busy)}
@@ -165,7 +173,7 @@ export function WorkDetail({ id }: { id: string }) {
               </Pressable>
             </View>
           ) : (
-            <Text style={styles.detail}>{item.status === 'DONE' ? 'This work is done.' : 'This work is not assigned to you.'}</Text>
+            <Text style={styles.detail}>{item.status === 'DONE' ? 'This work is finished.' : 'This work is not assigned to you.'}</Text>
           )}
         </View>
       ) : null}
