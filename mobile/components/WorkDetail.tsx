@@ -158,7 +158,7 @@ export function WorkDetail({ id }: { id: string }) {
                 )}
                 style={styles.primary}
               >
-                {busy.startsWith('Could not') ? <ActivityIndicator color="#fff" /> : (
+                {busy === 'Could not start the work' || busy === 'Could not finish the work' ? <ActivityIndicator color="#fff" /> : (
                   <Text style={styles.primaryText}>{item.startedAt ? 'Finished' : 'Start'}</Text>
                 )}
               </Pressable>

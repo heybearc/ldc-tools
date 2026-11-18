@@ -49,8 +49,14 @@ export async function POST(request: NextRequest) {
     }
 
     await prisma.workItem.updateMany({
-      where: { id: { in: openItems.map((item) => item.id) } },
-      data: { assigneeId },
+      where: {
+        id: { in: openItems.map((item) => item.id) },
+        OR: [
+          { assigneeId: null },
+          { assigneeId: { not: assigneeId } },
+        ],
+      },
+      data: { assigneeId, startedAt: null },
     });
 
     return NextResponse.json({ assigned: openItems.length });

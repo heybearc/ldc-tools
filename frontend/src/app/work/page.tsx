@@ -418,13 +418,17 @@ export default function WorkPage() {
       }
       const mailed = Number(body.emailed || 0);
       const failed = Number(body.emailFailed || 0);
+      const skipped = Number(body.skipped || 0);
       const mailNote = mailed > 0
         ? ` Sent ${mailed} completion email${mailed === 1 ? '' : 's'}.`
         : '';
       const failNote = failed > 0
         ? ` ${failed} completion email${failed === 1 ? '' : 's'} did not send.`
         : '';
-      setNotice(`Marked ${body.completed} finished.${mailNote}${failNote}`);
+      const skipNote = skipped > 0
+        ? ` ${skipped} still need Start.`
+        : '';
+      setNotice(`Marked ${body.completed} finished.${skipNote}${mailNote}${failNote}`);
       setSelectedIds([]);
       setLastSelectedIndex(null);
       await load();

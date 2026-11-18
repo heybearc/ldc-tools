@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { readMobileToken } from '@/lib/mobile-session';
 import { mobileGateResponse } from '@/lib/mobile-actor';
 import { activeUserInGroup } from '@/lib/work-item-access';
+import { startedAtAfterAssigneeChange } from '@/lib/work-start';
 
 export async function POST(
   request: NextRequest,
@@ -54,6 +55,7 @@ export async function POST(
       data: {
         assigneeId: user.id,
         claimedAt: item.assigneeId === user.id ? undefined : new Date(),
+        startedAt: startedAtAfterAssigneeChange(item.assigneeId, user.id),
       },
       select: { id: true, assigneeId: true },
     });

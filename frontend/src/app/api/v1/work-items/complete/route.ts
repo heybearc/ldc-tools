@@ -48,15 +48,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'You can only finish open work assigned to you' }, { status: 400 });
     }
 
+    const ready = openItems.filter((item) => item.startedAt);
+    if (ready.length === 0) {
+      return NextResponse.json({ error: 'Start each task before you finish it' }, { status: 400 });
+    }
+
     const completedAt = new Date();
-    await prisma.$transaction(openItems.map((item) => prisma.workItem.update({
+    await prisma.$transaction(ready.map((item) => prisma.workItem.update({
       where: { id: item.id },
-      data: { status: 'DONE', completedAt, startedAt: item.startedAt || completedAt },
+      data: { status: 'DONE', completedAt, startedAt: item.startedAt },
     })));
 
     let emailed = 0;
     let emailFailed = 0;
-    for (const item of openItems) {
+    for (const item of ready) {
       if (!item.requestorEmail || !canEmailAddress(item.requestorEmail, item.notifyRequestor)) continue;
       try {
         const sent = await sendWorkCompletionEmail({
@@ -76,7 +81,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      completed: openItems.length,
+      completed: ready.length,
+      skipped: openItems.length - ready.length,
       emailed,
       emailFailed,
       completedAt: completedAt.toISOString(),

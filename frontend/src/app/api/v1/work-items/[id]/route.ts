@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { activeUserInGroup, canEditWorkItem, canPostWork, canRunWork, isPersonnelLead, projectInGroup } from '@/lib/work-item-access';
 import { applyWorkStatus, startWork } from '@/lib/work-item-actions';
+import { startedAtAfterAssigneeChange } from '@/lib/work-start';
 import { dueOnDate, validateWorkItemInput } from '@/lib/work-items';
 import { enteredClaimPool } from '@/lib/work-available-notice';
 import { queueWorkAvailable } from '@/lib/work-available-notify';
@@ -114,6 +115,7 @@ export async function PATCH(
           projectId: input.projectId,
           claimable: input.claimable,
           assigneeId: input.assigneeId,
+          startedAt: startedAtAfterAssigneeChange(item.assigneeId, input.assigneeId),
           requestorName: input.requestorName,
           requestorEmail: input.requestorEmail,
         },

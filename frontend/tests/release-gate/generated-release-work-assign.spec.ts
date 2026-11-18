@@ -98,6 +98,8 @@ test('a task can have no deadline and several tasks can be assigned together', a
   await expect(row.getByText(assignee.name || assignee.email)).toBeVisible();
 
   for (const item of created) {
+    const started = await page.request.patch(`/api/v1/work-items/${item.id}`, { data: { start: true } });
+    expect(started.ok()).toBeTruthy();
     const done = await page.request.patch(`/api/v1/work-items/${item.id}`, { data: { status: 'DONE' } });
     expect(done.ok()).toBeTruthy();
   }

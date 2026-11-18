@@ -89,6 +89,10 @@ test('team chat, a help reply, and finishing several tasks', async ({ page }) =>
   const missing = await page.request.post('/api/v1/work-items/complete', { data: { ids: [] } });
   expect(missing.status()).toBe(400);
 
+  for (const id of createdIds) {
+    const started = await page.request.patch(`/api/v1/work-items/${id}`, { data: { start: true } });
+    expect(started.ok()).toBeTruthy();
+  }
   const finished = await page.request.post('/api/v1/work-items/complete', { data: { ids: createdIds } });
   expect(finished.ok()).toBeTruthy();
   const result = await finished.json();

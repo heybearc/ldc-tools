@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { canAccessCG, getCGScope } from '@/lib/cg-scope';
 import { activeUserInGroup } from '@/lib/work-item-access';
+import { startedAtAfterAssigneeChange } from '@/lib/work-start';
 
 export async function POST(
   _request: NextRequest,
@@ -56,6 +57,7 @@ export async function POST(
       data: {
         assigneeId: session.user.id,
         claimedAt: item.assigneeId === session.user.id ? undefined : new Date(),
+        startedAt: startedAtAfterAssigneeChange(item.assigneeId, session.user.id),
       },
       select: { id: true, assigneeId: true },
     });

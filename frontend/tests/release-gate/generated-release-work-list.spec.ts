@@ -101,6 +101,10 @@ test('personnel can post a task, see its timing, and claim a claimable one', asy
   await expect(claimRow.getByText('Monthly')).toBeVisible();
   await expect(claimRow.getByRole('button', { name: 'Claim' })).toHaveCount(0);
 
+  const startDeadline = await page.request.patch(`/api/v1/work-items/${deadline.id}`, { data: { start: true } });
+  const startClaim = await page.request.patch(`/api/v1/work-items/${claimItem.id}`, { data: { start: true } });
+  expect(startDeadline.ok()).toBeTruthy();
+  expect(startClaim.ok()).toBeTruthy();
   const doneDeadline = await page.request.patch(`/api/v1/work-items/${deadline.id}`, {
     data: { status: 'DONE' },
   });

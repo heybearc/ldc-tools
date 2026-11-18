@@ -132,6 +132,8 @@ test('starting a process lists one claimable process, not its steps', async ({ p
 
   const claim = await page.request.post(`/api/v1/work-items/${run.item.id}/claim`);
   expect(claim.ok()).toBeTruthy();
+  const started = await page.request.patch(`/api/v1/work-items/${run.item.id}`, { data: { start: true } });
+  expect(started.ok()).toBeTruthy();
   const done = await page.request.patch(`/api/v1/work-items/${run.item.id}`, { data: { status: 'DONE' } });
   expect(done.ok()).toBeTruthy();
   const finished = await done.json();

@@ -60,7 +60,7 @@ export default async function WorkHelpPage() {
 
           <h2>Finish a task</h2>
           <p>
-            An admin, an overseer, an assistant, or the assigned person can choose Start, then Finished. The page says whether the completion email was sent. The email subject is the task title. A crew request uses “Crew request completed” plus that title. Finished tasks stay in a collapsed Finished section, with the date they were finished.
+            An admin, an overseer, an assistant, the person who claimed it, or the assigned person can choose Start, then Finished. Support can do that only when the work is assigned to them. Changing the assignee, or returning the work to the pool, shows Start again. Mark selected finished only includes tasks that have been started. The page says whether the completion email was sent. The email subject is the task title. A crew request uses “Crew request completed” plus that title. Finished tasks stay in a collapsed Finished section, with the date they were finished.
             A published process is listed as available. A draft is not. Claiming a standalone process keeps every task inside that process. A project process is started from Processes after you choose the project. Finishing the process marks that one work item done.
             Anyone on the work list can add a note or ask for help on a task. A help request is listed at the top of Work.
             If email is already configured, the Personnel Contact and Assistant are told. Support is not.

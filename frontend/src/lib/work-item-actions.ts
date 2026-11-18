@@ -42,13 +42,16 @@ export async function applyWorkStatus(input: {
   if (!input.personnel && !isAssignee) {
     return { error: 'Only an admin, overseer, assistant, or the assigned person can update this work', httpStatus: 403 as const };
   }
+  if (input.status === 'DONE' && item.status !== 'DONE' && !item.startedAt) {
+    return { error: 'Start this work before you finish it', httpStatus: 400 as const };
+  }
 
   const updated = await prisma.workItem.update({
     where: { id: item.id },
     data: {
       status: input.status,
       completedAt: input.status === 'DONE' ? new Date() : null,
-      startedAt: input.status === 'DONE' ? (item.startedAt || new Date()) : null,
+      startedAt: input.status === 'DONE' ? item.startedAt : null,
     },
     select: {
       id: true,

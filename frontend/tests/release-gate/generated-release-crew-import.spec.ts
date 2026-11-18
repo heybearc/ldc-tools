@@ -113,6 +113,8 @@ test('a crew-update spreadsheet becomes a claimable task and keeps the requestor
   await expect(row.getByText('Crew request')).toBeVisible();
   await expect(row.getByText('Release check requestor')).toBeVisible();
 
+  const started = await page.request.patch(`/api/v1/work-items/${item!.id}`, { data: { start: true } });
+  expect(started.ok()).toBeTruthy();
   const done = await page.request.patch(`/api/v1/work-items/${item!.id}`, {
     data: { status: 'DONE' },
   });

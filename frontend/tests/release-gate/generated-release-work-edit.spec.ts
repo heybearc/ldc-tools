@@ -70,6 +70,8 @@ test('an administrator can edit a task and the due date is labeled', async ({ pa
   await expect(updated.getByText('Due date: Dec 20, 2026')).toBeVisible();
   await expect(updated.getByText(originalTitle)).toHaveCount(0);
 
+  const started = await page.request.patch(`/api/v1/work-items/${item.id}`, { data: { start: true } });
+  expect(started.ok()).toBeTruthy();
   const done = await page.request.patch(`/api/v1/work-items/${item.id}`, {
     data: { status: 'DONE' },
   });
