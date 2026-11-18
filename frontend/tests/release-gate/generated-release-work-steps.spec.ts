@@ -111,8 +111,8 @@ test('an assignee can check a step and return the work to the pool', async ({ pa
 
   const again = await page.request.post(`/api/v1/work-items/${workId}/claim`);
   expect(again.ok()).toBeTruthy();
-  const started = await page.request.patch(`/api/v1/work-items/${workId}`, { data: { start: true } });
-  expect(started.ok()).toBeTruthy();
+  const began = await page.request.patch(`/api/v1/work-items/${workId}`, { data: { start: true } });
+  expect(began.ok()).toBeTruthy();
   const done = await page.request.patch(`/api/v1/work-items/${workId}`, { data: { status: 'DONE' } });
   expect(done.ok()).toBeTruthy();
   expect((await done.json()).status).toBe('DONE');
