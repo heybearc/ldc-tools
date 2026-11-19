@@ -1,19 +1,20 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-18  
+**Last updated:** 2026-11-19  
 **Current branch:** main  
-**Working on:** v1.54.3 is LIVE on green (CT135, `8c1c190`). STANDBY blue (CT133) has Start/Finished at `d38ccb2`. Hub dates stay paused.
+**Working on:** v1.55.0 is LIVE on blue (CT133, `0d744bf`). STANDBY green (CT135) is synced. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.54.3 is LIVE on green CT135. Start then Finished is on STANDBY blue CT133 and is not shipped. Hub dates stay paused.
+v1.55.0 is LIVE on blue CT133. STANDBY green CT135 is synced at `0d744bf`. Hub dates stay paused.
 
 ### What I'm doing right now
-Start then Finished is on STANDBY blue CT133 (`d38ccb2`). Not shipped. The installed phone app still shows Done until the next store build. Hub assignment dates stay paused.
+v1.55.0 is shipped. Start, then Finished is live. iOS build 17 is on TestFlight. Android version code 24 is on the Play internal track. Hub assignment dates stay paused.
 
 ### Recent completions
-- ✅ Start then Finished, and chat no longer jumps the page (`d38ccb2`). Migration `startedAt` applied. STANDBY blue CT133 http://10.92.3.34:3001. Not shipped.
+- ✅ Shipped v1.55.0 (`0d744bf`). Start, then Finished. A new assignee or a return to the pool shows Start again. qa-01 full suite 109 passed, plus the start test. LIVE blue CT133. STANDBY green CT135 synced. iOS build 17. Android version code 24. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.0
+- ✅ Start then Finished, and chat no longer jumps the page (`d38ccb2`). Migration `startedAt` applied. Shipped in v1.55.0.
 - ✅ Shipped v1.54.3 (`8c1c190`). Work filters: project, Overdue, Email off. LIVE green CT135. STANDBY was synced, then blue took `d38ccb2`. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.3
 - ✅ Shipped v1.54.2 (`7edec05`). Admin shell fits the window. LIVE was green CT135. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.2
 - ✅ Shipped v1.54.1 (`e6b7385`). Official App Store and Google Play badges in the footer and on the mobile page. qa-01 directory gate plus the mobile-install test. LIVE green CT135. STANDBY blue CT133 synced. No new store build. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.1
@@ -72,12 +73,12 @@ Start then Finished is on STANDBY blue CT133 (`d38ccb2`). Not shipped. The insta
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Test Start then Finished on https://blue.ldctools.com. `/ship` when it should go live. Phone UI waits for the next store build. Hub assignment dates stay paused.
+Hub assignment dates stay paused. New session before the next slice.
 
 ---
 
 ## Known Issues
-- iOS 1.1.0 build 16 is in App Store Connect. Android version code 23 is on the Play internal track. Play does not email new testers; send the internal opt-in link. Xcode 27 can deadlock in actool; `mobile/scripts/hold-asset-catalog-pipes.py` unblocks that pipe during the store lanes.
+- iOS 1.1.0 build 17 is on TestFlight. Android version code 24 is on the Play internal track. Play does not email new testers; send the internal opt-in link. Xcode 27 can deadlock in actool; `mobile/scripts/hold-asset-catalog-pipes.py` unblocks that pipe during the store lanes.
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
 - Phone feature flows passed 10/10 on the Android emulator. iOS Simulator 27.2 is installed. Those flows were not rerun on iOS.
 - 37 open crew requests have completion email turned off.
@@ -90,4 +91,4 @@ Test Start then Finished on https://blue.ldctools.com. `/ship` when it should go
 ---
 
 ## Exact Next Command
-Test Start then Finished on https://blue.ldctools.com. `/ship` when it should go live. Phone UI waits for the next store build. Hub assignment dates stay paused.
+Hub assignment dates stay paused. New session before the next slice.

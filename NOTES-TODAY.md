@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-19)
+- Shipped v1.55.0 (`0d744bf`). LIVE blue CT133. STANDBY green CT135 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.0
+- A task shows Start, then Finished. A new assignee, an edit of the assignee, or a claim clears the start. Return to the pool already did. Finished is refused until Start.
+- qa-01 full suite 109 passed, plus the start test, before the switch. The schema change forced the full suite.
+- iOS build 17 is on TestFlight. Android version code 24 is on the Play internal track.
+- Chat no longer jumps when a refresh finds nothing new.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: new session before the next slice.
+
 ### Mid-day (2026-11-18, hard budget)
 - Shipped v1.54.2 (`7edec05`) and v1.54.3 (`8c1c190`). LIVE green CT135. Tags on GitHub.
 - Work list can filter by project, Overdue, and Email off.
