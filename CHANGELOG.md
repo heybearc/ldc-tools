@@ -5,6 +5,12 @@ All notable changes to LDC Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.55.1] - 2026-11-25
+
+### Fixed
+- Chat fills the window, so the message box stays on screen
+- A web address in a chat message is a link, including a linked title pasted into the box
+
 ## [1.55.0] - 2026-11-18
 
 ### Added

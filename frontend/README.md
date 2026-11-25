@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.55.0**
+Current: **1.55.1**
 
 ## Version History
+- **v1.55.1** (2026-11-25) - Chat stays on screen, and a web address in a message is a link
 - **v1.55.0** (2026-11-18) - A task shows Start, then Finished, and chat stays where you left it
 - **v1.54.3** (2026-11-18) - Work can be limited to a project, overdue dates, or tasks that will not email the requestor
 - **v1.54.2** (2026-11-17) - Admin pages use the full window, and announcement actions stay visible
