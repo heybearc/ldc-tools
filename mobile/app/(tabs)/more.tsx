@@ -8,6 +8,7 @@ import { PRIVACY_URL, SUPPORT_URL } from '@/lib/support';
 type Notice = { id: string; title: string; message: string; type: string; linkUrl?: string | null };
 
 const LINKS = [
+  { title: 'References', detail: 'Shared forms, documents, and sites', href: '/references' },
   { title: 'Processes', detail: 'Templates and starting work', href: '/processes' },
   { title: 'Trade teams', detail: 'Teams and crews', href: '/trade-teams' },
   { title: 'Feedback', detail: 'Send a note and see your items', href: '/feedback' },
@@ -74,7 +75,7 @@ export default function MoreScreen() {
         </View>
       ))}
       {items.map((item) => (
-        <Pressable key={item.href} testID={`link-${item.href.slice(1)}`} onPress={() => router.push(item.href as '/processes')} style={styles.card}>
+        <Pressable key={item.href} testID={`link-${item.href.slice(1)}`} onPress={() => router.push(item.href as '/references')} style={styles.card}>
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.detail}>{item.detail}</Text>
         </Pressable>

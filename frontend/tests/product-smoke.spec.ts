@@ -39,6 +39,9 @@ test('directory, work, chat, and projects open after sign-in', async ({ page }) 
 
   await page.goto('/processes');
   await expect(page.getByRole('heading', { name: 'Processes' })).toBeVisible();
+
+  await page.goto('/references');
+  await expect(page.getByRole('heading', { name: 'References' })).toBeVisible();
 });
 
 test('the store app rejects a bad password and reads work and the directory', async ({ request }) => {
@@ -65,4 +68,11 @@ test('the store app rejects a bad password and reads work and the directory', as
   expect(Array.isArray(payload.people)).toBe(true);
   expect(Array.isArray(payload.directory?.teams)).toBe(true);
   expect(payload.user?.email).toBeTruthy();
+
+  const references = await request.get('/api/v1/mobile/references', {
+    headers: { Authorization: `Bearer ${session.token}` },
+  });
+  expect(references.ok()).toBeTruthy();
+  const referenceBody = await references.json();
+  expect(Array.isArray(referenceBody.links)).toBe(true);
 });

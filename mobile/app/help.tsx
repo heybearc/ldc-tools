@@ -42,6 +42,26 @@ const ARTICLES: Article[] = [
     ],
   },
   {
+    id: 'references',
+    title: 'References',
+    summary: 'Shared links for this group',
+    sections: [
+      {
+        heading: 'Open a link',
+        paragraphs: [
+          'References lists forms, documents, and sites for this construction group. Open it from More. Search by title, note, or address.',
+          'A link on a task, or a web address in chat, stays on that item.',
+        ],
+      },
+      {
+        heading: 'Add a link',
+        paragraphs: [
+          'Personnel Contact, Assistant, and Support can add, edit, or remove a link. A title and a web address are required. A category and a note are optional.',
+        ],
+      },
+    ],
+  },
+  {
     id: 'processes',
     title: 'Processes',
     summary: 'Reusable checklists',

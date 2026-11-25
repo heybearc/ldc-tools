@@ -90,6 +90,7 @@ model User {
   expoPushTokens        ExpoPushToken[]
   chatBlocksMade      ChatBlock[] @relation("ChatBlocksMade")
   chatBlocksReceived  ChatBlock[] @relation("ChatBlocksReceived")
+  referenceLinks      ReferenceLink[]
 }
 
 model VerificationToken {
@@ -444,6 +445,7 @@ model ConstructionGroup {
   processTemplates ProcessTemplate[]
   chatChannels    ChatChannel[]
   directoryContacts DirectoryContact[]
+  referenceLinks  ReferenceLink[]
   auditLogsFrom   AuditLog[]  @relation("AuditLogFromCG")
   auditLogsTo     AuditLog[]  @relation("AuditLogToCG")
 
@@ -863,6 +865,24 @@ model ProjectCongregationAssignment {
   
   @@unique([projectId, congregationId])
   @@map("project_congregation_assignments")
+}
+
+model ReferenceLink {
+  id                  String            @id @default(cuid())
+  constructionGroupId String
+  title               String
+  url                 String
+  note                String?           @db.Text
+  category            String            @default("General")
+  createdById         String
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  constructionGroup   ConstructionGroup @relation(fields: [constructionGroupId], references: [id], onDelete: Cascade)
+  creator             User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([constructionGroupId])
+  @@map("reference_links")
 }
 
 model Announcement {

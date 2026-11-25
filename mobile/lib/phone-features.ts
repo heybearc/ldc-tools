@@ -40,6 +40,10 @@ export const phoneFeatures: PhoneFeature[] = [
     steps: [{ tap: 'More' }, { see: 'Templates and starting work' }, { seeId: 'screen-more' }],
   },
   {
+    id: 'references',
+    steps: [{ tap: 'More' }, { tapId: 'link-references' }, { seeId: 'screen-references' }],
+  },
+  {
     id: 'processes',
     steps: [{ tap: 'More' }, { tapId: 'link-processes' }, { seeId: 'screen-processes' }],
   },

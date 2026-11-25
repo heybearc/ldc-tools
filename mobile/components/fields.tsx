@@ -21,9 +21,9 @@ export function Field({
         onChangeText={onChangeText}
         secureTextEntry={secure}
         multiline={multiline}
-        autoCapitalize={label === 'Email' ? 'none' : 'sentences'}
-        autoCorrect={label !== 'Email'}
-        keyboardType={label === 'Email' ? 'email-address' : label === 'Date' ? 'numbers-and-punctuation' : 'default'}
+        autoCapitalize={label === 'Email' || label === 'Web address' || label === 'Search' ? 'none' : 'sentences'}
+        autoCorrect={label !== 'Email' && label !== 'Web address'}
+        keyboardType={label === 'Email' ? 'email-address' : label === 'Web address' ? 'url' : label === 'Date' ? 'numbers-and-punctuation' : 'default'}
         style={[styles.input, multiline && styles.multiline]}
       />
     </View>

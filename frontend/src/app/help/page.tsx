@@ -66,6 +66,13 @@ const helpTopics: HelpTopic[] = [
     icon: '✅'
   },
   {
+    id: 'references',
+    title: 'References',
+    description: 'Shared forms, documents, and sites for this construction group',
+    roles: ['SUPER_ADMIN', 'ZONE_OVERSEER', 'PERSONNEL_CONTACT', 'READ_ONLY'],
+    icon: '🔗'
+  },
+  {
     id: 'projects',
     title: 'Projects',
     description: 'See this construction group’s projects, dated work, and who is assigned as Personnel',
@@ -145,6 +152,12 @@ export default async function HelpPage() {
               className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
             >
               📋 Release Notes
+            </Link>
+            <Link
+              href="/references"
+              className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
+            >
+              🔗 References
             </Link>
             <Link
               href="/"

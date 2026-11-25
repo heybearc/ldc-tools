@@ -10,6 +10,7 @@ test('each phone feature gets its own flow', () => {
   assert.ok(ids.includes('projects'));
   assert.ok(ids.includes('directory'));
   assert.ok(ids.includes('chat'));
+  assert.ok(ids.includes('references'));
   assert.ok(ids.includes('processes'));
   assert.ok(ids.includes('trade-teams'));
   assert.ok(ids.includes('feedback'));
