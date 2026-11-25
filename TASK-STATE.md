@@ -1,18 +1,19 @@
 # LDC Tools Task State
 
-**Last updated:** 2026-11-19  
+**Last updated:** 2026-11-25  
 **Current branch:** main  
-**Working on:** v1.55.0 is LIVE on blue (CT133, `0d744bf`). STANDBY green (CT135) is synced. Hub dates stay paused.
+**Working on:** v1.55.1 is LIVE on blue (CT133, `d882a1a`). STANDBY green (CT135, `1f5318d`) is synced. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.55.0 is LIVE on blue CT133. STANDBY green CT135 is synced at `0d744bf`. Hub dates stay paused.
+v1.55.1 is LIVE on blue CT133. STANDBY green CT135 is synced at `1f5318d`. Hub dates stay paused.
 
 ### What I'm doing right now
-v1.55.0 is shipped. Start, then Finished is live. iOS build 17 is on TestFlight. Android version code 24 is on the Play internal track. Hub assignment dates stay paused.
+v1.55.1 is shipped. Chat stays on screen and a web address is a link. iOS build 19 is on TestFlight. Android version code 25 is on the Play internal track. There is no team reference library. Hub assignment dates stay paused.
 
 ### Recent completions
+- ✅ Shipped v1.55.1 (`d882a1a`). Chat fills the window and a web address is a link. qa-01 directory gate plus the chat-link test. LIVE blue CT133. STANDBY green CT135 synced at `1f5318d`. iOS build 19. Android version code 25. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.1
 - ✅ Shipped v1.55.0 (`0d744bf`). Start, then Finished. A new assignee or a return to the pool shows Start again. qa-01 full suite 109 passed, plus the start test. LIVE blue CT133. STANDBY green CT135 synced. iOS build 17. Android version code 24. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.0
 - ✅ Start then Finished, and chat no longer jumps the page (`d38ccb2`). Migration `startedAt` applied. Shipped in v1.55.0.
 - ✅ Shipped v1.54.3 (`8c1c190`). Work filters: project, Overdue, Email off. LIVE green CT135. STANDBY was synced, then blue took `d38ccb2`. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.54.3

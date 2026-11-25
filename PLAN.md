@@ -1,8 +1,8 @@
 # LDC Tools Plan
 
-**Last updated:** 2026-11-19  
+**Last updated:** 2026-11-25  
 **Current phase:** Region work queue  
-**Status:** v1.55.0 is LIVE on blue (CT133, `0d744bf`). STANDBY green (CT135) is synced. Hub dates are paused.
+**Status:** v1.55.1 is LIVE on blue (CT133, `d882a1a`). STANDBY green (CT135, `1f5318d`) is synced. Hub dates are paused.
 
 ---
 
@@ -49,6 +49,7 @@
 - [x] Admin pages fit the window. `/ship` v1.54.2 (`7edec05`).
 - [x] Work list filters: project, Overdue, Email off. `/ship` v1.54.3 (`8c1c190`). LIVE green CT135.
 - [x] Start then Finished on a task or process. `/ship` v1.55.0 (`0d744bf`). LIVE blue CT133. STANDBY green CT135 synced. iOS build 17. Android version code 24.
+- [x] Chat stays on screen and a web address is a link. `/ship` v1.55.1 (`d882a1a`). LIVE blue CT133. STANDBY green CT135 synced at `1f5318d`. iOS build 19. Android version code 25.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)

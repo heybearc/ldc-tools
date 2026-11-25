@@ -5,6 +5,16 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-25)
+- Shipped v1.55.1 (`d882a1a`). LIVE blue CT133. STANDBY green CT135 synced at `1f5318d` (same version). Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.1
+- Chat fills the window. A web address in a message is a link. Pasting a linked title keeps the address.
+- qa-01 directory gate plus the chat-link test passed on standby before the switch.
+- iOS build 19 is on TestFlight. Android version code 25 is on the Play internal track.
+- The icon-catalog helper no longer opens the pipe. That open made AssetCatalogAgent abort. A stuck compile is still recycled.
+- No shared reference library. Chat and a task reference link are not a team link list. Announcements are admin-only.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: new session before a reference library.
+
 ### Mid-day (2026-11-19)
 - Shipped v1.55.0 (`0d744bf`). LIVE blue CT133. STANDBY green CT135 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.0
 - A task shows Start, then Finished. A new assignee, an edit of the assignee, or a claim clears the start. Return to the pool already did. Finished is refused until Start.
