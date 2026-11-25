@@ -1,7 +1,8 @@
 'use client';
 
-import { FormEvent, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { ClipboardEvent, FormEvent, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { pastedChatText, splitChatLinks } from '@/lib/chat-links';
 import { userError } from '@/lib/user-error';
 
 interface Person {
@@ -35,6 +36,26 @@ function initials(label: string) {
   const parts = label.trim().split(/\s+/).filter(Boolean).slice(0, 2);
   const letters = parts.map((part) => part[0]?.toUpperCase() || '').join('');
   return letters || '•';
+}
+
+function MessageBody({ body, mine }: { body: string; mine: boolean }) {
+  return (
+    <p className="whitespace-pre-wrap break-words">
+      {splitChatLinks(body).map((part, index) => part.href ? (
+        <a
+          key={index}
+          href={part.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`underline break-all ${mine ? 'text-white' : 'text-blue-700'}`}
+        >
+          {part.text}
+        </a>
+      ) : (
+        <span key={index}>{part.text}</span>
+      ))}
+    </p>
+  );
 }
 
 function formatWhen(iso: string) {
@@ -78,6 +99,7 @@ function ChatScreen() {
   const [selectedId, setSelectedId] = useState<string | null>(requested);
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
+  const draftBox = useRef<HTMLTextAreaElement>(null);
   const [personQuery, setPersonQuery] = useState('');
   const [listQuery, setListQuery] = useState('');
   const [newChatOpen, setNewChatOpen] = useState(false);
@@ -210,6 +232,32 @@ function ChatScreen() {
     if (!pane || !stickToBottom.current) return;
     pane.scrollTop = pane.scrollHeight;
   }, [messages]);
+
+  useEffect(() => {
+    const box = draftBox.current;
+    if (!box) return;
+    box.style.height = '0px';
+    box.style.height = `${Math.min(box.scrollHeight, 128)}px`;
+  }, [draft]);
+
+  function insertPaste(event: ClipboardEvent<HTMLTextAreaElement>) {
+    const next = pastedChatText({
+      plain: event.clipboardData.getData('text/plain'),
+      html: event.clipboardData.getData('text/html'),
+      uriList: event.clipboardData.getData('text/uri-list'),
+    });
+    if (next == null) return;
+    event.preventDefault();
+    const box = event.currentTarget;
+    const start = box.selectionStart ?? box.value.length;
+    const end = box.selectionEnd ?? box.value.length;
+    const value = `${box.value.slice(0, start)}${next}${box.value.slice(end)}`;
+    setDraft(value);
+    requestAnimationFrame(() => {
+      const cursor = start + next.length;
+      draftBox.current?.setSelectionRange(cursor, cursor);
+    });
+  }
 
   async function send(event: FormEvent) {
     event.preventDefault();
@@ -392,7 +440,7 @@ function ChatScreen() {
     ));
 
   return (
-    <div className="flex h-[calc(100dvh-9rem)] min-h-[32rem] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <header className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
         <div className="min-w-0">
           <h1 className="text-lg font-semibold tracking-tight text-slate-900">Chat</h1>
@@ -588,20 +636,29 @@ function ChatScreen() {
               <article key={message.id} className={`flex max-w-[78%] flex-col ${message.mine ? 'ml-auto items-end' : 'items-start'}`}>
                 {!message.mine && <p className="mb-1 px-1 text-xs font-medium text-slate-500">{personName(message.author)}</p>}
                 <div className={`rounded-2xl px-3.5 py-2 text-sm leading-relaxed ${message.mine ? 'rounded-br-md bg-blue-600 text-white' : 'rounded-bl-md border border-slate-200 bg-white text-slate-900'}`}>
-                  <p className="whitespace-pre-wrap">{message.body}</p>
+                  <MessageBody body={message.body} mine={message.mine} />
                 </div>
                 <time className="mt-1 px-1 text-[11px] text-slate-400" dateTime={message.createdAt}>{formatWhen(message.createdAt)}</time>
               </article>
             ))}
             <div />
           </div>
-          <form onSubmit={send} className="flex gap-2 border-t border-slate-200 bg-white p-3">
-            <input
+          <form onSubmit={send} className="flex items-end gap-2 border-t border-slate-200 bg-white p-3">
+            <textarea
+              ref={draftBox}
+              rows={1}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
+              onPaste={insertPaste}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  event.currentTarget.form?.requestSubmit();
+                }
+              }}
               placeholder={selected ? `Message ${selected.title}` : 'Choose a chat'}
               disabled={!selectedId}
-              className="min-h-[44px] flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 placeholder:text-slate-400 disabled:opacity-60"
+              className="max-h-32 min-h-[44px] flex-1 resize-none rounded-3xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 disabled:opacity-60"
             />
             <button
               type="submit"

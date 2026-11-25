@@ -6,6 +6,7 @@ import {
   FlatList,
   Keyboard,
   type KeyboardEvent,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -18,6 +19,7 @@ import { useFocusEffect } from 'expo-router';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { publishChatUnread, unreadTotal } from '@/lib/chat-badge';
+import { splitChatLinks } from '@/lib/chat-links';
 import { setAppBadge } from '@/lib/push';
 
 type Person = { id: string; name: string | null; email: string };
@@ -437,7 +439,19 @@ export function ChatPane() {
             renderItem={({ item }) => (
               <View style={[styles.bubble, item.mine ? styles.mine : styles.theirs]}>
                 {!item.mine ? <Text style={styles.author}>{personName(item.author)}</Text> : null}
-                <Text style={[styles.body, item.mine && styles.mineText]}>{item.body}</Text>
+                <Text style={[styles.body, item.mine && styles.mineText]}>
+                  {splitChatLinks(item.body).map((part, index) => part.href ? (
+                    <Text
+                      key={index}
+                      style={[styles.link, item.mine && styles.mineLink]}
+                      onPress={() => { void Linking.openURL(part.href as string); }}
+                    >
+                      {part.text}
+                    </Text>
+                  ) : (
+                    <Text key={index}>{part.text}</Text>
+                  ))}
+                </Text>
                 {!item.mine ? (
                   <View style={styles.actions}>
                     <Pressable onPress={() => void reportMessage(item)}>
@@ -504,6 +518,8 @@ const styles = StyleSheet.create({
   author: { fontSize: 12, fontWeight: '700', color: '#374151', marginBottom: 2 },
   body: { color: '#111827', fontSize: 15 },
   mineText: { color: '#fff' },
+  link: { color: '#1e3a8a', textDecorationLine: 'underline' },
+  mineLink: { color: '#fff' },
   composer: { flexDirection: 'row', gap: 8, padding: 12, backgroundColor: '#fff' },
   input: { flex: 1, minHeight: 44, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, backgroundColor: '#fff' },
   send: { minHeight: 44, minWidth: 72, borderRadius: 8, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center' },

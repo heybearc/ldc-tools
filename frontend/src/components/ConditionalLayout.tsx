@@ -36,6 +36,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
   const isPublicPage = pathname === '/privacy' || pathname === '/support';
   const isHelpPage = pathname?.startsWith('/help') || pathname?.startsWith('/release-notes');
   const isAdminRoute = Boolean(pathname?.startsWith('/admin'));
+  const isChatRoute = pathname === '/chat';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -115,7 +116,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
     active ? 'text-blue-600 font-medium' : 'text-gray-900 hover:text-blue-600 font-medium';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={isChatRoute ? 'flex h-dvh flex-col overflow-hidden bg-gray-50' : 'min-h-screen bg-gray-50'}>
       <ReleaseBanner 
         currentVersion={APP_VERSION}
         userLastSeenVersion={userLastSeenVersion}
@@ -400,13 +401,13 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
       )}
 
       <FeedbackUpdateBanner />
-      <main className={isAdminRoute ? 'min-w-0' : 'max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8'}>
+      <main className={isChatRoute ? 'mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-3 py-3 sm:px-6 lg:px-8' : isAdminRoute ? 'min-w-0' : 'max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8'}>
         <div className={isAdminRoute ? 'px-4 pt-4 sm:px-6 lg:px-8' : undefined}>
           <AnnouncementBanner />
         </div>
         {children}
       </main>
-      {isAdminRoute ? null : (
+      {isAdminRoute || isChatRoute ? null : (
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">

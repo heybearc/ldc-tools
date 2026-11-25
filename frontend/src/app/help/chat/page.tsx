@@ -34,7 +34,7 @@ export default async function ChatHelpPage() {
 
           <h2>Team chat</h2>
           <p>
-            Open Chat and choose Team chat. A message there goes to the Personnel team in this construction group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send. Choose Mark unread to keep a conversation marked until you are ready, or Mark read to clear it. The Chat link shows how many conversations are still unread. The phone app can also show an alert, a badge, and a sound for a new chat message, an announcement, or work that is available to claim. Allow alerts when the phone asks.
+            Open Chat and choose Team chat. The conversation fills the screen, and the message box stays at the bottom. A web address in a message is a link. Pasting a linked title keeps the address with the title. A message there goes to the Personnel team in this construction group. On a phone, the list stays up until you choose a conversation. The phone app has the same team room and direct messages. Type a message and choose Send. Choose Mark unread to keep a conversation marked until you are ready, or Mark read to clear it. The Chat link shows how many conversations are still unread. The phone app can also show an alert, a badge, and a sound for a new chat message, an announcement, or work that is available to claim. Allow alerts when the phone asks.
           </p>
 
           <h2>A direct message</h2>
