@@ -23,7 +23,7 @@
           "sms"
         ]
       },
-      "buildNumber": "17"
+      "buildNumber": "19"
     },
     "android": {
       "package": "com.ldctools.mobile",

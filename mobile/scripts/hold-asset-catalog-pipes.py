@@ -1,20 +1,10 @@
 #!/usr/bin/env python3
-"""Keep Xcode 27 from hanging forever in CompileAssetCatalog.
+"""Recycle an actool that never finishes.
 
-Two failures show up on this toolchain:
-
-1. AssetCatalogAgent blocks in open() on HostToRemote until some writer
-   exists, and ibtoold will not open its write end until that returns.
-   A non-blocking write open fails with ENXIO in that window, so it never
-   breaks the wait. A read-write open succeeds with nobody else attached
-   and lets both sides finish the handshake. The extra descriptor has to
-   close once both sides have their own, or it swallows the compile message.
-
-2. After the handshake, actool sometimes sits forever with unread bytes in
-   both pipes. A normal catalog compile for this app finishes in a few
-   seconds. An actool that is still alive after 20 seconds is stuck. Kill
-   it, and the ibtoold/agent pair with it, so xcodebuild returns and the
-   archive can be retried instead of waiting out the agent.
+Do not open the HostToRemote FIFO. On Xcode 27 that open makes
+AssetCatalogAgent abort before the handshake, and a clean compile
+finishes without it. If actool is still alive after STUCK_AFTER seconds,
+kill it so the lane can retry the archive.
 """
 
 import errno
@@ -28,8 +18,7 @@ HELD = {}
 HELD_AT = {}
 ACTOOL_SEEN = {}
 DONE = set()
-STUCK_AFTER = 20
-HOLD_LIMIT = 2
+STUCK_AFTER = 90
 
 
 def pid_alive(pid):
@@ -102,40 +91,14 @@ def release(path, reason):
 
 
 def open_handshake():
-    now = time.time()
-    live = set(fifos())
-    for path in list(HELD):
-        if path not in live:
-            release(path, "gone")
-    for path in live:
-        pid = ibtoold_pid(path)
-        if not pid or not pid_alive(pid) or path in DONE:
-            continue
-        if path in HELD:
-            if ibtoold_has_write(path) and agent_has_read(path):
-                release(path, "both sides connected")
-            elif now - HELD_AT.get(path, now) > HOLD_LIMIT:
-                release(path, "hold limit")
-            continue
-        if ibtoold_has_write(path):
-            continue
-        try:
-            fd = os.open(path, os.O_RDWR | os.O_NONBLOCK)
-        except OSError as error:
-            if error.errno != errno.ENOENT:
-                print(f"asset-catalog pipe: {path}: {error}", flush=True)
-            continue
-        HELD[path] = fd
-        HELD_AT[path] = now
-        print(f"asset-catalog pipe: opened {path}", flush=True)
+    # Opening HostToRemote while actool is running makes AssetCatalogAgent
+    # abort before the handshake. A clean compile finishes on its own.
+    return
 
 
 def recycle_stuck_actool():
     now = time.time()
     current = set(pids_for("actool", exact=True))
-    for pid in list(ACTOOL_SEEN):
-        if pid not in current:
-            del ACTOOL_SEEN[pid]
     for pid in current:
         ACTOOL_SEEN.setdefault(pid, now)
         if now - ACTOOL_SEEN[pid] < STUCK_AFTER:

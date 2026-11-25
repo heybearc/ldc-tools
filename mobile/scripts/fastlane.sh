@@ -18,8 +18,9 @@ if [ -n "${JAVA_HOME:-}" ]; then
 fi
 
 cd "$(dirname "$0")/.."
-# Xcode 27 can deadlock actool against ibtoold. The watcher unblocks the
-# handshake and kills a stuck actool so the lane can retry the archive.
+# Xcode 27 can leave actool stuck. The watcher only recycles a compile that
+# has not finished. It must not open the asset-catalog FIFOs; that makes
+# AssetCatalogAgent abort before the handshake.
 python3 scripts/hold-asset-catalog-pipes.py >/tmp/ldc-asset-catalog-pipes.log 2>&1 &
 watcher=$!
 cleanup() {
