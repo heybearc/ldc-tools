@@ -18,6 +18,12 @@ if [ -n "${JAVA_HOME:-}" ]; then
 fi
 
 cd "$(dirname "$0")/.."
+# A previous archive can leave ibtoold running with its FIFOs. Clear those
+# leftovers before this lane starts.
+killall -9 actool ibtoold AssetCatalogAgent AssetCatalogSimulatorAgent >/dev/null 2>&1 || true
+if [ -n "${TMPDIR:-}" ]; then
+  find "$TMPDIR" -maxdepth 1 \( -name 'ibtoold-*' -o -name 'ib*-IBTOOLD-*' \) -exec rm -rf {} + || true
+fi
 # Xcode 27 can leave actool stuck. The watcher only recycles a compile that
 # has not finished. It must not open the asset-catalog FIFOs; that makes
 # AssetCatalogAgent abort before the handshake.
