@@ -5,6 +5,16 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-27, hard budget)
+- LIVE is still v1.55.1 on blue CT133. STANDBY green CT135 is `dd933f4` (http://10.92.3.25:3001).
+- References on the website and the phone. Whole group gets email, phone, and browser alerts when work is waiting. Assignee gets the same when someone else assigns them.
+- Work mail goes through Cloudigan Mail. From is LDC Admin Team at noreply@cloudigan.com. The old To line was the saved Gmail mailbox.
+- qa-01 full suite 112 passed on that standby build, plus the reference and work-alert tests.
+- v1.56.0 notes are `34f5487` on main. Not deployed. Not tagged.
+- iOS archive failed. actool hung. No TestFlight upload. Android not started. Traffic not switched. iOS build 19. Android version code 25.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: new chat. Retry the iOS lane, then Android, then finish `/ship` and `/sync`.
+
 ### Mid-day (2026-11-25)
 - Shipped v1.55.1 (`d882a1a`). LIVE blue CT133. STANDBY green CT135 synced at `1f5318d` (same version). Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.1
 - Chat fills the window. A web address in a message is a link. Pasting a linked title keeps the address.
