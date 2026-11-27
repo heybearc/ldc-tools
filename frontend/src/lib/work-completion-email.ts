@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { prisma } from '@/lib/prisma';
 import { decryptPassword } from '@/lib/email-crypto';
+import { mailGatewayConfigured, sendViaMailGateway } from '@/lib/mail-gateway';
 import { isDeliverableEmail } from '@/lib/reachable-email';
 
 function escapeHtml(value: string): string {
@@ -19,24 +20,49 @@ export async function sendWorkCompletionEmail(input: {
   completedByName: string;
   crewRequest?: boolean;
 }): Promise<boolean> {
+  if (!isDeliverableEmail(input.requestorEmail)) {
+    return false;
+  }
+
+  const greeting = input.requestorName || 'Hello';
+  const crewRequest = input.crewRequest === true;
+  const subject = crewRequest ? `Crew request completed — ${input.title}` : `${input.title} is done`;
+  const lead = crewRequest ? 'Your crew request is done.' : 'This work is done.';
+  const text = [
+    `Hello ${greeting},`,
+    '',
+    lead,
+    '',
+    input.title,
+    input.detail,
+    '',
+    `Completed by ${input.completedByName}.`,
+  ].join('\n');
+  const html = `
+      <p>Hello ${escapeHtml(greeting)},</p>
+      <p>${escapeHtml(lead)}</p>
+      <p><strong>${escapeHtml(input.title)}</strong></p>
+      <p style="white-space: pre-wrap;">${escapeHtml(input.detail)}</p>
+      <p>Completed by ${escapeHtml(input.completedByName)}.</p>
+    `;
+  if (mailGatewayConfigured()) {
+    await sendViaMailGateway({
+      to: [input.requestorEmail],
+      subject,
+      text,
+      html,
+      tags: { app: 'ldc-tools', event: 'work-completed' },
+    });
+    return true;
+  }
   const emailConfig = await prisma.emailConfiguration.findFirst({
     where: { isActive: true },
   });
   if (!emailConfig?.fromEmail || !emailConfig.smtpHost) {
     return false;
   }
-  if (!isDeliverableEmail(input.requestorEmail)) {
-    return false;
-  }
-
   const password = decryptPassword(emailConfig.appPasswordEncrypted || '');
-  const transportConfig: {
-    host: string;
-    port: number;
-    secure: boolean;
-    auth: { user: string; pass: string };
-    requireTLS?: boolean;
-  } = {
+  const transporter = nodemailer.createTransport({
     host: emailConfig.smtpHost,
     port: emailConfig.smtpPort || 587,
     secure: emailConfig.encryption === 'ssl',
@@ -44,37 +70,14 @@ export async function sendWorkCompletionEmail(input: {
       user: emailConfig.username || '',
       pass: password,
     },
-  };
-  if (emailConfig.encryption !== 'ssl') {
-    transportConfig.requireTLS = true;
-  }
-
-  const greeting = input.requestorName || 'Hello';
-  const crewRequest = input.crewRequest === true;
-  const subject = crewRequest ? `Crew request completed — ${input.title}` : `${input.title} is done`;
-  const lead = crewRequest ? 'Your crew request is done.' : 'This work is done.';
-  const transporter = nodemailer.createTransport(transportConfig);
+    ...(emailConfig.encryption === 'ssl' ? {} : { requireTLS: true }),
+  });
   await transporter.sendMail({
     from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
     to: input.requestorEmail,
     subject,
-    text: [
-      `Hello ${greeting},`,
-      '',
-      lead,
-      '',
-      input.title,
-      input.detail,
-      '',
-      `Completed by ${input.completedByName}.`,
-    ].join('\n'),
-    html: `
-      <p>Hello ${escapeHtml(greeting)},</p>
-      <p>${escapeHtml(lead)}</p>
-      <p><strong>${escapeHtml(input.title)}</strong></p>
-      <p style="white-space: pre-wrap;">${escapeHtml(input.detail)}</p>
-      <p>Completed by ${escapeHtml(input.completedByName)}.</p>
-    `,
+    text,
+    html,
   });
   return true;
 }
@@ -88,6 +91,31 @@ export async function sendWorkHelpEmail(input: {
 }): Promise<number> {
   const recipients = input.to.filter((email) => isDeliverableEmail(email));
   if (recipients.length === 0) return 0;
+
+  const subject = `Help requested — ${input.title}`;
+  const text = [
+    `${input.askedByName} asked for help on a work item.`,
+    '',
+    input.title,
+    input.detail,
+    '',
+    input.message,
+  ].join('\n');
+  const html = `
+      <p>${escapeHtml(input.askedByName)} asked for help on a work item.</p>
+      <p><strong>${escapeHtml(input.title)}</strong></p>
+      <p style="white-space: pre-wrap;">${escapeHtml(input.detail)}</p>
+      <p style="white-space: pre-wrap;">${escapeHtml(input.message)}</p>
+    `;
+  if (mailGatewayConfigured()) {
+    return sendViaMailGateway({
+      to: recipients,
+      subject,
+      text,
+      html,
+      tags: { app: 'ldc-tools', event: 'work-help' },
+    });
+  }
   const emailConfig = await prisma.emailConfiguration.findFirst({
     where: { isActive: true },
   });
@@ -110,21 +138,9 @@ export async function sendWorkHelpEmail(input: {
   await transporter.sendMail({
     from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
     to: recipients.join(', '),
-    subject: `Help requested — ${input.title}`,
-    text: [
-      `${input.askedByName} asked for help on a work item.`,
-      '',
-      input.title,
-      input.detail,
-      '',
-      input.message,
-    ].join('\n'),
-    html: `
-      <p>${escapeHtml(input.askedByName)} asked for help on a work item.</p>
-      <p><strong>${escapeHtml(input.title)}</strong></p>
-      <p style="white-space: pre-wrap;">${escapeHtml(input.detail)}</p>
-      <p style="white-space: pre-wrap;">${escapeHtml(input.message)}</p>
-    `,
+    subject,
+    text,
+    html,
   });
   return recipients.length;
 }
@@ -144,6 +160,25 @@ export async function sendWorkNoticeEmail(input: {
   const message = input.message;
   const recipients = input.to.filter((email) => isDeliverableEmail(email));
   if (!message || recipients.length === 0) return 0;
+
+  const titles = message.titles.map((title) => `<li>${escapeHtml(title)}</li>`).join('');
+  const more = message.extra > 0 ? `<li>and ${message.extra} more</li>` : '';
+  const detail = message.detail ? `<p style="white-space: pre-wrap;">${escapeHtml(message.detail)}</p>` : '';
+  const html = `
+    <p>${escapeHtml(message.lead)}</p>
+    <ul>${titles}${more}</ul>
+    ${detail}
+    <p><a href="${escapeHtml(message.link)}">Open this work in LDC Tools</a></p>
+  `;
+  if (mailGatewayConfigured()) {
+    return sendViaMailGateway({
+      to: recipients,
+      subject: message.subject,
+      text: message.text,
+      html,
+      tags: { app: 'ldc-tools', event: 'work-notice' },
+    });
+  }
   const emailConfig = await prisma.emailConfiguration.findFirst({
     where: { isActive: true },
   });
@@ -161,22 +196,10 @@ export async function sendWorkNoticeEmail(input: {
     ...(emailConfig.encryption === 'ssl' ? {} : { requireTLS: true }),
   });
 
-  const titles = message.titles.map((title) => `<li>${escapeHtml(title)}</li>`).join('');
-  const more = message.extra > 0 ? `<li>and ${message.extra} more</li>` : '';
-  const detail = message.detail ? `<p style="white-space: pre-wrap;">${escapeHtml(message.detail)}</p>` : '';
-  const html = `
-    <p>${escapeHtml(message.lead)}</p>
-    <ul>${titles}${more}</ul>
-    ${detail}
-    <p><a href="${escapeHtml(message.link)}">Open this work in LDC Tools</a></p>
-  `;
-
-  for (let index = 0; index < recipients.length; index += 40) {
-    const chunk = recipients.slice(index, index + 40);
+  for (const recipient of recipients) {
     await transporter.sendMail({
       from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
-      to: emailConfig.fromEmail,
-      bcc: chunk,
+      to: recipient,
       subject: message.subject,
       text: message.text,
       html,
