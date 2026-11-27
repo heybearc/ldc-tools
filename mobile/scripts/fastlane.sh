@@ -24,9 +24,8 @@ killall -9 actool ibtoold AssetCatalogAgent AssetCatalogSimulatorAgent >/dev/nul
 if [ -n "${TMPDIR:-}" ]; then
   find "$TMPDIR" -maxdepth 1 \( -name 'ibtoold-*' -o -name 'ib*-IBTOOLD-*' \) -exec rm -rf {} + || true
 fi
-# Xcode 27 can leave actool stuck. The watcher only recycles a compile that
-# has not finished. It must not open the asset-catalog FIFOs; that makes
-# AssetCatalogAgent abort before the handshake.
+# Xcode 27 can leave actool waiting on the catalog FIFO. The watcher opens
+# that FIFO only after a compile has already missed its normal window.
 python3 scripts/hold-asset-catalog-pipes.py >/tmp/ldc-asset-catalog-pipes.log 2>&1 &
 watcher=$!
 cleanup() {

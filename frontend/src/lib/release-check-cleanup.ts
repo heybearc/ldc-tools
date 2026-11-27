@@ -59,6 +59,19 @@ export async function removeReleaseCheckData(constructionGroupId: string) {
       ],
     },
   });
+  await prisma.volunteer.deleteMany({
+    where: {
+      constructionGroupId,
+      emailPersonal: { startsWith: 'release-check-directory+' },
+    },
+  });
+  await prisma.directoryContact.deleteMany({
+    where: {
+      constructionGroupId,
+      email: { startsWith: 'release-check-directory+' },
+    },
+  });
+
   const processes = await prisma.processTemplate.deleteMany({
     where: {
       constructionGroupId,

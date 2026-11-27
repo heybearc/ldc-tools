@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Recycle an actool that never finishes.
+"""Open the asset-catalog FIFO only after actool is already stuck.
 
-Do not open the HostToRemote FIFO. On Xcode 27 that open makes
-AssetCatalogAgent abort before the handshake, and a clean compile
-finishes without it. If actool is still alive after STUCK_AFTER seconds,
-kill it so the lane can retry the archive.
+A healthy catalog compile finishes in a few seconds. Opening HostToRemote
+during that window makes AssetCatalogAgent abort. Once actool has been
+alive longer than that, ibtoold still has no write end and both sides are
+waiting. Open the write end until ibtoold has its own, then close it.
 """
 
 import errno
@@ -18,7 +18,7 @@ HELD = {}
 HELD_AT = {}
 ACTOOL_SEEN = {}
 DONE = set()
-STUCK_AFTER = 90
+OPEN_AFTER = 8
 
 
 def pid_alive(pid):
@@ -90,31 +90,41 @@ def release(path, reason):
         print(f"asset-catalog pipe: released {path} ({reason})", flush=True)
 
 
-def open_handshake():
-    # Opening HostToRemote while actool is running makes AssetCatalogAgent
-    # abort before the handshake. A clean compile finishes on its own.
-    return
-
-
-def recycle_stuck_actool():
-    now = time.time()
+def actool_age(now):
     current = set(pids_for("actool", exact=True))
+    oldest = 0
     for pid in current:
         ACTOOL_SEEN.setdefault(pid, now)
-        if now - ACTOOL_SEEN[pid] < STUCK_AFTER:
-            continue
-        print(f"asset-catalog pipe: actool {pid} is still running after {STUCK_AFTER}s; recycling", flush=True)
-        for stuck in current:
-            try:
-                os.kill(stuck, signal.SIGKILL)
-            except OSError:
-                pass
-        subprocess.run(["killall", "-9", "ibtoold"], capture_output=True)
-        subprocess.run(["pkill", "-9", "-f", "AssetCatalogAgent"], capture_output=True)
-        ACTOOL_SEEN.clear()
-        for path in list(HELD):
-            release(path, "recycled")
+        oldest = max(oldest, now - ACTOOL_SEEN[pid])
+    for pid in list(ACTOOL_SEEN):
+        if pid not in current:
+            del ACTOOL_SEEN[pid]
+    return oldest
+
+
+def open_handshake(now):
+    if actool_age(now) < OPEN_AFTER:
         return
+    for path in fifos():
+        if path in DONE or path in HELD:
+            if path in HELD and ibtoold_has_write(path):
+                release(path, "ibtoold has the write end")
+            continue
+        if ibtoold_has_write(path):
+            DONE.add(path)
+            continue
+        try:
+            fd = os.open(path, os.O_WRONLY | os.O_NONBLOCK)
+        except OSError as error:
+            if error.errno != errno.ENXIO:
+                print(f"asset-catalog pipe: {path}: {error}", flush=True)
+            continue
+        os.set_blocking(fd, True)
+        HELD[path] = fd
+        HELD_AT[path] = now
+        print(f"asset-catalog pipe: opened {path}", flush=True)
+        if ibtoold_has_write(path):
+            release(path, "ibtoold has the write end")
 
 
 def main():
@@ -122,8 +132,7 @@ def main():
     parent = os.getppid()
     print(f"asset-catalog pipe: watching parent {parent}", flush=True)
     while pid_alive(parent):
-        open_handshake()
-        recycle_stuck_actool()
+        open_handshake(time.time())
         time.sleep(0.2)
     for path in list(HELD):
         release(path, "parent exited")
