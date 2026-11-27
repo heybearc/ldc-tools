@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.56.0**
+Current: **1.57.0**
 
 ## Version History
+- **v1.57.0** (2026-11-27) - Directory people stay in the directory, and work alerts go to Personnel
 - **v1.56.0** (2026-11-27) - Shared reference links, and the whole group is told when work is waiting
 - **v1.55.1** (2026-11-25) - Chat stays on screen, and a web address in a message is a link
 - **v1.55.0** (2026-11-18) - A task shows Start, then Finished, and chat stays where you left it
