@@ -4,6 +4,7 @@ import { isDeliverableEmail } from '@/lib/reachable-email';
 import { sendChatPush } from '@/lib/web-push';
 import { sendWorkNoticeEmail } from '@/lib/work-completion-email';
 import { userInGroupWhere } from '@/lib/work-item-access';
+import { PERSONNEL_ROLE_CODES } from '@/lib/work-items';
 import {
   assigneeToNotify,
   operatorTestEmail,
@@ -14,7 +15,29 @@ import {
 
 async function groupUsers(constructionGroupId: string) {
   return prisma.user.findMany({
-    where: userInGroupWhere(constructionGroupId),
+    where: {
+      status: 'ACTIVE',
+      OR: [
+        {
+          volunteer: {
+            isActive: true,
+            constructionGroupId,
+            roles: {
+              some: {
+                isActive: true,
+                endDate: null,
+                roleCode: { in: [...PERSONNEL_ROLE_CODES] },
+              },
+            },
+          },
+        },
+        {
+          personnelContacts: {
+            some: { isActive: true, endDate: null, constructionGroupId },
+          },
+        },
+      ],
+    },
     select: { id: true, email: true },
   });
 }

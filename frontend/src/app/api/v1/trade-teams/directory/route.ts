@@ -156,6 +156,44 @@ async function syncPersonActive(userId: string) {
   });
 }
 
+async function ensureDirectoryVolunteer(
+  constructionGroupId: string,
+  fields: { firstName: string; lastName: string; email: string; phone: string | null }
+) {
+  const existing = await prisma.volunteer.findFirst({
+    where: {
+      constructionGroupId,
+      OR: [
+        { emailPersonal: { equals: fields.email, mode: 'insensitive' } },
+        { emailJw: { equals: fields.email, mode: 'insensitive' } },
+      ],
+    },
+  });
+  if (existing) {
+    await prisma.volunteer.update({
+      where: { id: existing.id },
+      data: {
+        firstName: fields.firstName || existing.firstName,
+        lastName: fields.lastName || existing.lastName,
+        emailPersonal: fields.email || existing.emailPersonal,
+        phone: fields.phone ?? existing.phone,
+      },
+    });
+    return existing.id;
+  }
+  const volunteer = await prisma.volunteer.create({
+    data: {
+      firstName: fields.firstName || 'Unknown',
+      lastName: fields.lastName || 'Person',
+      emailPersonal: fields.email,
+      phone: fields.phone,
+      constructionGroupId,
+      isActive: true,
+    },
+  });
+  return volunteer.id;
+}
+
 async function ensureVolunteer(
   userId: string,
   constructionGroupId: string | null,
@@ -232,33 +270,38 @@ async function createDirectoryGroupPerson(body: Record<string, unknown>) {
 
   const displayName = `${firstName} ${lastName}`.trim();
   const existingUser = await prisma.user.findUnique({ where: { email } });
-  const user = existingUser
-    ? await prisma.user.update({
-        where: { id: existingUser.id },
-        data: {
-          name: existingUser.name || displayName,
-          firstName: existingUser.firstName || firstName,
-          lastName: existingUser.lastName || lastName,
-          isSister,
-          ...(photo.image ? { image: photo.image } : {}),
-          constructionGroupId: existingUser.constructionGroupId || constructionGroupId,
-        },
-      })
-    : await prisma.user.create({
-        data: {
-          name: displayName,
-          firstName,
-          lastName,
-          email,
-          isSister,
-          image: photo.image,
-          constructionGroupId,
-          role: 'USER',
-          status: 'INVITED',
-        },
-      });
+  // A sign-in account is only for Personnel. Construction-group people stay in the directory.
+  const user = place === 'personnel' || existingUser
+    ? existingUser
+      ? await prisma.user.update({
+          where: { id: existingUser.id },
+          data: {
+            name: existingUser.name || displayName,
+            firstName: existingUser.firstName || firstName,
+            lastName: existingUser.lastName || lastName,
+            isSister,
+            ...(photo.image ? { image: photo.image } : {}),
+            constructionGroupId: existingUser.constructionGroupId || constructionGroupId,
+          },
+        })
+      : await prisma.user.create({
+          data: {
+            name: displayName,
+            firstName,
+            lastName,
+            email,
+            isSister,
+            image: photo.image,
+            constructionGroupId,
+            role: 'USER',
+            status: 'INVITED',
+          },
+        })
+    : null;
 
-  const volunteerId = await ensureVolunteer(user.id, constructionGroupId, { firstName, lastName, email, phone });
+  const volunteerId = user
+    ? await ensureVolunteer(user.id, constructionGroupId, { firstName, lastName, email, phone })
+    : await ensureDirectoryVolunteer(constructionGroupId, { firstName, lastName, email, phone });
   if (!volunteerId) {
     return NextResponse.json({ error: 'Could not save this person' }, { status: 500 });
   }
@@ -268,6 +311,9 @@ async function createDirectoryGroupPerson(body: Record<string, unknown>) {
   });
 
   if (place === 'personnel') {
+    if (!user) {
+      return NextResponse.json({ error: 'Could not save this person' }, { status: 500 });
+    }
     const contactRole = role === 'PC-Support' ? 'PC_SUPPORT' : role;
     const already = await prisma.personnelContact.findUnique({
       where: {
