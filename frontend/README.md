@@ -3,9 +3,10 @@
 Personnel Contact assistance system for LDC Construction Groups.
 
 ## Version
-Current: **1.55.1**
+Current: **1.56.0**
 
 ## Version History
+- **v1.56.0** (2026-11-27) - Shared reference links, and the whole group is told when work is waiting
 - **v1.55.1** (2026-11-25) - Chat stays on screen, and a web address in a message is a link
 - **v1.55.0** (2026-11-18) - A task shows Start, then Finished, and chat stays where you left it
 - **v1.54.3** (2026-11-18) - Work can be limited to a project, overdue dates, or tasks that will not email the requestor
@@ -71,6 +72,8 @@ Current: **1.55.1**
 - Tasks for the signed-in construction group
 - Personnel add and assign them
 - Claimable tasks can be taken by anyone signed in to that group
+- When work is waiting and unassigned, everyone signed in gets an email, a phone alert, and a browser alert
+- Assigning work to someone else tells that person the same way
 - Assigned tasks are on My Work
 - Several open tasks can be marked done together
 - Help requests can be answered on the task
@@ -95,6 +98,11 @@ Current: **1.55.1**
 - Trade team and crew organization
 - Volunteer assignment and tracking
 - Crew change request workflow
+
+### References
+- Shared links for the signed-in construction group
+- Personnel add a form, document, or site. Everyone signed in can search and open it
+- The phone app opens the same list from More
 
 ### Communication
 - Team chat, and a direct message you start from search or a person list
