@@ -412,9 +412,11 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
 
       <FeedbackUpdateBanner />
       <main className={isChatRoute ? 'mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-3 py-3 sm:px-6 lg:px-8' : isAdminRoute ? 'min-w-0' : 'max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8'}>
-        <div className={isAdminRoute ? 'px-4 pt-4 sm:px-6 lg:px-8' : undefined}>
-          <AnnouncementBanner />
-        </div>
+        {isChatRoute ? null : (
+          <div className={isAdminRoute ? 'px-4 pt-4 sm:px-6 lg:px-8' : undefined}>
+            <AnnouncementBanner />
+          </div>
+        )}
         {children}
       </main>
       {isAdminRoute || isChatRoute ? null : (
