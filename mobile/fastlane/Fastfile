@@ -172,6 +172,7 @@ platform :ios do
           output_directory: File.dirname(ipa),
           output_name: IPA_NAME,
           clean: attempt.zero?,
+          xcargs: "ASSETCATALOG_EXEC=#{File.join(PROJECT, "scripts/actool")}",
           export_options: {
             provisioningProfiles: {
               BUNDLE_ID => profile

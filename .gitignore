@@ -133,6 +133,8 @@ frontend/data/
 
 # --- Local debug scripts ---
 frontend/test-env.js
+# Rebuilt by mobile/scripts/fastlane.sh before an iOS archive
+mobile/scripts/actool
 
 # Control plane Cursor symlinks
 .cursor/commands/*.md
