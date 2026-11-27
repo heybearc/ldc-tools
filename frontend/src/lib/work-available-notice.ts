@@ -11,14 +11,32 @@ export function enteredClaimPool(before: PoolState | null, after: PoolState) {
   return !(before.status === 'OPEN' && before.claimable && !before.assigneeId);
 }
 
-function releaseCheckTitle(title: string) {
-  return title.startsWith('QA ') || title.includes('QA Volunteer');
+export function isReleaseCheckTitle(title: string) {
+  const value = title.trim();
+  return value.startsWith('QA ')
+    || value.startsWith('Release check')
+    || value.includes('QA Volunteer')
+    || value.includes('Release check volunteer');
+}
+
+/** Release-gate mail goes here instead of the construction group. */
+export function operatorTestEmail() {
+  return (process.env.MAIL_TEST_RECIPIENT || 'corya1992@gmail.com').trim();
 }
 
 export type WorkNoticeItem = { id?: string; title: string; detail?: string | null };
+export type NoticeScope = 'group' | 'operator';
+
+function scopedItems(items: WorkNoticeItem[], scope: NoticeScope) {
+  return items.filter((item) => {
+    const title = item.title.trim();
+    if (!title) return false;
+    return isReleaseCheckTitle(title) === (scope === 'operator');
+  });
+}
 
 export function claimableNoticeItems(items: WorkNoticeItem[]) {
-  return items.filter((item) => item.title.trim() && !releaseCheckTitle(item.title));
+  return scopedItems(items, 'group');
 }
 
 export function workAvailableAlert(items: WorkNoticeItem[]) {
@@ -47,18 +65,27 @@ export function workToolsUrl(path: string, baseUrl = process.env.NEXTAUTH_URL ||
   return `${base}${route}`;
 }
 
-export function workAvailableMessage(items: WorkNoticeItem[], baseUrl?: string) {
-  const alert = workAvailableAlert(items);
+export function workAvailableMessage(items: WorkNoticeItem[], baseUrl?: string, scope: NoticeScope = 'group') {
+  const real = scopedItems(items, scope);
+  const alert = scope === 'group'
+    ? workAvailableAlert(items)
+    : (real.length === 0 ? null : {
+        title: 'Work available',
+        body: real.length === 1 ? real[0].title.trim() : `${real.length} tasks are available`,
+        url: real.length === 1 && real[0].id ? `/work#work-${real[0].id}` : '/work',
+        workItemId: real.length === 1 ? (real[0].id || '') : '',
+      });
   if (!alert) return null;
-  const real = claimableNoticeItems(items);
   const link = workToolsUrl(alert.url, baseUrl);
   const titles = real.map((item) => item.title.trim()).slice(0, 40);
   const extra = real.length - titles.length;
   const detail = real.length === 1 ? (real[0].detail || '').trim() : '';
-  const subject = real.length === 1
-    ? `Work available — ${real[0].title.trim()}`.slice(0, 140)
-    : `Work available — ${real.length} tasks`;
-  const lead = 'This work is available to claim.';
+  const subject = (scope === 'operator' ? '[test] ' : '') + (real.length === 1
+    ? `Work available — ${real[0].title.trim()}`
+    : `Work available — ${real.length} tasks`);
+  const lead = scope === 'operator'
+    ? 'Release check. This copy goes only to the operator.'
+    : 'This work is available to claim.';
   const text = [
     lead,
     '',
@@ -69,7 +96,7 @@ export function workAvailableMessage(items: WorkNoticeItem[], baseUrl?: string) 
     link,
   ].join('\n');
   return {
-    subject,
+    subject: subject.slice(0, 140),
     text,
     link,
     titles,
@@ -83,18 +110,20 @@ export function workAvailableMessage(items: WorkNoticeItem[], baseUrl?: string) 
   };
 }
 
-export function workAssignedMessage(items: WorkNoticeItem[], baseUrl?: string) {
-  const real = claimableNoticeItems(items);
+export function workAssignedMessage(items: WorkNoticeItem[], baseUrl?: string, scope: NoticeScope = 'group') {
+  const real = scopedItems(items, scope);
   if (real.length === 0) return null;
   const id = real.length === 1 ? (real[0].id || '') : '';
   const link = workToolsUrl(id ? `/work#work-${id}` : '/my-work', baseUrl);
   const titles = real.map((item) => item.title.trim()).slice(0, 40);
   const extra = real.length - titles.length;
   const detail = real.length === 1 ? (real[0].detail || '').trim() : '';
-  const subject = real.length === 1
-    ? `Work assigned — ${real[0].title.trim()}`.slice(0, 140)
-    : `Work assigned — ${real.length} tasks`;
-  const lead = 'This work was assigned to you.';
+  const subject = (scope === 'operator' ? '[test] ' : '') + (real.length === 1
+    ? `Work assigned — ${real[0].title.trim()}`
+    : `Work assigned — ${real.length} tasks`);
+  const lead = scope === 'operator'
+    ? 'Release check. This copy goes only to the operator.'
+    : 'This work was assigned to you.';
   const text = [
     lead,
     '',
@@ -105,7 +134,7 @@ export function workAssignedMessage(items: WorkNoticeItem[], baseUrl?: string) {
     link,
   ].join('\n');
   return {
-    subject,
+    subject: subject.slice(0, 140),
     text,
     link,
     titles,

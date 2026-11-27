@@ -6,6 +6,7 @@ import { sendWorkNoticeEmail } from '@/lib/work-completion-email';
 import { userInGroupWhere } from '@/lib/work-item-access';
 import {
   assigneeToNotify,
+  operatorTestEmail,
   workAssignedMessage,
   workAvailableMessage,
   type WorkNoticeItem,
@@ -85,22 +86,33 @@ export async function availableWorkCountForUser(userId: string, constructionGrou
   return claimableWorkCount(constructionGroupId);
 }
 
+async function sendOperatorCopy(message: ReturnType<typeof workAvailableMessage>) {
+  if (!message) return;
+  try {
+    await sendWorkNoticeEmail({ to: [operatorTestEmail()], message });
+  } catch (error) {
+    console.error('Work email failed:', error);
+  }
+}
+
 export async function notifyWorkAvailable(input: {
   constructionGroupId: string;
   excludeUserId?: string;
   items: WorkNoticeItem[];
 }) {
   const message = workAvailableMessage(input.items);
-  if (!message) return;
-  const recipients = recipientsFrom(await groupUsers(input.constructionGroupId), input.excludeUserId);
-  await deliverWorkNotice({
-    constructionGroupId: input.constructionGroupId,
-    userIds: recipients.userIds,
-    emails: recipients.emails,
-    excludeUserId: input.excludeUserId,
-    message,
-    kind: 'work',
-  });
+  if (message) {
+    const recipients = recipientsFrom(await groupUsers(input.constructionGroupId), input.excludeUserId);
+    await deliverWorkNotice({
+      constructionGroupId: input.constructionGroupId,
+      userIds: recipients.userIds,
+      emails: recipients.emails,
+      excludeUserId: input.excludeUserId,
+      message,
+      kind: 'work',
+    });
+  }
+  await sendOperatorCopy(workAvailableMessage(input.items, undefined, 'operator'));
 }
 
 export function queueWorkAvailable(input: {
@@ -121,18 +133,21 @@ export async function notifyWorkAssigned(input: {
 }) {
   if (assigneeToNotify(null, input.assigneeId, input.actorId) !== input.assigneeId) return;
   const message = workAssignedMessage(input.items);
-  if (!message) return;
-  const users = await groupUsers(input.constructionGroupId);
-  const assignee = users.find((user) => user.id === input.assigneeId);
-  if (!assignee) return;
-  const recipients = recipientsFrom([assignee]);
-  await deliverWorkNotice({
-    constructionGroupId: input.constructionGroupId,
-    userIds: recipients.userIds,
-    emails: recipients.emails,
-    message,
-    kind: 'work-assigned',
-  });
+  if (message) {
+    const users = await groupUsers(input.constructionGroupId);
+    const assignee = users.find((user) => user.id === input.assigneeId);
+    if (assignee) {
+      const recipients = recipientsFrom([assignee]);
+      await deliverWorkNotice({
+        constructionGroupId: input.constructionGroupId,
+        userIds: recipients.userIds,
+        emails: recipients.emails,
+        message,
+        kind: 'work-assigned',
+      });
+    }
+  }
+  await sendOperatorCopy(workAssignedMessage(input.items, undefined, 'operator'));
 }
 
 export function queueWorkAssigned(input: {

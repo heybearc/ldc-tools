@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assigneeToNotify, enteredClaimPool, workAssignedMessage, workAvailableAlert, workAvailableMessage } from './work-available-notice.ts';
+import { assigneeToNotify, enteredClaimPool, operatorTestEmail, workAssignedMessage, workAvailableAlert, workAvailableMessage } from './work-available-notice.ts';
 
 test('new unassigned claimable work enters the pool', () => {
   assert.equal(enteredClaimPool(null, { status: 'OPEN', claimable: true, assigneeId: null }), true);
@@ -31,9 +31,23 @@ test('one task names itself and several tasks share one alert', () => {
   assert.equal(many?.workItemId, '');
 });
 
-test('release-check titles stay quiet', () => {
+test('release-check titles stay quiet for the group and mail only the operator', () => {
   assert.equal(workAvailableAlert([{ id: 'w1', title: 'QA Volunteer request' }]), null);
   assert.equal(workAvailableMessage([{ title: 'QA Volunteer request' }]), null);
+  assert.equal(workAvailableMessage([{ title: 'Release check alert 1' }]), null);
+  assert.equal(workAssignedMessage([{ title: 'Add Volunteer to a Crew: Release check volunteer 1' }]), null);
+  const copy = workAvailableMessage(
+    [{ id: 'w1', title: 'Release check alert 1', detail: 'Release check for a claimable task.' }],
+    'https://ldctools.com',
+    'operator',
+  );
+  assert.match(copy?.subject || '', /^\[test\] Work available — Release check alert 1/);
+  assert.match(copy?.text || '', /only to the operator/);
+  const previous = process.env.MAIL_TEST_RECIPIENT;
+  delete process.env.MAIL_TEST_RECIPIENT;
+  assert.equal(operatorTestEmail(), 'corya1992@gmail.com');
+  if (previous === undefined) delete process.env.MAIL_TEST_RECIPIENT;
+  else process.env.MAIL_TEST_RECIPIENT = previous;
 });
 
 test('the email names the task and links to the work list', () => {
