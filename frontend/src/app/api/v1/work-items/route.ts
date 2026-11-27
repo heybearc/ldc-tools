@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
       queueWorkAvailable({
         constructionGroupId: scope.constructionGroupId,
         excludeUserId: session.user.id,
-        items: [{ id: created.id, title: created.title }],
+        items: [{ id: created.id, title: created.title, detail: created.detail }],
       });
     }
 

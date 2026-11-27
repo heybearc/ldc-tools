@@ -15,8 +15,14 @@ function releaseCheckTitle(title: string) {
   return title.startsWith('QA ') || title.includes('QA Volunteer');
 }
 
-export function workAvailableAlert(items: Array<{ id?: string; title: string }>) {
-  const real = items.filter((item) => item.title.trim() && !releaseCheckTitle(item.title));
+export type WorkNoticeItem = { id?: string; title: string; detail?: string | null };
+
+export function claimableNoticeItems(items: WorkNoticeItem[]) {
+  return items.filter((item) => item.title.trim() && !releaseCheckTitle(item.title));
+}
+
+export function workAvailableAlert(items: WorkNoticeItem[]) {
+  const real = claimableNoticeItems(items);
   if (real.length === 0) return null;
   if (real.length === 1) {
     const id = real[0].id || '';
@@ -33,4 +39,34 @@ export function workAvailableAlert(items: Array<{ id?: string; title: string }>)
     url: '/work',
     workItemId: '',
   };
+}
+
+export function workToolsUrl(path: string, baseUrl = process.env.NEXTAUTH_URL || 'https://ldctools.com') {
+  const base = baseUrl.replace(/\/$/, '');
+  const route = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${route}`;
+}
+
+export function workAvailableMessage(items: WorkNoticeItem[], baseUrl?: string) {
+  const alert = workAvailableAlert(items);
+  if (!alert) return null;
+  const real = claimableNoticeItems(items);
+  const link = workToolsUrl(alert.url, baseUrl);
+  const titles = real.map((item) => item.title.trim()).slice(0, 40);
+  const extra = real.length - titles.length;
+  const detail = real.length === 1 ? (real[0].detail || '').trim() : '';
+  const subject = real.length === 1
+    ? `Work available — ${real[0].title.trim()}`.slice(0, 140)
+    : `Work available — ${real.length} tasks`;
+  const lead = 'This work is available to claim.';
+  const text = [
+    lead,
+    '',
+    ...titles,
+    ...(extra > 0 ? [`and ${extra} more`] : []),
+    ...(detail ? ['', detail] : []),
+    '',
+    link,
+  ].join('\n');
+  return { subject, text, link, titles, extra, detail, lead };
 }

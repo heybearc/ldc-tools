@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { prisma } from '@/lib/prisma';
 import { decryptPassword } from '@/lib/email-crypto';
 import { isDeliverableEmail } from '@/lib/reachable-email';
+import { workAvailableMessage, type WorkNoticeItem } from '@/lib/work-available-notice';
 
 function escapeHtml(value: string): string {
   return value
@@ -126,5 +127,53 @@ export async function sendWorkHelpEmail(input: {
       <p style="white-space: pre-wrap;">${escapeHtml(input.message)}</p>
     `,
   });
+  return recipients.length;
+}
+
+export async function sendWorkAvailableEmail(input: {
+  to: string[];
+  items: WorkNoticeItem[];
+}): Promise<number> {
+  const message = workAvailableMessage(input.items);
+  const recipients = input.to.filter((email) => isDeliverableEmail(email));
+  if (!message || recipients.length === 0) return 0;
+  const emailConfig = await prisma.emailConfiguration.findFirst({
+    where: { isActive: true },
+  });
+  if (!emailConfig?.fromEmail || !emailConfig.smtpHost) return 0;
+
+  const password = decryptPassword(emailConfig.appPasswordEncrypted || '');
+  const transporter = nodemailer.createTransport({
+    host: emailConfig.smtpHost,
+    port: emailConfig.smtpPort || 587,
+    secure: emailConfig.encryption === 'ssl',
+    auth: {
+      user: emailConfig.username || '',
+      pass: password,
+    },
+    ...(emailConfig.encryption === 'ssl' ? {} : { requireTLS: true }),
+  });
+
+  const titles = message.titles.map((title) => `<li>${escapeHtml(title)}</li>`).join('');
+  const more = message.extra > 0 ? `<li>and ${message.extra} more</li>` : '';
+  const detail = message.detail ? `<p style="white-space: pre-wrap;">${escapeHtml(message.detail)}</p>` : '';
+  const html = `
+    <p>${escapeHtml(message.lead)}</p>
+    <ul>${titles}${more}</ul>
+    ${detail}
+    <p><a href="${escapeHtml(message.link)}">Open this work in LDC Tools</a></p>
+  `;
+
+  for (let index = 0; index < recipients.length; index += 40) {
+    const chunk = recipients.slice(index, index + 40);
+    await transporter.sendMail({
+      from: `"${emailConfig.fromName}" <${emailConfig.fromEmail}>`,
+      to: emailConfig.fromEmail,
+      bcc: chunk,
+      subject: message.subject,
+      text: message.text,
+      html,
+    });
+  }
   return recipients.length;
 }

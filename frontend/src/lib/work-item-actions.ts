@@ -85,7 +85,7 @@ export async function applyWorkStatus(input: {
     queueWorkAvailable({
       constructionGroupId: input.constructionGroupId,
       excludeUserId: input.actorId,
-      items: [{ id: item.id, title: item.title }],
+      items: [{ id: item.id, title: item.title, detail: item.detail }],
     });
   }
 
@@ -145,7 +145,7 @@ export async function releaseWorkToPool(input: {
   queueWorkAvailable({
     constructionGroupId: input.constructionGroupId,
     excludeUserId: input.actorId,
-    items: [{ id: item.id, title: item.title }],
+    items: [{ id: item.id, title: item.title, detail: item.detail }],
   });
   return updated;
 }

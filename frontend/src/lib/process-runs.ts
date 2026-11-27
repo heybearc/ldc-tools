@@ -85,7 +85,7 @@ export async function createProcessRun(input: {
     queueWorkAvailable({
       constructionGroupId: input.constructionGroupId,
       excludeUserId: input.createdById,
-      items: [{ id: item.id, title: item.title }],
+      items: [{ id: item.id, title: item.title, detail: item.detail }],
     });
   }
   return item;

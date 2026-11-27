@@ -128,7 +128,7 @@ export async function PATCH(
         queueWorkAvailable({
           constructionGroupId: item.constructionGroupId,
           excludeUserId: session.user.id,
-          items: [{ id: item.id, title: input.title }],
+          items: [{ id: item.id, title: input.title, detail: input.detail }],
         });
       }
       return NextResponse.json({ id: updated.id });

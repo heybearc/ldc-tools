@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { enteredClaimPool, workAvailableAlert } from './work-available-notice.ts';
+import { enteredClaimPool, workAvailableAlert, workAvailableMessage } from './work-available-notice.ts';
 
 test('new unassigned claimable work enters the pool', () => {
   assert.equal(enteredClaimPool(null, { status: 'OPEN', claimable: true, assigneeId: null }), true);
@@ -33,4 +33,27 @@ test('one task names itself and several tasks share one alert', () => {
 
 test('release-check titles stay quiet', () => {
   assert.equal(workAvailableAlert([{ id: 'w1', title: 'QA Volunteer request' }]), null);
+  assert.equal(workAvailableMessage([{ title: 'QA Volunteer request' }]), null);
+});
+
+test('the email names the task and links to the work list', () => {
+  const message = workAvailableMessage(
+    [{ id: 'w1', title: 'Set up chairs', detail: 'Hall B before the meeting.' }],
+    'https://ldctools.com',
+  );
+  assert.equal(message?.subject, 'Work available — Set up chairs');
+  assert.match(message?.text || '', /Set up chairs/);
+  assert.match(message?.text || '', /Hall B before the meeting/);
+  assert.match(message?.text || '', /https:\/\/ldctools.com\/work#work-w1/);
+});
+
+test('several tasks share one email that lists each title', () => {
+  const message = workAvailableMessage([
+    { title: 'Add: Ada' },
+    { title: 'Remove: Ben' },
+  ], 'https://ldctools.com/');
+  assert.equal(message?.subject, 'Work available — 2 tasks');
+  assert.match(message?.text || '', /Add: Ada/);
+  assert.match(message?.text || '', /Remove: Ben/);
+  assert.match(message?.text || '', /https:\/\/ldctools.com\/work$/m);
 });

@@ -1,7 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import { hiddenReleaseCheckWork } from '@/lib/release-check-cleanup';
+import { isDeliverableEmail } from '@/lib/reachable-email';
 import { sendChatPush } from '@/lib/web-push';
-import { workAvailableAlert } from '@/lib/work-available-notice';
+import { sendWorkAvailableEmail } from '@/lib/work-completion-email';
+import { userInGroupWhere } from '@/lib/work-item-access';
+import { workAvailableAlert, type WorkNoticeItem } from '@/lib/work-available-notice';
 
 const CLAIM_ROLES = ['PC', 'PCA'] as const;
 
@@ -40,6 +43,21 @@ export async function personnelClaimNotifyUserIds(constructionGroupId: string) {
   return Array.from(ids);
 }
 
+export async function teamClaimNotifyEmails(constructionGroupId: string, excludeUserId?: string) {
+  const users = await prisma.user.findMany({
+    where: userInGroupWhere(constructionGroupId),
+    select: { id: true, email: true },
+  });
+  const emails = new Map<string, string>();
+  for (const user of users) {
+    if (excludeUserId && user.id === excludeUserId) continue;
+    if (!isDeliverableEmail(user.email)) continue;
+    const key = user.email.toLowerCase();
+    if (!emails.has(key)) emails.set(key, user.email);
+  }
+  return Array.from(emails.values());
+}
+
 export async function claimableWorkCount(constructionGroupId: string) {
   return prisma.workItem.count({
     where: {
@@ -61,28 +79,39 @@ export async function availableWorkCountForUser(userId: string, constructionGrou
 export async function notifyWorkAvailable(input: {
   constructionGroupId: string;
   excludeUserId?: string;
-  items: Array<{ id?: string; title: string }>;
+  items: WorkNoticeItem[];
 }) {
   const alert = workAvailableAlert(input.items);
   if (!alert) return;
   const userIds = await personnelClaimNotifyUserIds(input.constructionGroupId);
-  if (userIds.length === 0) return;
-  await sendChatPush({
-    userIds,
-    excludeUserId: input.excludeUserId || '',
-    title: alert.title,
-    body: alert.body,
-    url: alert.url,
-    constructionGroupId: input.constructionGroupId,
-    kind: 'work',
-    data: alert.workItemId ? { workItemId: alert.workItemId } : undefined,
-  });
+  if (userIds.length > 0) {
+    try {
+      await sendChatPush({
+        userIds,
+        excludeUserId: input.excludeUserId || '',
+        title: alert.title,
+        body: alert.body,
+        url: alert.url,
+        constructionGroupId: input.constructionGroupId,
+        kind: 'work',
+        data: alert.workItemId ? { workItemId: alert.workItemId } : undefined,
+      });
+    } catch (error) {
+      console.error('Work available alert failed:', error);
+    }
+  }
+  try {
+    const emails = await teamClaimNotifyEmails(input.constructionGroupId, input.excludeUserId);
+    await sendWorkAvailableEmail({ to: emails, items: input.items });
+  } catch (error) {
+    console.error('Work available email failed:', error);
+  }
 }
 
 export function queueWorkAvailable(input: {
   constructionGroupId: string;
   excludeUserId?: string;
-  items: Array<{ id?: string; title: string }>;
+  items: WorkNoticeItem[];
 }) {
   void notifyWorkAvailable(input).catch((error) => {
     console.error('Work available alert failed:', error);

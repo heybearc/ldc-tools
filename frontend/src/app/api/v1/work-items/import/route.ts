@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
         items: fresh.map((row) => ({
           id: fresh.length === 1 ? created?.id : undefined,
           title: row.title,
+          detail: fresh.length === 1 ? row.detail : undefined,
         })),
       });
     }

@@ -46,7 +46,7 @@ export default async function WorkHelpPage() {
           <h2>Claim a task</h2>
           <p>
             When a claimable task has no assignee, anyone signed in to this construction group can choose Claim. That assigns the task to you.
-            The Personnel Contact and Assistant get a phone alert, and a browser alert if they allowed notifications. The Work link shows how many tasks are waiting.
+            The Personnel Contact and Assistant get a phone alert, and a browser alert if they allowed notifications. Everyone signed in to this group is emailed the title and a link to LDC Tools. The person who made the work available is not included. The Work link shows how many tasks are waiting.
             Open the task to check off its steps. Choose Start, then Finished, when the whole task is finished. Choose Return to pool when you cannot get to it. It becomes claimable again.
           </p>
 
@@ -54,7 +54,7 @@ export default async function WorkHelpPage() {
           <p>
             Personnel can import the Microsoft Form spreadsheet from Work. Each row becomes a claimable task
             with the requestor, volunteer, crew, project roster, and comments. Importing the same spreadsheet again
-            does not add those rows a second time. Marking the task Finished keeps the requestor on it. If email is
+            does not add those rows a second time. The signed-in team gets the same available-work email, listing each new title. Marking the task Finished keeps the requestor on it. If email is
             already configured, the requestor is told. A Bethel or jwpub.org address is not emailed.
           </p>
 
