@@ -124,7 +124,7 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
       />
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-4">
             <div className="flex items-center space-x-3">
               <img src="/logo.svg" alt="LDC Logo" className="h-8 w-8 sm:h-10 sm:w-10" />
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
@@ -142,8 +142,8 @@ export default function ConditionalLayout({ children, releaseHighlight }: Condit
             </button>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <nav className="flex space-x-6">
+            <div className="hidden lg:flex min-w-0 items-center gap-4">
+              <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <Link href="/" className={navClass(pathname === '/')}>
                   Dashboard
                 </Link>
