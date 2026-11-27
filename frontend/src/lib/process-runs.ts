@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { cadenceLabel, type ProcessCadence, type ProcessCustomUnit } from '@/lib/processes';
-import { enteredClaimPool } from '@/lib/work-available-notice';
-import { queueWorkAvailable } from '@/lib/work-available-notify';
+import { assigneeToNotify, enteredClaimPool } from '@/lib/work-available-notice';
+import { queueWorkAssigned, queueWorkAvailable } from '@/lib/work-available-notify';
 
 export async function setProcessPublished(input: {
   id: string;
@@ -85,6 +85,15 @@ export async function createProcessRun(input: {
     queueWorkAvailable({
       constructionGroupId: input.constructionGroupId,
       excludeUserId: input.createdById,
+      items: [{ id: item.id, title: item.title, detail: item.detail }],
+    });
+  }
+  const assigneeId = assigneeToNotify(null, item.assigneeId, input.createdById);
+  if (assigneeId) {
+    queueWorkAssigned({
+      constructionGroupId: input.constructionGroupId,
+      assigneeId,
+      actorId: input.createdById,
       items: [{ id: item.id, title: item.title, detail: item.detail }],
     });
   }

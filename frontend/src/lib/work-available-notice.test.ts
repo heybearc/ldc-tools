@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { enteredClaimPool, workAvailableAlert, workAvailableMessage } from './work-available-notice.ts';
+import { assigneeToNotify, enteredClaimPool, workAssignedMessage, workAvailableAlert, workAvailableMessage } from './work-available-notice.ts';
 
 test('new unassigned claimable work enters the pool', () => {
   assert.equal(enteredClaimPool(null, { status: 'OPEN', claimable: true, assigneeId: null }), true);
@@ -47,6 +47,19 @@ test('the email names the task and links to the work list', () => {
   assert.match(message?.text || '', /https:\/\/ldctools.com\/work#work-w1/);
 });
 
+test('assigning work to someone else names that task', () => {
+  assert.equal(assigneeToNotify(null, 'ada', 'cory'), 'ada');
+  assert.equal(assigneeToNotify('ada', 'ada', 'cory'), null);
+  assert.equal(assigneeToNotify(null, 'cory', 'cory'), null);
+  const message = workAssignedMessage(
+    [{ id: 'w1', title: 'Set up chairs', detail: 'Hall B before the meeting.' }],
+    'https://ldctools.com',
+  );
+  assert.equal(message?.subject, 'Work assigned — Set up chairs');
+  assert.equal(message?.pushTitle, 'Work assigned');
+  assert.match(message?.text || '', /This work was assigned to you/);
+  assert.match(message?.text || '', /https:\/\/ldctools.com\/work#work-w1/);
+});
 test('several tasks share one email that lists each title', () => {
   const message = workAvailableMessage([
     { title: 'Add: Ada' },

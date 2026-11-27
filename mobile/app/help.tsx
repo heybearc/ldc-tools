@@ -35,7 +35,7 @@ const ARTICLES: Article[] = [
         heading: 'Claim a task',
         paragraphs: [
           'Available lists claimable work that no one has taken. Claim assigns that task to you and moves it to My Work.',
-          'A number on Available is how many tasks are waiting. Everyone signed in to this group is emailed when claimable work is waiting, with the task title and a link. The Personnel Contact and Assistant also get an alert.',
+          'A number on Available is how many tasks are waiting. Everyone signed in to this group gets an email, a phone alert, and a browser alert when claimable work is waiting. The message names the task. When work is assigned to you, you get the same alerts.',
           'A published process can appear here as one claimable item. Its tasks stay inside that item.',
         ],
       },

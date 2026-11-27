@@ -46,7 +46,7 @@ export default async function WorkHelpPage() {
           <h2>Claim a task</h2>
           <p>
             When a claimable task has no assignee, anyone signed in to this construction group can choose Claim. That assigns the task to you.
-            The Personnel Contact and Assistant get a phone alert, and a browser alert if they allowed notifications. Everyone signed in to this group is emailed the title and a link to LDC Tools. The person who made the work available is not included. The Work link shows how many tasks are waiting.
+            Everyone signed in to this group gets an email, a phone alert, and a browser alert if they allowed notifications. The message names the task and links to LDC Tools. The person who made the work available is not included. When work is assigned to someone else, that person gets the same email, phone alert, and browser alert. The Work link shows how many tasks are waiting.
             Open the task to check off its steps. Choose Start, then Finished, when the whole task is finished. Choose Return to pool when you cannot get to it. It becomes claimable again.
           </p>
 

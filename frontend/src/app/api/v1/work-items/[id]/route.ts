@@ -7,8 +7,8 @@ import { activeUserInGroup, canEditWorkItem, canPostWork, canRunWork, isPersonne
 import { applyWorkStatus, startWork } from '@/lib/work-item-actions';
 import { startedAtAfterAssigneeChange } from '@/lib/work-start';
 import { dueOnDate, validateWorkItemInput } from '@/lib/work-items';
-import { enteredClaimPool } from '@/lib/work-available-notice';
-import { queueWorkAvailable } from '@/lib/work-available-notify';
+import { assigneeToNotify, enteredClaimPool } from '@/lib/work-available-notice';
+import { queueWorkAssigned, queueWorkAvailable } from '@/lib/work-available-notify';
 
 export async function PATCH(
   request: NextRequest,
@@ -128,6 +128,17 @@ export async function PATCH(
         queueWorkAvailable({
           constructionGroupId: item.constructionGroupId,
           excludeUserId: session.user.id,
+          items: [{ id: item.id, title: input.title, detail: input.detail }],
+        });
+      }
+      const assigneeId = item.status === 'OPEN'
+        ? assigneeToNotify(item.assigneeId, input.assigneeId, session.user.id)
+        : null;
+      if (assigneeId) {
+        queueWorkAssigned({
+          constructionGroupId: item.constructionGroupId,
+          assigneeId,
+          actorId: session.user.id,
           items: [{ id: item.id, title: input.title, detail: input.detail }],
         });
       }

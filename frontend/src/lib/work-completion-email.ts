@@ -2,7 +2,6 @@ import nodemailer from 'nodemailer';
 import { prisma } from '@/lib/prisma';
 import { decryptPassword } from '@/lib/email-crypto';
 import { isDeliverableEmail } from '@/lib/reachable-email';
-import { workAvailableMessage, type WorkNoticeItem } from '@/lib/work-available-notice';
 
 function escapeHtml(value: string): string {
   return value
@@ -130,11 +129,19 @@ export async function sendWorkHelpEmail(input: {
   return recipients.length;
 }
 
-export async function sendWorkAvailableEmail(input: {
+export async function sendWorkNoticeEmail(input: {
   to: string[];
-  items: WorkNoticeItem[];
+  message: {
+    subject: string;
+    text: string;
+    link: string;
+    titles: string[];
+    extra: number;
+    detail: string;
+    lead: string;
+  } | null;
 }): Promise<number> {
-  const message = workAvailableMessage(input.items);
+  const message = input.message;
   const recipients = input.to.filter((email) => isDeliverableEmail(email));
   if (!message || recipients.length === 0) return 0;
   const emailConfig = await prisma.emailConfiguration.findFirst({

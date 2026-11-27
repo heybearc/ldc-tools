@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth-config';
 import { prisma } from '@/lib/prisma';
 import { getCGScope } from '@/lib/cg-scope';
 import { activeUserInGroup, canPostWork } from '@/lib/work-item-access';
+import { queueWorkAssigned } from '@/lib/work-available-notify';
+import { assigneeToNotify } from '@/lib/work-available-notice';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,12 +44,13 @@ export async function POST(request: NextRequest) {
         constructionGroupId: scope.constructionGroupId,
         status: 'OPEN',
       },
-      select: { id: true },
+      select: { id: true, title: true, detail: true, assigneeId: true },
     });
     if (openItems.length === 0) {
       return NextResponse.json({ error: 'Those tasks are not open in this construction group' }, { status: 400 });
     }
 
+    const changing = openItems.filter((item) => item.assigneeId !== assigneeId);
     await prisma.workItem.updateMany({
       where: {
         id: { in: openItems.map((item) => item.id) },
@@ -58,6 +61,16 @@ export async function POST(request: NextRequest) {
       },
       data: { assigneeId, startedAt: null },
     });
+
+    const notifyId = assigneeToNotify(null, assigneeId, session.user.id);
+    if (notifyId && changing.length > 0) {
+      queueWorkAssigned({
+        constructionGroupId: scope.constructionGroupId,
+        assigneeId: notifyId,
+        actorId: session.user.id,
+        items: changing.map((item) => ({ id: item.id, title: item.title, detail: item.detail })),
+      });
+    }
 
     return NextResponse.json({ assigned: openItems.length });
   } catch (error) {
