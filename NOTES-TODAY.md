@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-27, v1.57.0 live)
+- Shipped v1.57.0 (`e00a5c6`). LIVE green CT135. STANDBY blue CT133 synced. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.57.0
+- Directory adds do not create sign-in accounts. 188 invited directory users were removed. Volunteers and oversight stayed. Work mail goes to Personnel. Release checks email the operator only.
+- qa-01 full suite passed on standby before the switch, plus the directory-account test.
+- iOS build 23 is on TestFlight. The archive retries actool until Assets.car exists, then writes the icon plist. Android version code 26 was already on the Play internal track.
+- MCP could not see green over SSH, so HAProxy was reloaded directly. `ldctools.com` uses `ldc-tools-green`. Backup `haproxy.cfg.bak-ldc-157`.
+- Open urgent feedback: not rechecked. Hub dates stay paused.
+- Next: new chat.
+
 ### Mid-day (2026-11-27)
 - LIVE is still v1.55.1 on blue CT133. STANDBY green CT135 is `537a264` (http://10.92.3.25:3001).
 - Android 1.1.0 version code 26 uploaded to the Play internal track. Commit `537a264`.

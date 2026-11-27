@@ -2,18 +2,19 @@
 
 **Last updated:** 2026-11-27  
 **Current branch:** main  
-**Working on:** v1.56.0 is not shipped. LIVE is still v1.55.1 on blue CT133. STANDBY green CT135 is `537a264`. Android version code 26 is on the Play internal track. iOS is still build 19. Hub dates stay paused.
+**Working on:** v1.57.0 is live. LIVE green CT135 `e00a5c6`. STANDBY blue CT133 synced. iOS build 23 on TestFlight. Android version code 26 already on Play internal. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.56.0 is not shipped. LIVE is still v1.55.1 on blue CT133 (`d882a1a`). STANDBY green CT135 is `537a264` (http://10.92.3.25:3001). Hub dates stay paused.
+v1.57.0 is shipped. LIVE green CT135 (`e00a5c6`). STANDBY blue CT133 synced at the same commit. Hub dates stay paused.
 
 ### What I'm doing right now
-Android 1.1.0 version code 26 is on the Play internal track (`537a264`). The iOS archive still dies in actool under xcodebuild. No TestFlight upload. iOS build stayed 19. Traffic was not switched. Hub assignment dates stay paused.
+Nothing in flight. Directory people do not get sign-in accounts. Work alerts go to Personnel. Release checks email the operator. iOS build 23 is on TestFlight. Android version code 26 was already on the Play internal track.
 
 ### Recent completions
-- ⏸ v1.56.0 notes and Android version code 26 are on STANDBY green CT135 (`537a264`). Not tagged. iOS build stayed 19. No TestFlight upload. Traffic not switched.
+- ✅ Shipped v1.57.0 (`e00a5c6`). qa-01 full suite plus the directory-account test. LIVE green CT135. STANDBY blue CT133 synced. iOS build 23. Android version code 26. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.57.0
+- ✅ iOS archive retries actool until Assets.car exists, then writes the app-icon plist (`c7e7b3c`). It does not kill the storyboard ibtoold.
 - ✅ References, group alerts, assignee alerts, and Cloudigan Mail (`dd933f4`) are on STANDBY green CT135. From is LDC Admin Team `noreply@cloudigan.com`. Each person is the To line. qa-01 full suite 112 passed, plus the reference and work-alert tests.
 - ✅ Shipped v1.55.1 (`d882a1a`). Chat fills the window and a web address is a link. qa-01 directory gate plus the chat-link test. LIVE blue CT133. STANDBY green CT135 synced at `1f5318d`. iOS build 19. Android version code 25. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.1
 - ✅ Shipped v1.55.0 (`0d744bf`). Start, then Finished. A new assignee or a return to the pool shows Start again. qa-01 full suite 109 passed, plus the start test. LIVE blue CT133. STANDBY green CT135 synced. iOS build 17. Android version code 24. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.0
@@ -76,7 +77,7 @@ Android 1.1.0 version code 26 is on the Play internal track (`537a264`). The iOS
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Retry the iOS lane only. Android version code 26 is already on the Play internal track. Tag v1.56.0, switch, sync. Hub dates stay paused.
+Hub dates stay paused. New chat before the next slice.
 
 ---
 

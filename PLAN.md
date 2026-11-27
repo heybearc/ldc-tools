@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-11-27  
 **Current phase:** Region work queue  
-**Status:** v1.55.1 is LIVE on blue (CT133, `d882a1a`). STANDBY green (CT135) is `dd933f4`. v1.56.0 notes `34f5487` are not deployed. Hub dates are paused.
+**Status:** v1.57.0 is LIVE on green (CT135, `e00a5c6`). STANDBY blue (CT133) is synced. Hub dates are paused.
 
 ---
 
@@ -50,7 +50,7 @@
 - [x] Work list filters: project, Overdue, Email off. `/ship` v1.54.3 (`8c1c190`). LIVE green CT135.
 - [x] Start then Finished on a task or process. `/ship` v1.55.0 (`0d744bf`). LIVE blue CT133. STANDBY green CT135 synced. iOS build 17. Android version code 24.
 - [x] Chat stays on screen and a web address is a link. `/ship` v1.55.1 (`d882a1a`). LIVE blue CT133. STANDBY green CT135 synced at `1f5318d`. iOS build 19. Android version code 25.
-- [ ] References, group work alerts, and Cloudigan Mail. qa-01 112 passed on STANDBY `dd933f4`. v1.56.0 notes `34f5487` not deployed. iOS archive failed. Finish `/ship` then `/sync`.
+- [x] References, group work alerts, Personnel-only accounts, and Cloudigan Mail. `/ship` v1.57.0 (`e00a5c6`). iOS build 23. Android version code 26.
 
 ### Completed This Phase
 - ✅ Resume from Level B — CT133/135 running, onboot on (2026-10-26)
