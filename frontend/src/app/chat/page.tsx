@@ -456,7 +456,7 @@ function ChatScreen() {
       </header>
       {error && <p className="border-b border-red-100 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
       {notice && <p className="border-b border-emerald-100 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">{notice}</p>}
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="grid h-full min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)]">
         <aside className={`${selectedId ? 'hidden lg:flex' : 'flex'} min-h-0 flex-col border-slate-200 bg-slate-50 lg:border-r`}>
           <div ref={peopleBox} className="border-b border-slate-200 p-3">
             <div className="flex items-center gap-2">
@@ -591,7 +591,7 @@ function ChatScreen() {
             )}
           </ul>
         </aside>
-        <section className={`${selectedId ? 'flex' : 'hidden lg:flex'} min-h-0 flex-col bg-white`}>
+        <section className={`${selectedId ? 'flex' : 'hidden lg:flex'} h-full min-h-0 flex-col bg-white`}>
           <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
             <button
               type="button"
@@ -619,7 +619,7 @@ function ChatScreen() {
               if (!pane) return;
               stickToBottom.current = pane.scrollHeight - pane.scrollTop - pane.clientHeight < 80;
             }}
-            className="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 px-4 py-4"
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50/60 px-4 py-4"
           >
             {!selected && (
               <div className="flex h-full flex-col items-center justify-center px-6 text-center">
