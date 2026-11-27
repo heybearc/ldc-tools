@@ -2,18 +2,18 @@
 
 **Last updated:** 2026-11-27  
 **Current branch:** main  
-**Working on:** v1.56.0 is not shipped. LIVE is still v1.55.1 on blue CT133. STANDBY green CT135 has the mail fix `dd933f4`. Version notes `34f5487` are on main and not deployed. Hub dates stay paused.
+**Working on:** v1.56.0 is not shipped. LIVE is still v1.55.1 on blue CT133. STANDBY green CT135 is `537a264`. Android version code 26 is on the Play internal track. iOS is still build 19. Hub dates stay paused.
 
 ---
 
 ## Current Task
-v1.56.0 is not shipped. LIVE is still v1.55.1 on blue CT133 (`d882a1a`). STANDBY green CT135 is the mail fix `dd933f4`, not the version commit `34f5487`. Hub dates stay paused.
+v1.56.0 is not shipped. LIVE is still v1.55.1 on blue CT133 (`d882a1a`). STANDBY green CT135 is `537a264` (http://10.92.3.25:3001). Hub dates stay paused.
 
 ### What I'm doing right now
-References, whole-group work alerts, and Cloudigan Mail are on STANDBY. qa-01 full suite 112 passed on `dd933f4`. The iOS archive failed (actool). No TestFlight upload. Android was not started. Traffic was not switched. Hub assignment dates stay paused.
+Android 1.1.0 version code 26 is on the Play internal track (`537a264`). The iOS archive still dies in actool under xcodebuild. No TestFlight upload. iOS build stayed 19. Traffic was not switched. Hub assignment dates stay paused.
 
 ### Recent completions
-- ⏸ v1.56.0 notes are on main (`34f5487`). Not tagged. Not on STANDBY. iOS build stayed 19. Android version code stayed 25.
+- ⏸ v1.56.0 notes and Android version code 26 are on STANDBY green CT135 (`537a264`). Not tagged. iOS build stayed 19. No TestFlight upload. Traffic not switched.
 - ✅ References, group alerts, assignee alerts, and Cloudigan Mail (`dd933f4`) are on STANDBY green CT135. From is LDC Admin Team `noreply@cloudigan.com`. Each person is the To line. qa-01 full suite 112 passed, plus the reference and work-alert tests.
 - ✅ Shipped v1.55.1 (`d882a1a`). Chat fills the window and a web address is a link. qa-01 directory gate plus the chat-link test. LIVE blue CT133. STANDBY green CT135 synced at `1f5318d`. iOS build 19. Android version code 25. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.1
 - ✅ Shipped v1.55.0 (`0d744bf`). Start, then Finished. A new assignee or a return to the pool shows Start again. qa-01 full suite 109 passed, plus the start test. LIVE blue CT133. STANDBY green CT135 synced. iOS build 17. Android version code 24. Tag https://github.com/heybearc/ldc-tools/releases/tag/v1.55.0
@@ -76,14 +76,13 @@ References, whole-group work alerts, and Cloudigan Mail are on STANDBY. qa-01 fu
 - ✅ `Host ldc` now points at blue `10.92.3.34`
 
 ### Exact Next Command
-Retry the iOS lane, then Android. Tag v1.56.0, deploy STANDBY, switch, sync. Hub dates stay paused.
+Retry the iOS lane only. Android version code 26 is already on the Play internal track. Tag v1.56.0, switch, sync. Hub dates stay paused.
 
 ---
 
 ## Known Issues
-- undeployed work on branch main: `34f5487` (v1.56.0 notes). Code through `dd933f4` is on STANDBY. Next: retry iOS, then Android, tag v1.56.0, `deploy_to_standby`, switch, sync.
-- iOS archive failed 2026-11-27. Xcode reported no error after actool was recycled. Build number was restored to 19. Do not switch until a store upload succeeds.
-- iOS 1.1.0 build 17 is on TestFlight. Android version code 24 is on the Play internal track. Play does not email new testers; send the internal opt-in link. Xcode 27 can deadlock in actool; `mobile/scripts/hold-asset-catalog-pipes.py` unblocks that pipe during the store lanes.
+- iOS archive still fails under xcodebuild. actool and ibtoold wait on each other. A standalone actool finishes after the remote handshake is written; the Xcode-spawned tool never reads it. Build number stayed 19. Do not switch until the iOS upload succeeds.
+- iOS 1.1.0 build 19 is the last TestFlight upload. Android version code 26 is on the Play internal track. Play does not email new testers; send the internal opt-in link.
 - Android 1.1.0 version code 15 is on the Play internal track. Expo Android cloud builds stay used up until 2026-12-01.
 - Phone feature flows passed 10/10 on the Android emulator. iOS Simulator 27.2 is installed. Those flows were not rerun on iOS.
 - 37 open crew requests have completion email turned off.
@@ -96,4 +95,4 @@ Retry the iOS lane, then Android. Tag v1.56.0, deploy STANDBY, switch, sync. Hub
 ---
 
 ## Exact Next Command
-Retry `npm run release:ios` from `mobile/`, then Android. Tag v1.56.0, deploy STANDBY, switch, sync. Hub dates stay paused.
+Retry `npm run release:ios` from `mobile/`. Android version code 26 is already uploaded. Tag v1.56.0, switch, sync. Hub dates stay paused.

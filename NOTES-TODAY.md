@@ -5,6 +5,15 @@ purpose: Scratchpad for today's discoveries (promote on /end-day)
 
 ## Today
 
+### Mid-day (2026-11-27)
+- LIVE is still v1.55.1 on blue CT133. STANDBY green CT135 is `537a264` (http://10.92.3.25:3001).
+- Android 1.1.0 version code 26 uploaded to the Play internal track. Commit `537a264`.
+- iOS archive still fails. xcodebuild's actool never finishes the catalog handshake. Build number stayed 19. No TestFlight upload.
+- Writing the remote handshake unblocks a standalone actool. The Xcode-spawned ibtoold waits in the error forwarder and never reads it.
+- Traffic was not switched. v1.56.0 is not tagged.
+- Open urgent feedback: 0. Hub dates stay paused.
+- Next: retry the iOS lane only, then tag, switch, and sync.
+
 ### Mid-day (2026-11-27, hard budget)
 - LIVE is still v1.55.1 on blue CT133. STANDBY green CT135 is `dd933f4` (http://10.92.3.25:3001).
 - References on the website and the phone. Whole group gets email, phone, and browser alerts when work is waiting. Assignee gets the same when someone else assigns them.
